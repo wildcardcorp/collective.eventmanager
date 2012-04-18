@@ -3,7 +3,7 @@ import os
 
 version = '1.0a1'
 
-setup(name='collective.conferencemanager',
+setup(name='collective.eventmanager',
       version=version,
       description="",
       long_description=open("README.txt").read() + "\n" +
