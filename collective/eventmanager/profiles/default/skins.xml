@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<object name="portal_skins">
+    <object name="event_manager"
+            meta_type="Filesystem Directory View"
+            directory="collective.eventmanager:skins/event_manager" />
+    <skin-path name="*">
+        <layer name="event_manager" based-on="Plone Default" insert-after="custom" />
+    </skin-path>
+</object>
