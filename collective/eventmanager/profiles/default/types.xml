@@ -3,4 +3,5 @@
     <object name="collective.eventmanager.Session" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.TravelAccommodation" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.LodgingAccommodation" meta_type="Dexterity FTI" />
+    <object name="collective.eventmanager.Registrant" meta_type="Dexterity FTI" />
 </object>

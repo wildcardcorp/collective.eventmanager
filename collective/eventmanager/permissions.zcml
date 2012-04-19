@@ -21,4 +21,8 @@
         id="collective.eventmanager.AddLodgingAccommodation"
         title="Event Manager: Add Lodging Accommodation"
         />
+    <permission
+        id="collective.eventmanager.AddRegistrant"
+        title="Event Manager: Add Registrant"
+        />
 </configure>
