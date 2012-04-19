@@ -27,7 +27,6 @@ setup(name='collective.eventmanager',
           'setuptools',
           # -*- Extra requirements: -*-
           'Products.CMFPlone',
-          'archetypes.schemaextender',
           'plone.app.dexterity [grok]',
           'plone.app.referenceablebehavior',
           'plone.app.relationfield',

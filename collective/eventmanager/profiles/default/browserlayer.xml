@@ -1,4 +1,0 @@
-<layers>
-    <layer name="collective.eventmanager"
-           interface="collective.eventmanager.interfaces.IEventManagerLayer" />
-</layers>
