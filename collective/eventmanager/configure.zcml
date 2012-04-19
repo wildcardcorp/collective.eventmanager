@@ -22,7 +22,11 @@
   <!-- -*- extra stuff goes here -*- -->
 
   <adapter
-    name="EventManager.EventExtender"
+    name="collective.eventmanager.EventModifier"
+    factory=".extender.EventExtender"
+    provides="archetypes.schemaextender.interfaces.ISchemaModifier" />
+  <adapter
+    name="collective.eventmanager.EventExtender"
     factory=".extender.EventExtender"
     provides="archetypes.schemaextender.interfaces.ISchemaExtender" />
 
