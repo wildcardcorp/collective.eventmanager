@@ -5,5 +5,8 @@
 
     <!-- Define new permissions -->
 
-   
+    <permission
+        id="collective.eventmanager.AddEvent"
+        title="Event Manager: Add Event"
+        />
 </configure>
