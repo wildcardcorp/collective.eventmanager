@@ -4,4 +4,6 @@
     i18n_domain="collective.eventmanager">
 
     <!-- Define new permissions -->
+
+   
 </configure>

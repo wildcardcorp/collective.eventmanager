@@ -8,6 +8,8 @@
   <includeDependencies package="." />
   <include file="permissions.zcml" />
 
+  <include package="archetypes.schemaextender" />
+
   <grok:grok package="." />
 
   <genericsetup:registerProfile
@@ -18,5 +20,10 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
   <!-- -*- extra stuff goes here -*- -->
+
+  <adapter
+    name="EventManager.EventExtender"
+    factory=".extender.EventExtender"
+    provides="archetypes.schemaextender.interfaces.ISchemaExtender" />
 
 </configure>

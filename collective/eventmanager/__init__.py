@@ -1,5 +1,5 @@
 # -*- extra stuff goes here -*-
 
-from zope.i18messageid import MessageFactory
+from zope.i18nmessageid import MessageFactory
 EventManagerMessageFactory = \
     MessageFactory('collective.eventmanager')

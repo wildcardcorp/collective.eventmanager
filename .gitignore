@@ -1,4 +1,4 @@
 *.pyc
 *.pyo
-collective.conferencemanager.egg-info/*
+collective.eventmanager.egg-info/*
 
