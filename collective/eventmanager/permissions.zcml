@@ -9,4 +9,16 @@
         id="collective.eventmanager.AddEvent"
         title="Event Manager: Add Event"
         />
+    <permission
+        id="collective.eventmanager.AddSession"
+        title="Event Manager: Add Session"
+        />
+    <permission
+        id="collective.eventmanager.AddTravelAccommodation"
+        title="Event Manager: Add Travel Accommodation"
+        />
+    <permission
+        id="collective.eventmanager.AddLodgingAccommodation"
+        title="Event Manager: Add Lodging Accommodation"
+        />
 </configure>

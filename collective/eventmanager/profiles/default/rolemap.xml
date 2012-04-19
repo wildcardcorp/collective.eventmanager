@@ -1,7 +1,25 @@
 <?xml version="1.0"?>
 <rolemap>
     <permissions>
-        <permission name="Event Manager: Add Event" acquire="False">
+        <permission name="Event Manager: Add Event" acquire="True">
+            <role name="Manager" />
+            <role name="Site Administrator" />
+            <role name="Owner" />
+            <role name="Contributor" />
+        </permission>
+        <permission name="Event Manager: Add Session" acquire="True">
+            <role name="Manager" />
+            <role name="Site Administrator" />
+            <role name="Owner" />
+            <role name="Contributor" />
+        </permission>
+        <permission name="Event Manager: Add Travel Accommodation" acquire="True">
+            <role name="Manager" />
+            <role name="Site Administrator" />
+            <role name="Owner" />
+            <role name="Contributor" />
+        </permission>
+        <permission name="Event Manager: Add Lodging Accommodation" acquire="True">
             <role name="Manager" />
             <role name="Site Administrator" />
             <role name="Owner" />
