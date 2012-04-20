@@ -1,27 +1,23 @@
 from five import grok
 from zope import schema
 from plone.directives import form
+from zope.app.container.interfaces import IObjectAddedEvent
 
 from plone.namedfile.field import NamedBlobFile
-from plone.app.textfield import RichText
 
 from collective.eventmanager import EventManagerMessageFactory as _
+from collective.eventmanager.registrant import registrantFormGen
 
 
 class IEMEvent(form.Schema):
     """An event"""
 
-    name = schema.TextLine(
+    title = schema.TextLine(
             title=_(u"Event Name"),
-            description=_(u"Name of the event as displayed to users"),
-            required=True,
         )
 
-    description = RichText(
+    description = schema.Text(
             title=_(u"Description/Notes"),
-            description=_(u"Description or notes to be displayed about the "
-                            + u"event."),
-            required=False,
         )
 
     startdate = schema.Datetime(
@@ -113,7 +109,7 @@ class IEMEvent(form.Schema):
             required=False,
         )
 
-    contactDetails = RichText(
+    contactDetails = schema.Text(
             title=_(u"Contact/Presenter Details"),
             description=_(u"Put information about the contact/presentor, "
                             + u"including phone, email, twitter handle, and "
@@ -147,7 +143,7 @@ class IEMEvent(form.Schema):
             required=False,
             default=_(u"A New Event is Available"),
         )
-    announcementEMailBody = RichText(
+    announcementEMailBody = schema.Text(
             title=_(u"Announcement EMail Body"),
             description=_(u"The content of the EMail announcing the event"),
             required=False,
@@ -163,7 +159,7 @@ class IEMEvent(form.Schema):
             required=True,
             default=_(u"Registration Complete"),
         )
-    thankYouEMailBody = RichText(
+    thankYouEMailBody = schema.Text(
             title=_(u"Thank You EMail Body"),
             description=_(u"The content of the EMail a person receives after "
                             + u"registering for the event, NOTE: this message "
@@ -197,7 +193,7 @@ class IEMEvent(form.Schema):
             required=False,
             default=_(u"Please confirm your registration"),
         )
-    confirmationEMailBody = RichText(
+    confirmationEMailBody = schema.Text(
             title=_(u"Confirmation EMail Body"),
             description=_(u"The content of the email sent on the confirmation "
                             + u"date and time"),
@@ -245,7 +241,7 @@ class IEMEvent(form.Schema):
             required=False,
             default=_(u"We're sorry, but registration is full"),
         )
-    registrationFullEMailBody = RichText(
+    registrationFullEMailBody = schema.Text(
             title=_(u"Registration Full EMail Body"),
             description=_(u"The content of the EMail a person receives when "
                             + u"registration is full and the waiting list "
@@ -272,7 +268,7 @@ class IEMEvent(form.Schema):
             required=False,
             default=_(u"You have been placed on a waiting list"),
         )
-    waitingListEMailBody = RichText(
+    waitingListEMailBody = schema.Text(
             title=_(u"Waiting List EMail Body"),
             description=_(u"The content of the EMail a person receives when "
                             + u"registration is full and they have been put "
@@ -293,7 +289,7 @@ class IEMEvent(form.Schema):
             required=False,
             default=_(u"Registration is available"),
         )
-    offWaitingListEMailBody = RichText(
+    offWaitingListEMailBody = schema.Text(
             title=_(u"Off Waiting List EMail Body"),
             description=_(u"When a person has been placed on the waiting "
                             + u"list, this is the content of the email that "
@@ -305,6 +301,25 @@ class IEMEvent(form.Schema):
                         + u"interested in attending, you can complete your "
                         + u"registration by following the instructions below"),
         )
+
+
+@grok.subscribe(IEMEvent, IObjectAddedEvent)
+def addRegistrantFormsFolder(emevent, event):
+    """Adds a PloneFormGen FormFolder to the EM Event to house registrant
+    information"""
+    # add the folder to the EM Event
+    emevent.invokeFactory('FormFolder', 'registrants')
+    context = emevent['registrants']
+
+    # delete auto-generated fields
+    context._delObject('replyto')
+    context._delObject('topic')
+    context._delObject('comments')
+    context._delObject('mailer')
+    context._delObject('thank-you')
+
+    # add fields to the form for generating a registrant!
+    registrantFormGen(context)
 
 
 class View(grok.View):

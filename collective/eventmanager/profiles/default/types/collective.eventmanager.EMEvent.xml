@@ -19,7 +19,7 @@
         <element value="collective.eventmanager.Session" />
         <element value="collective.eventmanager.TravelAccommodation" />
         <element value="collective.eventmanager.LodgingAccommodation" />
-        <element value="collective.eventmanager.Registrant" />
+        <element value="FormFolder" />
     </property>
 
     <!-- Schema, class and security -->

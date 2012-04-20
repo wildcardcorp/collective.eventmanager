@@ -5,6 +5,24 @@ from plone.directives import form
 from collective.eventmanager import EventManagerMessageFactory as _
 
 
+def registrantFormGen(context):
+    """Adds the appropriate fields to generate a Registrant from a PloneFormGen
+    Form"""
+
+    # NAME
+    context.invokeFactory('FormStringField', 'name')
+    field = context['name']
+    field.setTitle("Name")
+    field.setDescription("Please enter your full name")
+
+    # EMAIL ADDRESS
+    context.invokeFactory('FormStringField', 'email')
+    field = context['email']
+    field.setTitle("EMail Address")
+    field.setDescription("Please enter a valid email address you can be "
+                            + "contacted with")
+
+
 class IRegistrant(form.Schema):
     """An individual who has registered for an event"""
 
