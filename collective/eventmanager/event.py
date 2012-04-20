@@ -17,7 +17,7 @@ class IEMEvent(form.Schema):
             required=True,
         )
 
-    description = schema.Text(
+    description = RichText(
             title=_(u"Description/Notes"),
             description=_(u"Description or notes to be displayed about the "
                             + u"event."),
@@ -100,7 +100,26 @@ class IEMEvent(form.Schema):
             description=_(u"Hide the event from the public calendar, potential"
                             + u" registrants must be either added manually or "
                             + u"receive an announcement email containing a "
-                            + u"registration link")
+                            + u"registration link"),
+            required=True,
+            default=False,
+        )
+
+    # === CONTACT/PRESENTER ===
+    contactName = schema.TextLine(
+            title=_(u"Contact/Presenter Name"),
+            description=_(u"A name for the primary contact or presenter of "
+                            + u"this event"),
+            required=False,
+        )
+
+    contactDetails = RichText(
+            title=_(u"Contact/Presenter Details"),
+            description=_(u"Put information about the contact/presentor, "
+                            + u"including phone, email, twitter handle, and "
+                            + u"any other descriptive information about the "
+                            + u"person"),
+            required=False,
         )
 
     # === ANNOUNCEMENT EMAIL ===

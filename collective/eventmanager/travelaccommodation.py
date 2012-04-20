@@ -8,6 +8,13 @@ from collective.eventmanager import EventManagerMessageFactory as _
 class ITravelAccommodation(form.Schema):
     """An accomodation made for traveling"""
 
+    location = schema.TextLine(
+            title=_(u"Location"),
+            description=_(u"Address that will be automatically linked to a "
+                            + u"Google Map"),
+            required=False,
+        )
+
 
 class View(grok.View):
     """Default view (called "@@view"") for a travel accommodation.
