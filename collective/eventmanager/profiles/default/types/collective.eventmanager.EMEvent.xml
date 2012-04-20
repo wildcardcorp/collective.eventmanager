@@ -20,6 +20,7 @@
         <element value="collective.eventmanager.TravelAccommodation" />
         <element value="collective.eventmanager.LodgingAccommodation" />
         <element value="FormFolder" />
+        <element value="Folder" />
     </property>
 
     <!-- Schema, class and security -->

@@ -22,6 +22,23 @@ def registrantFormGen(context):
     field.setDescription("Please enter a valid email address you can be "
                             + "contacted with")
 
+    # CUSTOM SCRIPT ADAPTER
+    # Saves results
+    context.invokeFactory('FormCustomScriptAdapter', 'registrantsaver')
+    field = context['registrantsaver']
+    field.setTitle("Save Registrant")
+    field.setScriptBody("""
+target = context.aq_inner.aq_parent.aq_parent.registrants
+form = request.form
+from DateTime import DateTime
+uid = str(DateTime().millis())
+target.invokeFactory('collective.eventmanager.Registrant',
+                     id=uid,
+                     title=form['name'])
+obj = target[uid]
+obj.setDescription(form['email'])
+obj.reindexObject()""")
+
 
 class IRegistrant(form.Schema):
     """An individual who has registered for an event"""

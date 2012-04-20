@@ -307,9 +307,13 @@ class IEMEvent(form.Schema):
 def addRegistrantFormsFolder(emevent, event):
     """Adds a PloneFormGen FormFolder to the EM Event to house registrant
     information"""
-    # add the folder to the EM Event
-    emevent.invokeFactory('FormFolder', 'registrants')
-    context = emevent['registrants']
+
+    # add a regular folder to hold registrant types
+    emevent.invokeFactory('Folder', 'registrants')
+
+    # add the forms folder to the EM Event
+    emevent.invokeFactory('FormFolder', 'registrantform')
+    context = emevent['registrantform']
 
     # delete auto-generated fields
     context._delObject('replyto')
