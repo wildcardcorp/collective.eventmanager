@@ -1,37 +1,32 @@
 <?xml version="1.0"?>
 <object
-    name="collective.eventmanager.EMEvent"
+    name="collective.eventmanager.RegistrantFolder"
     meta_type="Dexterity FTI"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     i18n:domain="collective.eventmanager">
 
     <!-- Basic properties -->
-    <property name="title" i18n:translate="">EM Event</property>
-    <property name="description" i18n:translate="">An event</property>
+    <property name="title" i18n:translate="">Registrant Folder</property>
+    <property name="description" i18n:translate="">A container for registrants.</property>
     <property name="allow_discussion">False</property>
 
     <!-- Hierarchy control -->
-    <property name="global_allow">True</property>
+    <property name="global_allow">False</property>
     <property name="filter_content_types">True</property>
     <property name="allowed_content_types">
-        <element value="Document" />
-        <element value="Image" />
-        <element value="collective.eventmanager.SessionFolder" />
-        <element value="collective.eventmanager.TravelAccommodationFolder" />
-        <element value="collective.eventmanager.LodgingAccommodationFolder" />
-        <element value="collective.eventmanager.RegistrantFolder" />
-        <element value="FormFolder" />
+        <element value="collective.eventmanager.Registrant" />
     </property>
 
     <!-- Schema, class and security -->
-    <property name="schema">collective.eventmanager.event.IEMEvent</property>
+    <property name="schema">collective.eventmanager.registrantfolder.IRegistrantFolder</property>
     <property name="klass">plone.dexterity.content.Container</property>
-    <property name="add_permission">collective.eventmanager.AddEvent</property>
+    <property name="add_permission">collective.eventmanager.AddRegistrantFolder</property>
 
     <!-- enabled behaviors -->
     <property name="behaviors">
         <element value="plone.app.content.interfaces.INameFromTitle" />
         <element value="plone.app.referenceablebehavior.referenceable.IReferenceable" />
+        <element value="plone.app.dexterity.behaviors.metadata.IDublinCore" />
     </property>
 
     <!-- Views and aliases -->

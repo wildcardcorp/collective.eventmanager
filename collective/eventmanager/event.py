@@ -304,16 +304,29 @@ class IEMEvent(form.Schema):
 
 
 @grok.subscribe(IEMEvent, IObjectAddedEvent)
-def addRegistrantFormsFolder(emevent, event):
-    """Adds a PloneFormGen FormFolder to the EM Event to house registrant
-    information"""
+def addFoldersForEventFormsFolder(emevent, event):
+    """Adds the forms and folders required for an emevent"""
 
-    # add a regular folder to hold registrant types
-    emevent.invokeFactory('Folder', 'registrants')
+    # add a folder to hold sessions
+    emevent.invokeFactory('collective.eventmanager.SessionFolder', 'Sessions')
+
+    # add a folder to hold registrant types
+    emevent.invokeFactory(
+        'collective.eventmanager.RegistrantFolder',
+        'Registrants')
+
+    # add a folder to hold travel accommodations
+    emevent.invokeFactory(
+        'collective.eventmanager.TravelAccommodationFolder',
+        'Travel Accommodations')
+
+    # add a folder to hold lodging accommodations
+    emevent.invokeFactory('collective.eventmanager.LodgingAccommodationFolder',
+                          'Lodging Accommodations')
 
     # add the forms folder to the EM Event
-    emevent.invokeFactory('FormFolder', 'registrantform')
-    context = emevent['registrantform']
+    emevent.invokeFactory('FormFolder', 'Registrant Form')
+    context = emevent['Registrant Form']
 
     # delete auto-generated fields
     context._delObject('replyto')

@@ -13,7 +13,19 @@
             <role name="Owner" />
             <role name="Contributor" />
         </permission>
+        <permission name="Event Manager: Add Session Folder" acquire="True">
+            <role name="Manager" />
+            <role name="Site Administrator" />
+            <role name="Owner" />
+            <role name="Contributor" />
+        </permission>
         <permission name="Event Manager: Add Travel Accommodation" acquire="True">
+            <role name="Manager" />
+            <role name="Site Administrator" />
+            <role name="Owner" />
+            <role name="Contributor" />
+        </permission>
+        <permission name="Event Manager: Add Travel Accommodation Folder" acquire="True">
             <role name="Manager" />
             <role name="Site Administrator" />
             <role name="Owner" />
@@ -25,7 +37,19 @@
             <role name="Owner" />
             <role name="Contributor" />
         </permission>
+        <permission name="Event Manager: Add Lodging Accommodation Folder" acquire="True">
+            <role name="Manager" />
+            <role name="Site Administrator" />
+            <role name="Owner" />
+            <role name="Contributor" />
+        </permission>
         <permission name="Event Manager: Add Registrant" acquire="True">
+            <role name="Manager" />
+            <role name="Site Administrator" />
+            <role name="Owner" />
+            <role name="Contributor" />
+        </permission>
+        <permission name="Event Manager: Add Registrant Folder" acquire="True">
             <role name="Manager" />
             <role name="Site Administrator" />
             <role name="Owner" />

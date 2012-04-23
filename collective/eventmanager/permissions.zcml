@@ -14,15 +14,31 @@
         title="Event Manager: Add Session"
         />
     <permission
+        id="collective.eventmanager.AddSessionFolder"
+        title="Event Manager: Add Session Folder"
+        />
+    <permission
         id="collective.eventmanager.AddTravelAccommodation"
         title="Event Manager: Add Travel Accommodation"
+        />
+    <permission
+        id="collective.eventmanager.AddTravelAccommodationFolder"
+        title="Event Manager: Add Travel Accommodation Folder"
         />
     <permission
         id="collective.eventmanager.AddLodgingAccommodation"
         title="Event Manager: Add Lodging Accommodation"
         />
     <permission
+        id="collective.eventmanager.AddLodgingAccommodationFolder"
+        title="Event Manager: Add Lodging Accommodation Folder"
+        />
+    <permission
         id="collective.eventmanager.AddRegistrant"
         title="Event Manager: Add Registrant"
+        />
+    <permission
+        id="collective.eventmanager.AddRegistrantFolder"
+        title="Event Manager: Add Registrant Folder"
         />
 </configure>

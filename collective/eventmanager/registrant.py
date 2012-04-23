@@ -28,7 +28,7 @@ def registrantFormGen(context):
     field = context['registrantsaver']
     field.setTitle("Save Registrant")
     field.setScriptBody("""
-target = context.aq_inner.aq_parent.aq_parent.registrants
+target = context.aq_inner.aq_parent.aq_parent.Registrants
 form = request.form
 from DateTime import DateTime
 uid = str(DateTime().millis())
