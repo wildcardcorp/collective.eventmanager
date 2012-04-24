@@ -1,16 +1,38 @@
 from five import grok
-from zope import schema
+from zope import schema, interface
 from plone.directives import form
 from zope.app.container.interfaces import IObjectAddedEvent
 
 from plone.namedfile.field import NamedBlobFile
+from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 
 from collective.eventmanager import EventManagerMessageFactory as _
-from collective.eventmanager.registrant import registrantFormGen
+#from collective.eventmanager.registrant import registrantFormGen
+
+
+class IRegistrationFieldRow(interface.Interface):
+    name = schema.TextLine(
+            title=u"Name",
+        )
+    fieldtype = schema.TextLine(
+            title=u"Field Type",
+        )
+    required = schema.TextLine(
+            title=u"Required",
+        )
 
 
 class IEMEvent(form.Schema):
     """An event"""
+
+    registrationfields = schema.List(
+            title=_(u"Registration Fields"),
+            value_type=DictRow(
+                    title=_(u"Registration Field"),
+                    schema=IRegistrationFieldRow
+                ),
+            required=False,
+        )
 
     title = schema.TextLine(
             title=_(u"Event Name"),
@@ -101,7 +123,36 @@ class IEMEvent(form.Schema):
             default=False,
         )
 
+    # === REGISTRATION FIELDS ===
+    #form.fieldset(
+    #        "registratinfields",
+    #        label=_(u"Registration Fields"),
+    #        fields=[
+    #            'registrationFields'
+    #        ]
+    #    )
+    #registrationFields = DataGridField(
+    #        label=_(u"Registration Fields"),
+    #        searchable=True,
+    #        columns=("name", "fieldtype", "required"),
+    #        widget=DataGridWidget(
+    #            columns={
+    #                'name': Column("Name"),
+    #                'fieldtype': Column("Field Type"),
+    #                'required': Column("Required")
+    #            }
+    #        ),
+    #    )
+
     # === CONTACT/PRESENTER ===
+    form.fieldset(
+            "contactsettings",
+            label=_(u"Contact Settings"),
+            fields=[
+                'contactName',
+                'contactDetails'
+            ]
+        )
     contactName = schema.TextLine(
             title=_(u"Contact/Presenter Name"),
             description=_(u"A name for the primary contact or presenter of "
@@ -119,6 +170,16 @@ class IEMEvent(form.Schema):
         )
 
     # === ANNOUNCEMENT EMAIL ===
+    form.fieldset(
+            "announcmentemailsettings",
+            label=_(u"Announcement EMail Settings"),
+            fields=[
+                'sendAnnouncementEMail',
+                'sendAnnouncementEMailTo',
+                'announcementEMailSubject',
+                'announcementEMailBody'
+            ])
+
     # sent to a list of email addresses, either manually by an administrator
     # or automatically when registration opens
     sendAnnouncementEMail = schema.Bool(
@@ -151,6 +212,14 @@ class IEMEvent(form.Schema):
         )
 
     # === THANK YOU EMAIL ===
+    form.fieldset(
+            "thankyouemailsettings",
+            label=_(u"Thank You EMail Settings"),
+            fields=[
+                'thankYouEMailSubject',
+                'thankYouEMailBody'
+            ])
+
     # this email gets sent as soon as a person has completed registration
     thankYouEMailSubject = schema.TextLine(
             title=_(u"Thank You EMail Subject"),
@@ -171,6 +240,20 @@ class IEMEvent(form.Schema):
         )
 
     # === CONFIRMATION EMAIL ===
+    form.fieldset(
+            "confirmationemailsettings",
+            label=_(u"Confirmation EMail Settings"),
+            fields=[
+                'sendConfirmationEMailAutomatically',
+                'sendConfirmationEMailOn',
+                'confirmationEMailSubject',
+                'confirmationEMailBody',
+                'confirmationEMailAttachment1',
+                'confirmationEMailAttachment2',
+                'confirmationEMailAttachment3',
+                'confirmationEMailAttachment4'
+            ])
+
     # this email gets sent either automatically on the date/time indicated,
     # or manually by an administrator.
     sendConfirmationEMailAutomatically = schema.Bool(
@@ -225,6 +308,15 @@ class IEMEvent(form.Schema):
         )
 
     # === REGISTRATION FULL EMAIL ===
+    form.fieldset(
+            "registrationfullemailsettings",
+            label=_(u"Registration Full EMail Settings"),
+            fields=[
+                'sendRegistrationFullEMail',
+                'registrationFullEMailSubject',
+                'registrationFullEMailBody'
+            ])
+
     sendRegistrationFullEMail = schema.Bool(
             title=_(u"Send Registration Full EMail"),
             description=_(u"If unchecked, no email indicating registration "
@@ -252,6 +344,17 @@ class IEMEvent(form.Schema):
         )
 
     # === WAITING LIST EMAIL ===
+    form.fieldset(
+            "waitinglistemailsettings",
+            label=_(u"Waiting List EMail Settings"),
+            fields=[
+                'sendWaitingListEMail',
+                'waitingListEMailSubject',
+                'waitingListEMailBody',
+                'offWaitingListEMailSubject',
+                'offWaitingListEMailBody'
+            ])
+
     sendWaitingListEMail = schema.Bool(
             title=_(u"Send Waiting List EMail"),
             description=_(u"If unchecked, no email will be sent indicating "
@@ -312,8 +415,8 @@ def addFoldersForEventFormsFolder(emevent, event):
 
     # add a folder to hold registrant types
     emevent.invokeFactory(
-        'collective.eventmanager.RegistrantFolder',
-        'Registrants')
+        'collective.eventmanager.RegistrationFolder',
+        'Registrations')
 
     # add a folder to hold travel accommodations
     emevent.invokeFactory(
@@ -325,18 +428,18 @@ def addFoldersForEventFormsFolder(emevent, event):
                           'Lodging Accommodations')
 
     # add the forms folder to the EM Event
-    emevent.invokeFactory('FormFolder', 'Registrant Form')
-    context = emevent['Registrant Form']
+    #emevent.invokeFactory('FormFolder', 'Registration Form')
+    #context = emevent['Registration Form']
 
     # delete auto-generated fields
-    context._delObject('replyto')
-    context._delObject('topic')
-    context._delObject('comments')
-    context._delObject('mailer')
-    context._delObject('thank-you')
+    #context._delObject('replyto')
+    #context._delObject('topic')
+    #context._delObject('comments')
+    #context._delObject('mailer')
+    #context._delObject('thank-you')
 
     # add fields to the form for generating a registrant!
-    registrantFormGen(context)
+    #registrantFormGen(context)
 
 
 class View(grok.View):

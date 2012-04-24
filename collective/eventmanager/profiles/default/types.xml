@@ -6,6 +6,6 @@
     <object name="collective.eventmanager.TravelAccommodationFolder" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.LodgingAccommodation" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.LodgingAccommodationFolder" meta_type="Dexterity FTI" />
-    <object name="collective.eventmanager.Registrant" meta_type="Dexterity FTI" />
-    <object name="collective.eventmanager.RegistrantFolder" meta_type="Dexterity FTI" />
+    <object name="collective.eventmanager.Registration" meta_type="Dexterity FTI" />
+    <object name="collective.eventmanager.RegistrationFolder" meta_type="Dexterity FTI" />
 </object>

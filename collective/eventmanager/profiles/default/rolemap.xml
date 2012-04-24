@@ -43,13 +43,13 @@
             <role name="Owner" />
             <role name="Contributor" />
         </permission>
-        <permission name="Event Manager: Add Registrant" acquire="True">
+        <permission name="Event Manager: Add Registration" acquire="True">
             <role name="Manager" />
             <role name="Site Administrator" />
             <role name="Owner" />
             <role name="Contributor" />
         </permission>
-        <permission name="Event Manager: Add Registrant Folder" acquire="True">
+        <permission name="Event Manager: Add Registration Folder" acquire="True">
             <role name="Manager" />
             <role name="Site Administrator" />
             <role name="Owner" />

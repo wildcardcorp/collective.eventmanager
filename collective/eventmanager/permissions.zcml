@@ -34,11 +34,11 @@
         title="Event Manager: Add Lodging Accommodation Folder"
         />
     <permission
-        id="collective.eventmanager.AddRegistrant"
-        title="Event Manager: Add Registrant"
+        id="collective.eventmanager.AddRegistration"
+        title="Event Manager: Add Registration"
         />
     <permission
-        id="collective.eventmanager.AddRegistrantFolder"
-        title="Event Manager: Add Registrant Folder"
+        id="collective.eventmanager.AddRegistrationFolder"
+        title="Event Manager: Add Registration Folder"
         />
 </configure>

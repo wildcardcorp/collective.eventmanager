@@ -1,24 +1,26 @@
 <?xml version="1.0"?>
 <object
-    name="collective.eventmanager.Registrant"
+    name="collective.eventmanager.RegistrationFolder"
     meta_type="Dexterity FTI"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     i18n:domain="collective.eventmanager">
 
     <!-- Basic properties -->
-    <property name="title" i18n:translate="">Registrant</property>
-    <property name="description" i18n:translate="">A person who has registered for the event</property>
+    <property name="title" i18n:translate="">Registration Folder</property>
+    <property name="description" i18n:translate="">A container for registrations.</property>
     <property name="allow_discussion">False</property>
 
     <!-- Hierarchy control -->
     <property name="global_allow">False</property>
     <property name="filter_content_types">True</property>
-    <property name="allowed_content_types"></property>
+    <property name="allowed_content_types">
+        <element value="collective.eventmanager.Registration" />
+    </property>
 
     <!-- Schema, class and security -->
-    <property name="schema">collective.eventmanager.registrant.IRegistrant</property>
+    <property name="schema">collective.eventmanager.registrationfolder.IRegistrationFolder</property>
     <property name="klass">plone.dexterity.content.Container</property>
-    <property name="add_permission">collective.eventmanager.AddRegistrant</property>
+    <property name="add_permission">collective.eventmanager.AddRegistrationFolder</property>
 
     <!-- enabled behaviors -->
     <property name="behaviors">

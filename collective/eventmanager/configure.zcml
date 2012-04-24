@@ -19,4 +19,13 @@
       />
   <!-- -*- extra stuff goes here -*- -->
 
+<!--
+  <plone:behavior
+    title="Registration Form"
+    description="Automatically generate registration form based on parent EM Event fields"
+    provides="collective.eventmanager.IRegistration"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    />
+  -->
+
 </configure>
