@@ -2,23 +2,38 @@ from five import grok
 from zope import schema, interface
 from plone.directives import form
 from zope.app.container.interfaces import IObjectAddedEvent
-
+from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from plone.namedfile.field import NamedBlobFile
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 
 from collective.eventmanager import EventManagerMessageFactory as _
-#from collective.eventmanager.registrant import registrantFormGen
+
+
+registrationRowAvailableFieldTypes = SimpleVocabulary(
+    [SimpleTerm(value=u'TextLine', title=u'Text Line'),
+     SimpleTerm(value=u'Text', title=u'Text Area'),
+     SimpleTerm(value=u'Float', title=u'Number'),
+     SimpleTerm(value=u'Bool', title=u'Check Box'),
+     SimpleTerm(value=u'Datetime', title=u'Date/Time'),
+     SimpleTerm(value=u'URI', title=u'URL')]
+    )
 
 
 class IRegistrationFieldRow(interface.Interface):
     name = schema.TextLine(
             title=u"Name",
+            required=True,
         )
-    fieldtype = schema.TextLine(
+
+    fieldtype = schema.Choice(
             title=u"Field Type",
+            vocabulary=registrationRowAvailableFieldTypes,
+            required=True,
         )
-    required = schema.TextLine(
-            title=u"Required",
+    required = schema.Bool(
+            title=u"Required?",
+            required=True,
+            default=True,
         )
 
 
