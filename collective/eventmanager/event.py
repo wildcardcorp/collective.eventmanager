@@ -25,16 +25,6 @@ class IRegistrationFieldRow(interface.Interface):
 class IEMEvent(form.Schema):
     """An event"""
 
-    form.widget(registrationfields=DataGridFieldFactory)
-    registrationfields = schema.List(
-            title=_(u"Registration Fields"),
-            value_type=DictRow(
-                    title=_(u"Registration Field"),
-                    schema=IRegistrationFieldRow
-                ),
-            required=False,
-        )
-
     title = schema.TextLine(
             title=_(u"Event Name"),
         )
@@ -125,25 +115,23 @@ class IEMEvent(form.Schema):
         )
 
     # === REGISTRATION FIELDS ===
-    #form.fieldset(
-    #        "registratinfields",
-    #        label=_(u"Registration Fields"),
-    #        fields=[
-    #            'registrationFields'
-    #        ]
-    #    )
-    #registrationFields = DataGridField(
-    #        label=_(u"Registration Fields"),
-    #        searchable=True,
-    #        columns=("name", "fieldtype", "required"),
-    #        widget=DataGridWidget(
-    #            columns={
-    #                'name': Column("Name"),
-    #                'fieldtype': Column("Field Type"),
-    #                'required': Column("Required")
-    #            }
-    #        ),
-    #    )
+    form.fieldset(
+            "registrationfields",
+            label=_(u"Registration Fields"),
+            fields=[
+                'registrationFields'
+            ]
+        )
+
+    form.widget(registrationFields=DataGridFieldFactory)
+    registrationFields = schema.List(
+            title=_(u"Registration Fields"),
+            value_type=DictRow(
+                    title=_(u"Registration Field"),
+                    schema=IRegistrationFieldRow
+                ),
+            required=False,
+        )
 
     # === CONTACT/PRESENTER ===
     form.fieldset(
