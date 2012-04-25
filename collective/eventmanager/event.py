@@ -25,6 +25,7 @@ class IRegistrationFieldRow(interface.Interface):
 class IEMEvent(form.Schema):
     """An event"""
 
+    form.widget(registrationfields=DataGridFieldFactory)
     registrationfields = schema.List(
             title=_(u"Registration Fields"),
             value_type=DictRow(
