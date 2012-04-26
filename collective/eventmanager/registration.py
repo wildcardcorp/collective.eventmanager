@@ -18,22 +18,24 @@ class IRegistration(form.Schema):
         )
 
 
+def addDynamicField(form, reg_fields):
+    for fielddata in reg_fields:
+        field = getattr(schema,
+                        fielddata['fieldtype'])(
+                            title=unicode(fielddata['name']),
+                            required=fielddata['required'])
+        field.__name__ = str(fielddata['name'])
+        field.interface = IRegistration
+        utils.add(form, field)
+
+
 class EditForm(dexterity.EditForm):
     grok.context(IRegistration)
 
     def updateFields(self):
         super(dexterity.EditForm, self).updateFields()
-
         em = self.context.__parent__.__parent__
-        fields = em.registrationFields
-        for fielddata in fields:
-            field = getattr(schema,
-                            fielddata['fieldtype'])(
-                                title=unicode(fielddata['name']),
-                                required=fielddata['required'])
-            field.__name__ = str(fielddata['name'])
-            field.interface = IRegistration
-            utils.add(self, field)
+        addDynamicField(em.registrationFields)
 
 
 class AddForm(dexterity.AddForm):
@@ -42,15 +44,7 @@ class AddForm(dexterity.AddForm):
     def updateFields(self):
         super(dexterity.AddForm, self).updateFields()
         em = self.context.__parent__
-        fields = em.registrationFields
-        for fielddata in fields:
-            field = getattr(schema,
-                            fielddata['fieldtype'])(
-                                title=unicode(fielddata['name']),
-                                required=fielddata['required'])
-            field.__name__ = str(fielddata['name'])
-            field.interface = IRegistration
-            utils.add(self, field)
+        addDynamicField(em.registrationFields)
 
 
 class View(grok.View):
