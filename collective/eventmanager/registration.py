@@ -18,41 +18,6 @@ class IRegistration(form.Schema):
         )
 
 
-class EditForm(dexterity.EditForm):
-    grok.context(IRegistration)
-
-    def updateFields(self):
-        super(dexterity.EditForm, self).updateFields()
-
-        em = self.context.__parent__.__parent__
-        fields = em.registrationFields
-        for fielddata in fields:
-            field = getattr(schema,
-                            fielddata['fieldtype'])(
-                                title=unicode(fielddata['name']),
-                                required=fielddata['required'])
-            field.__name__ = str(fielddata['name'])
-            field.interface = IRegistration
-            utils.add(self, field)
-
-
-class AddForm(dexterity.AddForm):
-    grok.name('collective.eventmanager.Registration')
-
-    def updateFields(self):
-        super(dexterity.AddForm, self).updateFields()
-        em = self.context.__parent__
-        fields = em.registrationFields
-        for fielddata in fields:
-            field = getattr(schema,
-                            fielddata['fieldtype'])(
-                                title=unicode(fielddata['name']),
-                                required=fielddata['required'])
-            field.__name__ = str(fielddata['name'])
-            field.interface = IRegistration
-            utils.add(self, field)
-
-
 class View(grok.View):
     """Default view (called "@@view"") for an event.
 
@@ -63,8 +28,31 @@ class View(grok.View):
     grok.require('zope2.View')
     grok.name('view')
 
-    def __call__(self):
-        import pdb;pdb.set_trace()
 
-    def update(self):
-        import pdb;pdb.set_trace()
+def addDynamicField(form, reg_fields):
+    for fielddata in reg_fields:
+        field = getattr(schema,
+                        fielddata['fieldtype'])(
+                            title=unicode(fielddata['name']),
+                            required=fielddata['required'])
+        field.__name__ = str(fielddata['name'])
+        field.interface = IRegistration
+        utils.add(form, field)
+
+
+class EditForm(dexterity.EditForm):
+    grok.context(IRegistration)
+
+    def updateFields(self):
+        super(dexterity.EditForm, self).updateFields()
+        em = self.context.__parent__.__parent__
+        addDynamicField(em.registrationFields)
+
+
+class AddForm(dexterity.AddForm):
+    grok.name('collective.eventmanager.Registration')
+
+    def updateFields(self):
+        super(dexterity.AddForm, self).updateFields()
+        em = self.context.__parent__
+        addDynamicField(em.registrationFields)
