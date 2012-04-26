@@ -31,7 +31,18 @@ setup(name='collective.eventmanager',
           'plone.app.referenceablebehavior',
           'plone.app.relationfield',
           'plone.namedfile [blobs]',
-          'Products.PloneFormGen',
+          'collective.z3cform.datagridfield',
+
+          'plone.directives.dexterity',
+          'plone.directives.form',
+
+          # for creating a custom behavior
+          #'plone.behavior',
+          #'plone.directives.form',
+          #'zope.schema',
+          #'zope.interface',
+          #'zope.component',
+          #'rwproperty',
       ],
       extras_require={
             'test': ['plone.app.testing', ]
