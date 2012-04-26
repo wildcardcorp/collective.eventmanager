@@ -24,7 +24,7 @@
     <property name="behaviors">
         <element value="plone.app.content.interfaces.INameFromTitle" />
         <element value="plone.app.referenceablebehavior.referenceable.IReferenceable" />
-        <element value="collective.eventmanager.behaviors.IRegistrationFields" />
+        <!--<element value="collective.eventmanager.behaviors.IRegistrationFields" />-->
     </property>
 
     <!-- Views and aliases -->

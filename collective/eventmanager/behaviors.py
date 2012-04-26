@@ -13,11 +13,11 @@ from collective.eventmanager import EventManagerMessageFactory as _
 class IRegistrationFields(form.Schema):
     """Add fields based on parent EM Event Registration Fields field :)"""
 
-    name = schema.TextLine(
-            title=_(u"Test Field [Title]"),
+    title = schema.TextLine(
+            title=_(u"Name"),
         )
-    email = schema.Text(
-            title=_(u"Test Field [Description]"),
+    description = schema.Text(
+            title=_(u"EMail Address"),
         )
 
 alsoProvides(IRegistrationFields, form.IFormFieldProvider)
@@ -25,23 +25,23 @@ alsoProvides(IRegistrationFields, form.IFormFieldProvider)
 
 class RegistrationFields(object):
     implements(IRegistrationFields)
-    adapts(IDublinCore)
+    #adapts(IDublinCore)
 
     def __init__(self, context):
         self.context = context
 
     @getproperty
-    def name(self):
+    def title(self):
         return "HARD CODED NAME"
 
     @setproperty
-    def name(self, value):
+    def title(self, value):
         pass
 
     @getproperty
-    def email(self):
+    def description(self):
         return "HARD CODED EMAIL"
 
     @setproperty
-    def email(self, value):
+    def description(self, value):
         pass

@@ -6,11 +6,11 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.eventmanager">
 
-
+<!--
   <include package="plone.behavior" file="meta.zcml" />
   <include package="plone.directives.form" file="meta.zcml" />
   <include package="plone.directives.form" />
-
+-->
 
   <includeDependencies package="." />
   <include file="permissions.zcml" />
@@ -26,13 +26,13 @@
       />
   <!-- -*- extra stuff goes here -*- -->
 
-
+<!--
   <plone:behavior
     title="Registration Form"
     description="Automatically generate registration form fields based on parent EM Event fields"
     provides="collective.eventmanager.behaviors.IRegistrationFields"
     factory="collective.eventmanager.behaviors.RegistrationFields"
     />
-
+-->
 
 </configure>

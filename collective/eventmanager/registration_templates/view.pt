@@ -10,8 +10,7 @@
 <metal:content-core fill-slot="content-core">
     <metal:content-core define-macro="content-core">
 
-        <span tal:replace="${context}/name" />
-        - <span tal:replace="${context}/email" />
+<span tal:replace="string:${context/testline}" />
 
     </metal:content-core>
 </metal:content-core>
