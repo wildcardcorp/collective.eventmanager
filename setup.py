@@ -32,6 +32,7 @@ setup(name='collective.eventmanager',
           'plone.app.relationfield',
           'plone.namedfile [blobs]',
           'Products.PloneFormGen',
+          'collective.z3cform.datagridfield'
       ],
       extras_require={
             'test': ['plone.app.testing', ]
