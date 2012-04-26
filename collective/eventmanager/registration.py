@@ -18,6 +18,17 @@ class IRegistration(form.Schema):
         )
 
 
+class View(grok.View):
+    """Default view (called "@@view"") for an event.
+
+    The associated template is found in registration_templates/view.pt
+    """
+
+    grok.context(IRegistration)
+    grok.require('zope2.View')
+    grok.name('view')
+
+
 def addDynamicField(form, reg_fields):
     for fielddata in reg_fields:
         field = getattr(schema,
@@ -45,17 +56,3 @@ class AddForm(dexterity.AddForm):
         super(dexterity.AddForm, self).updateFields()
         em = self.context.__parent__
         addDynamicField(em.registrationFields)
-
-
-class View(grok.View):
-    """Default view (called "@@view"") for an event.
-
-    The associated template is found in registration_templates/view.pt
-    """
-
-    grok.context(IRegistration)
-    grok.require('zope2.View')
-    grok.name('view')
-
-    #def initialize(self):
-    #    import pdb;pdb.set_trace()
