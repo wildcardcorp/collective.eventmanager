@@ -24,11 +24,17 @@ class EditForm(dexterity.EditForm):
     def updateFields(self):
         super(dexterity.EditForm, self).updateFields()
 
-        field = schema.TextLine(title=_(u"TEST FIELD"))
-        field.__name__ = "testline"
-        field.interface = IRegistration
-        utils.add(self, field)
-        #processFields(self, schema, permissionChecks=True)
+        em = self.context._parent_._parent_
+        fields = em.registrationFields
+        for fielddata in fields:
+            field = getattr(schema,
+                            fielddata['fieldtype'])(
+                                title=unicode(fielddata['name']),
+                                required=fielddata['required'])
+            field.__name__ = str(fielddata['name'])
+            field.interface = IRegistration
+            utils.add(self, field)
+
 
 class AddForm(dexterity.AddForm):
     grok.context(IRegistration)
@@ -36,10 +42,16 @@ class AddForm(dexterity.AddForm):
     def updateFields(self):
         super(dexterity.AddForm, self).updateFields()
 
-        field = schema.TextLine(title=_(u"TEST FIELD"))
-        field.__name__ = "testline"
-        field.interface = IRegistration
-        utils.add(self, field)
+        em = self.context._parent_._parent_
+        fields = em.registrationFields
+        for fielddata in fields:
+            field = getattr(schema,
+                            fielddata['fieldtype'])(
+                                title=unicode(fielddata['name']),
+                                required=fielddata['required'])
+            field.__name__ = str(fielddata['name'])
+            field.interface = IRegistration
+            utils.add(self, field)
 
 
 class View(grok.View):
