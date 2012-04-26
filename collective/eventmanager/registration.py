@@ -63,5 +63,8 @@ class View(grok.View):
     grok.require('zope2.View')
     grok.name('view')
 
-    #def initialize(self):
-    #    import pdb;pdb.set_trace()
+    def __call__(self):
+        import pdb;pdb.set_trace()
+
+    def update(self):
+        import pdb;pdb.set_trace()
