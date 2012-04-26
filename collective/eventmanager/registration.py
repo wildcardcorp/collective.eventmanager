@@ -24,7 +24,7 @@ class EditForm(dexterity.EditForm):
     def updateFields(self):
         super(dexterity.EditForm, self).updateFields()
 
-        em = self.context._parent_._parent_
+        em = self.context.__parent__.__parent__
         fields = em.registrationFields
         for fielddata in fields:
             field = getattr(schema,
@@ -37,12 +37,11 @@ class EditForm(dexterity.EditForm):
 
 
 class AddForm(dexterity.AddForm):
-    grok.context(IRegistration)
+    grok.name('collective.eventmanager.Registration')
 
     def updateFields(self):
         super(dexterity.AddForm, self).updateFields()
-
-        em = self.context._parent_._parent_
+        em = self.context.__parent__
         fields = em.registrationFields
         for fielddata in fields:
             field = getattr(schema,
