@@ -24,7 +24,7 @@
     <property name="behaviors">
         <element value="plone.app.content.interfaces.INameFromTitle" />
         <element value="plone.app.referenceablebehavior.referenceable.IReferenceable" />
-        <element value="plone.app.dexterity.behaviors.metadata.IDublinCore" />
+        <element value="collective.eventmanager.behaviors.IRegistrationFields" />
     </property>
 
     <!-- Views and aliases -->

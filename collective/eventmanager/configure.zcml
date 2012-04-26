@@ -1,9 +1,16 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:plone="http://namespaces.plone.org/plone"
     xmlns:grok="http://namespaces.zope.org/grok"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.eventmanager">
+
+
+  <include package="plone.behavior" file="meta.zcml" />
+  <include package="plone.directives.form" file="meta.zcml" />
+  <include package="plone.directives.form" />
+
 
   <includeDependencies package="." />
   <include file="permissions.zcml" />
@@ -19,13 +26,13 @@
       />
   <!-- -*- extra stuff goes here -*- -->
 
-<!--
+
   <plone:behavior
     title="Registration Form"
-    description="Automatically generate registration form based on parent EM Event fields"
-    provides="collective.eventmanager.IRegistration"
-    for="plone.dexterity.interfaces.IDexterityContent"
+    description="Automatically generate registration form fields based on parent EM Event fields"
+    provides="collective.eventmanager.behaviors.IRegistrationFields"
+    factory="collective.eventmanager.behaviors.RegistrationFields"
     />
-  -->
+
 
 </configure>

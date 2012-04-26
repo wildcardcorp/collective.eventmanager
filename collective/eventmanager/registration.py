@@ -28,3 +28,6 @@ class View(grok.View):
     grok.context(IRegistration)
     grok.require('zope2.View')
     grok.name('view')
+
+    #def initialize(self):
+    #    import pdb;pdb.set_trace()
