@@ -5,16 +5,14 @@ version = '1.0a1'
 
 setup(name='collective.eventmanager',
       version=version,
-      description="",
+      description="Event manager for plone.",
       long_description=open("README.txt").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
-      # Get more strings from
-      # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
         "Framework :: Plone",
         "Programming Language :: Python",
         ],
-      keywords='',
+      keywords='plone event manager',
       author='Joel Kleier',
       author_email='joel.kleier@gmail.com',
       url='http://github.com/zombified/collective.eventmanager',
@@ -25,7 +23,6 @@ setup(name='collective.eventmanager',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          # -*- Extra requirements: -*-
           'Products.CMFPlone',
           'plone.app.dexterity [grok]',
           'plone.app.referenceablebehavior',

@@ -3,14 +3,9 @@
     xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:plone="http://namespaces.plone.org/plone"
     xmlns:grok="http://namespaces.zope.org/grok"
+    xmlns:five="http://namespaces.zope.org/five"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.eventmanager">
-
-<!--
-  <include package="plone.behavior" file="meta.zcml" />
-  <include package="plone.directives.form" file="meta.zcml" />
-  <include package="plone.directives.form" />
--->
 
   <includeDependencies package="." />
   <include file="permissions.zcml" />
@@ -21,18 +16,9 @@
       name="default"
       title="Event Manager"
       directory="profiles/default"
-      description="Installs the collective.eventmanager package"
+      description="Event management package for plone"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
   <!-- -*- extra stuff goes here -*- -->
-
-<!--
-  <plone:behavior
-    title="Registration Form"
-    description="Automatically generate registration form fields based on parent EM Event fields"
-    provides="collective.eventmanager.behaviors.IRegistrationFields"
-    factory="collective.eventmanager.behaviors.RegistrationFields"
-    />
--->
 
 </configure>
