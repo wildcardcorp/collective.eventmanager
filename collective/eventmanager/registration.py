@@ -76,7 +76,7 @@ class View(grok.View):
         return item['value']
 
 
-def addDynamicField(form, reg_fields):
+def addDynamicFields(form, reg_fields):
     for fielddata in reg_fields:
         field = getattr(schema, fielddata['fieldtype'])(
                     title=unicode(fielddata['name']),
@@ -92,7 +92,7 @@ class EditForm(dexterity.EditForm):
     def updateFields(self):
         super(dexterity.EditForm, self).updateFields()
         em = self.context.__parent__.__parent__
-        addDynamicField(self, em.registrationFields)
+        addDynamicFields(self, em.registrationFields)
 
 
 class AddForm(dexterity.AddForm):
@@ -101,4 +101,4 @@ class AddForm(dexterity.AddForm):
     def updateFields(self):
         super(dexterity.AddForm, self).updateFields()
         em = self.context.__parent__
-        addDynamicField(self, em.registrationFields)
+        addDynamicFields(self, em.registrationFields)
