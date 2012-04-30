@@ -29,17 +29,9 @@ setup(name='collective.eventmanager',
           'plone.app.relationfield',
           'plone.namedfile [blobs]',
           'collective.z3cform.datagridfield',
-
           'plone.directives.dexterity',
           'plone.directives.form',
-
-          # for creating a custom behavior
-          #'plone.behavior',
-          #'plone.directives.form',
-          #'zope.schema',
-          #'zope.interface',
-          #'zope.component',
-          #'rwproperty',
+          'Solgema.fullcalendar'
       ],
       extras_require={
             'test': ['plone.app.testing', ]

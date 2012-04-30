@@ -45,6 +45,9 @@ class View(grok.View):
         return fields
 
     def getDisplayValueFor(self, item):
+        if item['value'] == None:
+            return ''
+
         if item['fieldtype'] == 'Bool':
             return 'Yes' if item['value'] else 'No'
         elif item['fieldtype'] == 'URI':
@@ -52,8 +55,6 @@ class View(grok.View):
                    ">%s</a>" % (item['value'], item['value'], item['value'])
         elif item['fieldtype'] == 'Datetime':
             v = item['value']
-            if v is None:
-                return ''
 
             timestr = ''
             datestr = ''

@@ -5,6 +5,8 @@ from zope.app.container.interfaces import IObjectAddedEvent
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from plone.namedfile.field import NamedBlobFile
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
+from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
+from datetime import datetime
 
 from collective.eventmanager import EventManagerMessageFactory as _
 
@@ -37,7 +39,7 @@ class IRegistrationFieldRow(interface.Interface):
         )
 
 
-class IEMEvent(form.Schema):
+class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
     """An event"""
 
     title = schema.TextLine(
@@ -48,22 +50,34 @@ class IEMEvent(form.Schema):
             title=_(u"Description/Notes"),
         )
 
-    startdate = schema.Datetime(
+    start = schema.Datetime(
             title=_(u"Start Date/Time"),
             description=_(u"Date and time the Event starts"),
             required=True,
+            default=datetime.today()
         )
 
-    enddate = schema.Datetime(
+    end = schema.Datetime(
             title=_(u"End Date/Time"),
             description=_(u"Date and time the Event ends"),
             required=True,
+            default=datetime.today()
+        )
+
+    showSessions = schema.Bool(
+            title=_(u"Show Sessions"),
+            description=_(u"If checked, the em event display will be updated "
+                          u"with a session calendar showing all sessions "
+                          u"registered for the event"),
+            required=True,
+            default=True,
         )
 
     registrationOpen = schema.Datetime(
             title=_(u"Registration Open"),
             description=_(u"Date and time registration for the event is open"),
             required=True,
+            default=datetime.today()
         )
 
     registrationClosed = schema.Datetime(
@@ -417,6 +431,16 @@ def addFoldersForEventFormsFolder(emevent, event):
     # add a folder to hold sessions
     emevent.invokeFactory('collective.eventmanager.SessionFolder', 'Sessions')
 
+    # add an ATTopic to display a calendar for sessions
+    idval = emevent.invokeFactory('Topic', 'Session Calendar')
+    sessioncal = emevent[idval]
+    criterion = sessioncal.addCriterion('Type', 'ATPortalTypeCriterion')
+    criterion.setValue('Session')
+    #import pdb; pdb.set_trace()
+    criterion = sessioncal.addCriterion('Location', 'ATRelativePathCriterion')
+    criterion.setRelativePath('../Sessions')
+    sessioncal.setLayout('solgemafullcalendar_view')
+
     # add a folder to hold registrant types
     emevent.invokeFactory(
         'collective.eventmanager.RegistrationFolder',
@@ -430,20 +454,6 @@ def addFoldersForEventFormsFolder(emevent, event):
     # add a folder to hold lodging accommodations
     emevent.invokeFactory('collective.eventmanager.LodgingAccommodationFolder',
                           'Lodging Accommodations')
-
-    # add the forms folder to the EM Event
-    #emevent.invokeFactory('FormFolder', 'Registration Form')
-    #context = emevent['Registration Form']
-
-    # delete auto-generated fields
-    #context._delObject('replyto')
-    #context._delObject('topic')
-    #context._delObject('comments')
-    #context._delObject('mailer')
-    #context._delObject('thank-you')
-
-    # add fields to the form for generating a registrant!
-    #registrantFormGen(context)
 
 
 class View(grok.View):

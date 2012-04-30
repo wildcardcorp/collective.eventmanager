@@ -16,11 +16,11 @@
     <property name="allowed_content_types">
         <element value="Document" />
         <element value="Image" />
+        <element value="Topic" />
         <element value="collective.eventmanager.SessionFolder" />
         <element value="collective.eventmanager.TravelAccommodationFolder" />
         <element value="collective.eventmanager.LodgingAccommodationFolder" />
         <element value="collective.eventmanager.RegistrationFolder" />
-        <element value="FormFolder" />
     </property>
 
     <!-- Schema, class and security -->
@@ -32,6 +32,9 @@
     <property name="behaviors">
         <element value="plone.app.content.interfaces.INameFromTitle" />
         <element value="plone.app.referenceablebehavior.referenceable.IReferenceable" />
+        <element value='plone.app.dexterity.behaviors.metadata.ICategorization' />
+        <element value='plone.app.dexterity.behaviors.metadata.IPublication' />
+        <element value='plone.app.dexterity.behaviors.metadata.IOwnership' />
     </property>
 
     <!-- Views and aliases -->
