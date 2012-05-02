@@ -31,7 +31,8 @@ setup(name='collective.eventmanager',
           'collective.z3cform.datagridfield',
           'plone.directives.dexterity',
           'plone.directives.form',
-          'Solgema.fullcalendar'
+          'Solgema.fullcalendar',
+          'z3c.jbot',
       ],
       extras_require={
             'test': ['plone.app.testing', ]

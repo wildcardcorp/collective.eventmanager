@@ -4,11 +4,13 @@
     xmlns:plone="http://namespaces.plone.org/plone"
     xmlns:grok="http://namespaces.zope.org/grok"
     xmlns:five="http://namespaces.zope.org/five"
+    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.eventmanager">
 
   <includeDependencies package="." />
   <include file="permissions.zcml" />
+  <include package="z3c.jbot" file="meta.zcml" />
 
   <grok:grok package="." />
 
@@ -20,5 +22,9 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
   <!-- -*- extra stuff goes here -*- -->
+
+  <browser:jbot
+    directory="jbot"
+    />
 
 </configure>

@@ -437,7 +437,7 @@ def addFoldersForEventFormsFolder(emevent, event):
     criterion = sessioncal.addCriterion('Type', 'ATPortalTypeCriterion')
     criterion.setValue('Session')
     #import pdb; pdb.set_trace()
-    criterion = sessioncal.addCriterion('Location', 'ATRelativePathCriterion')
+    criterion = sessioncal.addCriterion('path', 'ATRelativePathCriterion')
     criterion.setRelativePath('../Sessions')
     sessioncal.setLayout('solgemafullcalendar_view')
 

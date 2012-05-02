@@ -1,4 +1,4 @@
 *.pyc
 *.pyo
 collective.eventmanager.egg-info/*
-
+.DS_Store
