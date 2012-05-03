@@ -24,7 +24,6 @@
   <!-- -*- extra stuff goes here -*- -->
 
   <browser:jbot
-    directory="jbot"
-    />
-
+      directory="jbot"
+      />
 </configure>

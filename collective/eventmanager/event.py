@@ -2,6 +2,7 @@ from five import grok
 from zope import schema, interface
 from plone.directives import form
 from zope.app.container.interfaces import IObjectAddedEvent
+from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from plone.namedfile.field import NamedBlobFile
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
@@ -64,11 +65,14 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             default=datetime.today()
         )
 
-    showSessions = schema.Bool(
-            title=_(u"Show Sessions"),
+    enableSessions = schema.Bool(
+            title=_(u"Enable Sessions"),
             description=_(u"If checked, the em event display will be updated "
                           u"with a session calendar showing all sessions "
-                          u"registered for the event"),
+                          u"registered for the event. <em>NOTE</em> if this "
+                          u"option is disabled after the event has been "
+                          u"created, the session folders will be deleted, "
+                          u"along with all sessions added to it."),
             required=True,
             default=True,
         )
@@ -155,6 +159,10 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
     form.widget(registrationFields=DataGridFieldFactory)
     registrationFields = schema.List(
             title=_(u"Registration Fields"),
+            description=_(u"All registrations have a name and email field. "
+                          u"Configure any additional fields you wish to "
+                          u"associated with a registration for this event "
+                          u"here."),
             value_type=DictRow(
                     title=_(u"Registration Field"),
                     schema=IRegistrationFieldRow
@@ -424,22 +432,35 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
         )
 
 
-@grok.subscribe(IEMEvent, IObjectAddedEvent)
-def addFoldersForEventFormsFolder(emevent, event):
-    """Adds the forms and folders required for an emevent"""
-
+def addSessionsFolder(emevent):
     # add a folder to hold sessions
     emevent.invokeFactory('collective.eventmanager.SessionFolder', 'Sessions')
 
-    # add an ATTopic to display a calendar for sessions
+
+def addSessionCalendarFolder(emevent):
+    # add an ATTopic to display a calendar for sessions, if
+    # sessions are enabled
     idval = emevent.invokeFactory('Topic', 'Session Calendar')
     sessioncal = emevent[idval]
     criterion = sessioncal.addCriterion('Type', 'ATPortalTypeCriterion')
     criterion.setValue('Session')
-    #import pdb; pdb.set_trace()
     criterion = sessioncal.addCriterion('path', 'ATRelativePathCriterion')
     criterion.setRelativePath('../Sessions')
     sessioncal.setLayout('solgemafullcalendar_view')
+
+
+def addSessionFolders(emevent):
+    addSessionsFolder(emevent)
+    addSessionCalendarFolder(emevent)
+
+
+@grok.subscribe(IEMEvent, IObjectAddedEvent)
+def addFoldersForEventFormsFolder(emevent, event):
+    """Adds the forms and folders required for an emevent"""
+
+    # add session container and a session calendar
+    if emevent.enableSessions:
+        addSessionFolders(emevent)
 
     # add a folder to hold registrant types
     emevent.invokeFactory(
@@ -454,6 +475,23 @@ def addFoldersForEventFormsFolder(emevent, event):
     # add a folder to hold lodging accommodations
     emevent.invokeFactory('collective.eventmanager.LodgingAccommodationFolder',
                           'Lodging Accommodations')
+
+
+@grok.subscribe(IEMEvent, IObjectModifiedEvent)
+def checkEventForSessionsState(emevent, event):
+    """If sessions are disabled then remove the sessions folder,
+       they are enabled, then session folders should be added."""
+
+    if not emevent.enableSessions:
+        if getattr(emevent, 'Sessions', None) != None:
+            emevent.manage_delObjects(['Sessions'])
+        if getattr(emevent, 'Session Calendar', None) != None:
+            emevent.manage_delObjects(['Session Calendar'])
+    else:
+        if getattr(emevent, 'Sessions', None) == None:
+            addSessionsFolder(emevent)
+        if getattr(emevent, 'Session Calendar', None) == None:
+            addSessionCalendarFolder(emevent)
 
 
 class View(grok.View):

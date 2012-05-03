@@ -36,6 +36,6 @@
     disableAJAX: true,
     editable: false,
     disableDragging: true,
-    disableResizing: true,
+    disableResizing: false,
   }
 </metal:javascript>
