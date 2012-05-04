@@ -34,6 +34,10 @@ def getNumApprovedAndConfirmed(context):
     return len(brains)
 
 
+def sendEMail(reg, emailtype):
+    pass
+
+
 @grok.subscribe(IRegistration, IObjectAddedEvent)
 def handleNewRegistration(reg, event):
     parentevent = reg.__parent__.__parent__
@@ -46,37 +50,24 @@ def handleNewRegistration(reg, event):
 
     workflowTool = getToolByName(reg, "portal_workflow")
 
-    # private events and events with private registration require a private
-    # link or manual creation, so both are, in a sense, pre-approved and need
-    # to be transitioned to the 'approved' state right away
+    # private registration through a private event or explicitely defined
+    # indicates immediate approval
     if isPrivateEvent or hasPrivateReg:
         workflowTool.doActionFor(reg, 'approve')
-        pass
 
-    # if a waiting list is enabled, and the number of registrations has not
-    # reached the maximum number of registrations allowed for the event, then
-    # transition the registration to the approved stateand send out an email
-    # indicating that the registrant has been successfully registered
-    elif hasWaitingList and (maxreg == None or numRegApproved < maxreg):
-        pass
+    # if there's room left for the registration, approve it
+    elif maxreg == None or numRegApproved < maxreg:
+        workflowTool.doActionFor(reg, 'approve')
+        sendEMail(reg, 'registration successful')
 
-    # if a waiting list is enabled, and there is no space left, then leave the
-    # registration in the submitted state, and send the registrant an email
-    # indicating they are on the 'waiting list'
+    # no space left, but there is a waiting list, send email indicating so
     elif hasWaitingList and (maxreg != None and numRegApproved >= maxreg):
-        pass
+        sendEMail(reg, 'on waiting list')
 
-    # if a waiting list is not enabled, and there is space for registration
-    # left, then transition to the 'approved' state and send out a
-    # 'registration successful' message
-    elif not hasWaitingList and (maxreg == None or numRegApproved < maxreg):
-        pass
-
-    # if a waiting list is not enabled, and there is no space left for
-    # registration, then transition to 'denied' and send a 'registration full'
-    # email to registrant
+    # no space left, and no waiting list, send registration full email
     elif not hasWaitingList and (maxreg != None and numRegApproved >= maxreg):
-        pass
+        workflowTool.doActionFor(reg, 'deny')
+        sendEMail(reg, 'registration full')
 
 
 class View(grok.View):
