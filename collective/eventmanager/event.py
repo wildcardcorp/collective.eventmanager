@@ -8,6 +8,7 @@ from plone.namedfile.field import NamedBlobFile
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from datetime import datetime
+from collective.eventmanager.config import BASE_TYPE_NAME
 
 from collective.eventmanager import EventManagerMessageFactory as _
 
@@ -432,20 +433,27 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
         )
 
 
+def canAdd(folder, type_name):
+    folder.setConstrainTypesMode(1)
+    folder.setLocallyAllowedTypes((BASE_TYPE_NAME + type_name,))
+
+
 def addSessionsFolder(emevent):
     # add a folder to hold sessions
-    emevent.invokeFactory('collective.eventmanager.SessionFolder', 'Sessions')
+    id = emevent.invokeFactory('Folder', 'sessions', title="Sessions")
+    canAdd(emevent[id], 'Session')
 
 
 def addSessionCalendarFolder(emevent):
     # add an ATTopic to display a calendar for sessions, if
     # sessions are enabled
-    idval = emevent.invokeFactory('Topic', 'Session Calendar')
+    idval = emevent.invokeFactory('Topic', 'session-calendar',
+        title="Session Calendar")
     sessioncal = emevent[idval]
     criterion = sessioncal.addCriterion('Type', 'ATPortalTypeCriterion')
     criterion.setValue('Session')
     criterion = sessioncal.addCriterion('path', 'ATRelativePathCriterion')
-    criterion.setRelativePath('../Sessions')
+    criterion.setRelativePath('../sessions')
     sessioncal.setLayout('solgemafullcalendar_view')
 
 
@@ -455,40 +463,40 @@ def addFoldersForEventFormsFolder(emevent, event):
 
     # add session container and a session calendar
     if emevent.enableSessions:
-        if getattr(emevent, 'Sessions', None) == None:
+        if 'sessions' not in emevent.objectIds():
             addSessionsFolder(emevent)
-        if getattr(emevent, 'Session Calendar', None) == None:
+        if 'session-calendar' not in emevent.objectIds():
             addSessionCalendarFolder(emevent)
 
-    # add a folder to hold registrant types
-    emevent.invokeFactory(
-        'collective.eventmanager.RegistrationFolder',
-        'Registrations')
+    id = emevent.invokeFactory('Folder', 'registrations',
+        title='Registrations')
+    canAdd(emevent[id], 'Registration')
 
     # add a folder to hold travel accommodations
-    emevent.invokeFactory(
-        'collective.eventmanager.TravelAccommodationFolder',
-        'Travel Accommodations')
+    id = emevent.invokeFactory('Folder', 'travel-accommodations',
+        title='Travel Accommodations')
+    canAdd(emevent[id], 'TravelAccommodation')
 
     # add a folder to hold lodging accommodations
-    emevent.invokeFactory('collective.eventmanager.LodgingAccommodationFolder',
-                          'Lodging Accommodations')
+    id = emevent.invokeFactory('Folder', 'lodging-accommodations',
+        title='Lodging Accommodations')
+    canAdd(emevent[id], 'LodgingAccommodation')
 
 
 @grok.subscribe(IEMEvent, IObjectModifiedEvent)
 def checkEventForSessionsState(emevent, event):
     """If sessions are disabled then remove the sessions folder,
        they are enabled, then session folders should be added."""
-
+    ids = emevent.objectIds()
     if not emevent.enableSessions:
-        if getattr(emevent, 'Sessions', None) != None:
-            emevent.manage_delObjects(['Sessions'])
-        if getattr(emevent, 'Session Calendar', None) != None:
-            emevent.manage_delObjects(['Session Calendar'])
+        if 'sessions' in ids:
+            emevent.manage_delObjects(['sessions'])
+        if 'session-calendar' in ids:
+            emevent.manage_delObjects(['session-calendar'])
     else:
-        if getattr(emevent, 'Sessions', None) == None:
+        if 'sessions' not in ids:
             addSessionsFolder(emevent)
-        if getattr(emevent, 'Session Calendar', None) == None:
+        if 'session-calendar' not in ids:
             addSessionCalendarFolder(emevent)
 
 

@@ -1,11 +1,7 @@
 <object name="portal_types">
     <object name="collective.eventmanager.EMEvent" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.Session" meta_type="Dexterity FTI" />
-    <object name="collective.eventmanager.SessionFolder" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.TravelAccommodation" meta_type="Dexterity FTI" />
-    <object name="collective.eventmanager.TravelAccommodationFolder" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.LodgingAccommodation" meta_type="Dexterity FTI" />
-    <object name="collective.eventmanager.LodgingAccommodationFolder" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.Registration" meta_type="Dexterity FTI" />
-    <object name="collective.eventmanager.RegistrationFolder" meta_type="Dexterity FTI" />
 </object>
