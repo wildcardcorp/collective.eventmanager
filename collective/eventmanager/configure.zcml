@@ -8,6 +8,7 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.eventmanager">
 
+  <five:registerPackage package="." initialize=".initialize" />
   <includeDependencies package="." />
   <include file="permissions.zcml" />
   <include package="z3c.jbot" file="meta.zcml" />
@@ -21,7 +22,6 @@
       description="Event management package for plone"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
-  <!-- -*- extra stuff goes here -*- -->
 
   <browser:jbot
       directory="jbot"
