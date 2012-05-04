@@ -109,11 +109,17 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             required=False,
         )
 
-    enableRegistrationList = schema.Bool(
+    enableWaitingList = schema.Bool(
             title=_(u"Enable Waiting List"),
-            description=_(u"When enabled, registration will stay open beyond "
-                          u"the maximum registration, but registrants "
-                          u"will be put on a waiting list"),
+            description=_(u"When enabled, if registration is private or "
+                          u"the event is private, then registrations get "
+                          u"approved until the max registration amount is "
+                          u"reached (if there is a maximum), and then "
+                          u"registrations get placed on the waiting list. "
+                          u"If registration is public, and this option is "
+                          u"enabled then if maximum registrations have been "
+                          u"met, registrations are put on to the waiting "
+                          u"list. Otherwise, registrations are approved."),
             required=True,
             default=False,
         )

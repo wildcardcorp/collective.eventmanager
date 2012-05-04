@@ -24,7 +24,8 @@ class EventManager(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         # install into the Plone site
-        applyProfile(portal, 'collective.eventmanager:default')
+        qi = portal.portal_quickinstaller
+        qi.installProducts(('collective.eventmanager',))
         setRoles(portal, TEST_USER_ID, ('Member', 'Manager'))
         workflowTool = getToolByName(portal, 'portal_workflow')
         workflowTool.setDefaultChain('plone_workflow')

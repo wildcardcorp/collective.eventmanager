@@ -42,7 +42,7 @@ def sendEMail(reg, emailtype):
 def handleNewRegistration(reg, event):
     parentevent = reg.__parent__.__parent__
     regfolderish = reg.__parent__
-    hasWaitingList = parentevent.enableRegistrationList
+    hasWaitingList = parentevent.enableWaitingList
     hasPrivateReg = parentevent.privateRegistration
     isPrivateEvent = parentevent.privateEvent
     maxreg = parentevent.maxRegistrations
