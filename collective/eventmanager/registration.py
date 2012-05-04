@@ -2,6 +2,8 @@ from five import grok
 from zope import schema
 from plone.directives import form, dexterity
 from plone.z3cform.fieldsets import utils
+from zope.app.container.interfaces import IObjectAddedEvent
+from Products.CMFCore.utils import getToolByName
 
 from collective.eventmanager import EventManagerMessageFactory as _
 
@@ -16,6 +18,65 @@ class IRegistration(form.Schema):
     description = schema.TextLine(
             title=_(u"EMail Address"),
         )
+
+
+def getNumApprovedAndConfirmed(context):
+    catalog = getToolByName(context, 'portal_catalog')
+    searchDict = {
+        'query': ('/'.join(context.getPhysicalPath())),
+        'depth': 1,
+        'portal_type': 'collective.eventmanager.Registration',
+        'review_state': 'approved'}
+    brains = [a for a in catalog.searchResults(searchDict)]
+    searchDict['review_state'] = 'confirmed'
+    brains.append([a for a in catalog.searchResults(searchDict)])
+
+    return len(brains)
+
+
+@grok.subscribe(IRegistration, IObjectAddedEvent)
+def handleNewRegistration(reg, event):
+    parentevent = reg.__parent__.__parent__
+    regfolderish = reg.__parent__
+    hasWaitingList = parentevent.enableRegistrationList
+    hasPrivateReg = parentevent.privateRegistration
+    isPrivateEvent = parentevent.privateEvent
+    maxreg = parentevent.maxRegistrations
+    numRegApproved = getNumApprovedAndConfirmed(regfolderish)
+
+    workflowTool = getToolByName(reg, "portal_workflow")
+
+    # private events and events with private registration require a private
+    # link or manual creation, so both are, in a sense, pre-approved and need
+    # to be transitioned to the 'approved' state right away
+    if isPrivateEvent or hasPrivateReg:
+        workflowTool.doActionFor(reg, 'approve')
+        pass
+
+    # if a waiting list is enabled, and the number of registrations has not
+    # reached the maximum number of registrations allowed for the event, then
+    # transition the registration to the approved stateand send out an email
+    # indicating that the registrant has been successfully registered
+    elif hasWaitingList and (maxreg == None or numRegApproved < maxreg):
+        pass
+
+    # if a waiting list is enabled, and there is no space left, then leave the
+    # registration in the submitted state, and send the registrant an email
+    # indicating they are on the 'waiting list'
+    elif hasWaitingList and (maxreg != None and numRegApproved >= maxreg):
+        pass
+
+    # if a waiting list is not enabled, and there is space for registration
+    # left, then transition to the 'approved' state and send out a
+    # 'registration successful' message
+    elif not hasWaitingList and (maxreg == None or numRegApproved < maxreg):
+        pass
+
+    # if a waiting list is not enabled, and there is no space left for
+    # registration, then transition to 'denied' and send a 'registration full'
+    # email to registrant
+    elif not hasWaitingList and (maxreg != None and numRegApproved >= maxreg):
+        pass
 
 
 class View(grok.View):

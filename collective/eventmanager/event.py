@@ -449,18 +449,16 @@ def addSessionCalendarFolder(emevent):
     sessioncal.setLayout('solgemafullcalendar_view')
 
 
-def addSessionFolders(emevent):
-    addSessionsFolder(emevent)
-    addSessionCalendarFolder(emevent)
-
-
 @grok.subscribe(IEMEvent, IObjectAddedEvent)
 def addFoldersForEventFormsFolder(emevent, event):
     """Adds the forms and folders required for an emevent"""
 
     # add session container and a session calendar
     if emevent.enableSessions:
-        addSessionFolders(emevent)
+        if getattr(emevent, 'Sessions', None) == None:
+            addSessionsFolder(emevent)
+        if getattr(emevent, 'Session Calendar', None) == None:
+            addSessionCalendarFolder(emevent)
 
     # add a folder to hold registrant types
     emevent.invokeFactory(

@@ -8,8 +8,8 @@
 "Id:","submitted"
 "Title:","Submitted"
 "Description:","A registration has been submitted and is on the waiting list"
-"Transitions","approve, cancel"
-"Permissions","Acquire","Anonymous","Authenticated","Member","Manager","Owner","Editor","Reader","Contributor","Reviewer"
+"Transitions","approve, cancel, deny"
+"Permissions", "Acquire","Anonymous","Authenticated","Member","Manager","Owner","Editor","Reader","Contributor","Reviewer"
 "View","N",,,,"X","X","X","X",,
 "Access contents information","N",,,,"X","X","X","X",,
 "Modify portal content","N",,,,"X","X","X",,,
@@ -59,32 +59,27 @@
 "Title:","Approve"
 "Description:","Approve a submitted registration"
 "Target state:","approved"
-"Guard permission:","Request review"
 
 "[Transition]"
 "Id:","deny"
 "Title:","Deny"
 "Description:","Deny an approved registration"
 "Target state:","denied"
-"Guard permission:","Review portal content"
 
 "[Transition]"
 "Id:","confirm"
 "Title:","Confirm"
 "Description:","Confirm an approved registration"
 "Target state:","confirmed"
-"Guard permission:","Review portal content"
 
 "[Transition]"
 "Id:","cancel"
 "Title:","Cancel"
 "Description:","Cancel a registration"
 "Target state:","cancelled"
-"Guard permission:","Review portal content"
 
 "[Transition]"
 "Id:","modify"
 "Title:","Modify"
 "Description:","A registration has been modified and needs to be sent back for approval"
 "Target state:","submitted"
-"Guard permission:","Review portal content"
