@@ -36,7 +36,8 @@ setup(name='collective.eventmanager',
           'z3c.jbot',
           'collective.wtf',
           'collective.z3cform.mapwidget',
-          'collective.geo.geographer'
+          'collective.geo.geographer',
+          'plone.resource'
       ],
       extras_require={
             'test': ['plone.app.testing', ]

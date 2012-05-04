@@ -23,7 +23,12 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
-  <browser:jbot
-      directory="jbot"
-      />
+  <browser:jbot directory="jbot" />
+
+  <include package="plone.resource" file="meta.zcml"/>
+  <plone:static
+    directory="static"
+    type="theme"
+    name="em"
+    />
 </configure>
