@@ -11,6 +11,7 @@ from datetime import datetime
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
+from collective.z3cform.mapwidget.widget import MapFieldWidget
 
 
 registrationRowAvailableFieldTypes = SimpleVocabulary(
@@ -92,6 +93,7 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             required=False,
         )
 
+    form.widget(location=MapFieldWidget)
     location = schema.TextLine(
             title=_(u"Location"),
             description=_(u"Address of the location of the event"),

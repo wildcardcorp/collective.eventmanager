@@ -1,3 +1,4 @@
+from collective.z3cform.mapwidget.widget import MapFieldWidget
 from five import grok
 from zope import schema
 from plone.directives import form
@@ -8,6 +9,7 @@ from collective.eventmanager import EventManagerMessageFactory as _
 class ITravelAccommodation(form.Schema):
     """An accomodation made for traveling"""
 
+    form.widget(location=MapFieldWidget)
     location = schema.TextLine(
             title=_(u"Location"),
             description=_(u"Address that will be automatically linked to a "

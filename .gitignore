@@ -2,3 +2,10 @@
 *.pyo
 collective.eventmanager.egg-info/*
 .DS_Store
+.mr.developer.cfg
+bin
+develop-eggs
+extras
+.installed.cfg
+parts
+var

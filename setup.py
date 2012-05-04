@@ -35,6 +35,8 @@ setup(name='collective.eventmanager',
           'Solgema.fullcalendar',
           'z3c.jbot',
           'collective.wtf',
+          'collective.z3cform.mapwidget',
+          'collective.geo.geographer'
       ],
       extras_require={
             'test': ['plone.app.testing', ]
