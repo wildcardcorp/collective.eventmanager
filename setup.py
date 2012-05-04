@@ -24,6 +24,7 @@ setup(name='collective.eventmanager',
       install_requires=[
           'setuptools',
           'Products.CMFPlone',
+          'Products.CMFPlacefulWorkflow',
           'plone.app.dexterity [grok]',
           'plone.app.referenceablebehavior',
           'plone.app.relationfield',
@@ -33,6 +34,7 @@ setup(name='collective.eventmanager',
           'plone.directives.form',
           'Solgema.fullcalendar',
           'z3c.jbot',
+          'collective.wtf',
       ],
       extras_require={
             'test': ['plone.app.testing', ]
