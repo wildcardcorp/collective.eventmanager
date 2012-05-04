@@ -16,3 +16,10 @@ This package also depends on Solgema.fullcalendar, specifically at least the ver
 If you'd like to display EM Event type objects on a calendar, this package configures the EM Event type to be compatible with the Solgema.fullcalendar product. Just create a Collection (ATTopic), add criteria for the EM Event type, and switch the display for the collection to Solgema.fullcalendar.
 
 
+Running the buildout
+--------------------
+
+git clone git@github.com:zombified/collective.eventmanager.git
+cd collective.eventmanager
+/path/to/python bootstrap.py
+./bin/buildout
