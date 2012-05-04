@@ -3,7 +3,7 @@ from zope import schema
 from plone.directives import form
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from datetime import datetime
-
+from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
 
 
@@ -71,3 +71,4 @@ class View(grok.View):
     grok.context(ISession)
     grok.require('zope2.View')
     grok.name('view')
+    grok.layer(ILayer)

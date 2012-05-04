@@ -4,7 +4,7 @@ from plone.directives import form, dexterity
 from plone.z3cform.fieldsets import utils
 from zope.app.container.interfaces import IObjectAddedEvent
 from Products.CMFCore.utils import getToolByName
-
+from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
 
 
@@ -79,6 +79,7 @@ class View(grok.View):
     grok.context(IRegistration)
     grok.require('zope2.View')
     grok.name('view')
+    grok.layer(ILayer)
 
     def dynamicFields(self):
         registrationFields = \
