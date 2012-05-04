@@ -19,3 +19,15 @@ class BaseTest(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+
+class PublicEventTest(BaseTest):
+    def setUp(self):
+        super(PublicEventTest, self).setUp()
+
+        self.emevent = self.portal.invokeFactory(
+                    'collective.eventmanager.EMEvent',
+                    'Test Event')
+
+    def tearDown(self):
+        super(PublicEventTest, self).tearDown()
