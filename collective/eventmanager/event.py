@@ -9,7 +9,7 @@ from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from datetime import datetime
 from collective.eventmanager.config import BASE_TYPE_NAME
-
+from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
 
 
@@ -509,3 +509,4 @@ class View(grok.View):
     grok.context(IEMEvent)
     grok.require('zope2.View')
     grok.name('view')
+    grok.layer(ILayer)

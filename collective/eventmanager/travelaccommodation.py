@@ -1,7 +1,7 @@
 from five import grok
 from zope import schema
 from plone.directives import form
-
+from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
 
 
@@ -25,3 +25,4 @@ class View(grok.View):
     grok.context(ITravelAccommodation)
     grok.require('zope2.View')
     grok.name('view')
+    grok.layer(ILayer)
