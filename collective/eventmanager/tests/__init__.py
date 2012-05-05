@@ -1,3 +1,4 @@
+from Products.CMFCore.utils import getToolByName
 from collective.eventmanager.testing import \
     EventManager_INTEGRATION_TESTING
 from plone.app.testing import setRoles
@@ -31,6 +32,7 @@ class PublicEventTest(BaseTest):
                     'collective.eventmanager.EMEvent',
                     'Test Event')
         self.emevent = self.portal[newid]
+        self.workflowTool = getToolByName(self.portal, "portal_workflow")
 
     def tearDown(self):
         super(PublicEventTest, self).tearDown()
@@ -42,18 +44,24 @@ class PublicEventTest(BaseTest):
         self.emevent.enableRegistrationList = waiting_list
         self.emevent.maxRegistrations = max_registration
 
-        resultingreg = self.emevent.registrations.invokeFactory(
-                        'collective.eventmananger.Registration',
+        resultingregid = self.emevent.registrations.invokeFactory(
+                        'collective.eventmanager.Registration',
                         'Test Registration 1')
+        resultingreg = self.emevent.registrations[resultingregid]
         numReg = getNumApprovedAndConfirmed(resultingreg)
 
         self.assertTrue(numReg >= 1)
-        self.assertEqual(resultingreg.review_state, first_state)
+        status = self.workflowTool.getStatusOf(
+            "collective.eventmanager.Registration_workflow", resultingreg)
+        self.assertEqual(status['review_state'], first_state)
 
-        resultingreg = self.emevent.registrations.invokeFactory(
-                        'collective.eventmananger.Registration',
+        resultingregid = self.emevent.registrations.invokeFactory(
+                        'collective.eventmanager.Registration',
                         'Test Registration 2')
+        resultingreg = self.emevent.registrations[resultingregid]
         numReg = getNumApprovedAndConfirmed(resultingreg)
 
         self.assertTrue(numReg >= 2)
-        self.assertEqual(resultingreg.review_state, second_state)
+        status = self.workflowTool.getStatusOf(
+            "collective.eventmanager.Registration_workflow", resultingreg)
+        self.assertEqual(status['review_state'], second_state)

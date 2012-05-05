@@ -2,7 +2,7 @@ from five import grok
 from zope import schema
 from plone.directives import form, dexterity
 from plone.z3cform.fieldsets import utils
-from zope.app.container.interfaces import IObjectAddedEvent
+from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from Products.CMFCore.utils import getToolByName
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _

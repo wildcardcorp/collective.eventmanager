@@ -1,7 +1,7 @@
 from five import grok
 from zope import schema, interface
 from plone.directives import form
-from zope.app.container.interfaces import IObjectAddedEvent
+from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from plone.namedfile.field import NamedBlobFile

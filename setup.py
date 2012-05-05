@@ -37,6 +37,7 @@ setup(name='collective.eventmanager',
           'collective.wtf',
           'collective.z3cform.mapwidget',
           'collective.geo.geographer',
+          'collective.geo.mapwidget',
           'plone.resource'
       ],
       extras_require={
