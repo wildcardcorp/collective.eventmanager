@@ -44,28 +44,27 @@ def handleNewRegistration(reg, event):
     regfolderish = reg.__parent__
     hasWaitingList = parentevent.enableWaitingList
     hasPrivateReg = parentevent.privateRegistration
-    isPrivateEvent = parentevent.privateEvent
+    #isPrivateEvent = parentevent.privateEvent
     maxreg = parentevent.maxRegistrations
     numRegApproved = getNumApprovedAndConfirmed(regfolderish)
 
     workflowTool = getToolByName(reg, "portal_workflow")
 
-    # private registration through a private event or explicitely defined
-    # indicates immediate approval
-    if isPrivateEvent or hasPrivateReg:
+    # private registration means manual adding of registrations
+    if hasPrivateReg:
         workflowTool.doActionFor(reg, 'approve')
 
-    # if there's room left for the registration, approve it
-    elif maxreg == None or numRegApproved < maxreg:
+    # haven't hit max, 'approve'
+    elif maxreg == None or numRegApproved <= maxreg:
         workflowTool.doActionFor(reg, 'approve')
         sendEMail(reg, 'registration successful')
 
-    # no space left, but there is a waiting list, send email indicating so
-    elif hasWaitingList and (maxreg != None and numRegApproved >= maxreg):
+    # waiting list, and hit max == remain 'submitted' (on waiting list)
+    elif hasWaitingList:
         sendEMail(reg, 'on waiting list')
 
-    # no space left, and no waiting list, send registration full email
-    elif not hasWaitingList and (maxreg != None and numRegApproved >= maxreg):
+    # all other cases, 'deny'
+    else:
         workflowTool.doActionFor(reg, 'deny')
         sendEMail(reg, 'registration full')
 

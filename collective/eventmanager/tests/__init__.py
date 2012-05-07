@@ -41,7 +41,7 @@ class PublicEventTest(BaseTest):
                        max_registration, first_state, second_state):
         self.emevent.privateEvent = private_event
         self.emevent.privateRegistration = private_registration
-        self.emevent.enableRegistrationList = waiting_list
+        self.emevent.enableWaitingList = waiting_list
         self.emevent.maxRegistrations = max_registration
 
         resultingregid = self.emevent.registrations.invokeFactory(
