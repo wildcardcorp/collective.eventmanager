@@ -3,6 +3,7 @@ from collective.eventmanager.tests import PublicEventTest
 
 
 class TestRegistrationWorkflow(PublicEventTest):
+    #### TESTS FOR INITIAL REGISTRATION ####
     def test_pubevent_pubreg_nowait_nomax_registration(self):
         self.doWorkflowTest(False, False, False, None, 'approved', 'approved')
 
@@ -50,6 +51,31 @@ class TestRegistrationWorkflow(PublicEventTest):
 
     def test_privevent_privreg_wait_max_registration(self):
         self.doWorkflowTest(True, True, True, 1, 'approved', 'approved')
+
+    #### TESTS FOR CONFIRMATION, CANCELLATION, AND DENIAL ####
+    def test_modify_denied(self):
+        pass
+
+    def test_modify_cancelled(self):
+        pass
+
+    def test_cancel_approved(self):
+        pass
+
+    def test_cancel_denied(self):
+        pass
+
+    def test_cancel_confirmed(self):
+        pass
+
+    def test_deny_approved(self):
+        pass
+
+    def test_deny_confirmed(self):
+        pass
+
+    def test_confirm_approved(self):
+        pass
 
 
 def test_suite():

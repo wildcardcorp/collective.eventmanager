@@ -39,29 +39,32 @@ class PublicEventTest(BaseTest):
 
     def doWorkflowTest(self, private_event, private_registration, waiting_list,
                        max_registration, first_state, second_state):
+        # setup event values
         self.emevent.privateEvent = private_event
         self.emevent.privateRegistration = private_registration
         self.emevent.enableWaitingList = waiting_list
         self.emevent.maxRegistrations = max_registration
 
+        # first registration
         resultingregid = self.emevent.registrations.invokeFactory(
                         'collective.eventmanager.Registration',
                         'Test Registration 1')
-        resultingreg = self.emevent.registrations[resultingregid]
-        numReg = getNumApprovedAndConfirmed(resultingreg)
-
+        resultingreg1 = self.emevent.registrations[resultingregid]
+        numReg = getNumApprovedAndConfirmed(resultingreg1)
         self.assertTrue(numReg >= 1)
         status = self.workflowTool.getStatusOf(
-            "collective.eventmanager.Registration_workflow", resultingreg)
+            "collective.eventmanager.Registration_workflow", resultingreg1)
         self.assertEqual(status['review_state'], first_state)
 
+        # second registration
         resultingregid = self.emevent.registrations.invokeFactory(
                         'collective.eventmanager.Registration',
                         'Test Registration 2')
-        resultingreg = self.emevent.registrations[resultingregid]
-        numReg = getNumApprovedAndConfirmed(resultingreg)
-
+        resultingreg2 = self.emevent.registrations[resultingregid]
+        numReg = getNumApprovedAndConfirmed(resultingreg2)
         self.assertTrue(numReg >= 2)
         status = self.workflowTool.getStatusOf(
-            "collective.eventmanager.Registration_workflow", resultingreg)
+            "collective.eventmanager.Registration_workflow", resultingreg2)
         self.assertEqual(status['review_state'], second_state)
+
+        return (resultingreg1, resultingreg2)
