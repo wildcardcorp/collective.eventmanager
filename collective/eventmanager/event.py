@@ -8,6 +8,9 @@ from plone.namedfile.field import NamedBlobFile
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from datetime import datetime
+from Products.CMFCore.utils import getToolByName
+from zope.pagetemplate.pagetemplatefile import PageTemplateFile
+
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
@@ -211,6 +214,7 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             fields=[
                 'sendAnnouncementEMail',
                 'sendAnnouncementEMailTo',
+                'announcementEMailFrom',
                 'announcementEMailSubject',
                 'announcementEMailBody'
             ])
@@ -224,6 +228,11 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                           u" the annoucement email at any time"),
             required=True,
             default=False,
+        )
+    announcementEMailFrom = schema.TextLine(
+            title=_(u"EMail address to send Announcement EMail from"),
+            description=_(u"The EMail address to use in the From field"),
+            required=False,
         )
     sendAnnouncementEMailTo = schema.Text(
             title=_(u"EMail addresses to send Announcement to"),
@@ -251,11 +260,17 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             "thankyouemailsettings",
             label=_(u"Thank You EMail Settings"),
             fields=[
+                'thankYouEMailFrom',
                 'thankYouEMailSubject',
                 'thankYouEMailBody'
             ])
 
     # this email gets sent as soon as a person has completed registration
+    thankYouEMailFrom = schema.TextLine(
+            title=_(u"EMail address to send Thank You from"),
+            description=_(u"The EMail address to use in the From field"),
+            required=False,
+        )
     thankYouEMailSubject = schema.TextLine(
             title=_(u"Thank You EMail Subject"),
             description=_(u"The subject of the EMail a person receives after "
@@ -281,6 +296,7 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             fields=[
                 'sendConfirmationEMailAutomatically',
                 'sendConfirmationEMailOn',
+                'confirmationEMailFrom',
                 'confirmationEMailSubject',
                 'confirmationEMailBody',
                 'confirmationEMailAttachment1',
@@ -302,6 +318,11 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
     sendConfirmationEMailOn = schema.Datetime(
             title=_(u"Date/Time to Send Confirmation EMail"),
             description=_(u"If no value is entered, no email will be sent"),
+            required=False,
+        )
+    confirmationEMailFrom = schema.TextLine(
+            title=_(u"EMail address to send Confirmation EMail from"),
+            description=_(u"The EMail address to use in the From field"),
             required=False,
         )
     confirmationEMailSubject = schema.TextLine(
@@ -348,6 +369,7 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             label=_(u"Registration Full EMail Settings"),
             fields=[
                 'sendRegistrationFullEMail',
+                'registrationEMailFrom',
                 'registrationFullEMailSubject',
                 'registrationFullEMailBody'
             ])
@@ -359,6 +381,11 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                           u"of the number of registrations"),
             required=True,
             default=False,
+        )
+    registrationFullEMailFrom = schema.TextLine(
+            title=_(u"EMail address to send Registration EMail from"),
+            description=_(u"The EMail address to use in the From field"),
+            required=False,
         )
     registrationFullEMailSubject = schema.TextLine(
             title=_(u"Registration Full EMail Subject"),
@@ -384,6 +411,7 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             label=_(u"Waiting List EMail Settings"),
             fields=[
                 'sendWaitingListEMail',
+                'waitingListEMailFrom',
                 'waitingListEMailSubject',
                 'waitingListEMailBody',
                 'offWaitingListEMailSubject',
@@ -397,6 +425,11 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                           u"waiting list"),
             required=True,
             default=False,
+        )
+    waitingListEMailFrom = schema.TextLine(
+            title=_(u"EMail address to send Waiting List EMail from"),
+            description=_(u"The EMail address to use in the From field"),
+            required=False,
         )
     waitingListEMailSubject = schema.TextLine(
             title=_(u"Waiting List EMail Subject"),
@@ -441,6 +474,52 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
         )
 
 
+class MailBodyTemplate(PageTemplateFile):
+    def pt_getContext(self, args=(), options={}, **kw):
+        rval = PageTemplateFile.pt_getContext(self, args=args)
+        options.update(rval)
+        return options
+
+
+def sendEMail(emevent, emailtype, mto=[], reg=None):
+    mfrom = ''
+    msubject = ''
+    mbody = ''
+    mtemplate = ''
+
+    mh = getToolByName(emevent, 'MailHost')
+
+    if emailtype == 'thank you':
+        mfrom = emevent.thankYouEMailFrom
+        msubject = emevent.thankYouEMailSubject
+        mbody = emevent.thankYouEMailBody
+        mtemplate = 'email_thankyou.pt'
+
+    elif emailtype == 'on waiting list':
+        mfrom = emevent.waitingListEMailFrom
+        msubject = emevent.waitingListEMailSubject
+        mbody = emevent.waitingListEMailBody
+        mtemplate = 'email_onwaitinglist.pt'
+
+    elif emailtype == 'registration full':
+        mfrom = emevent.registrationFullEMailFrom
+        msubject = emevent.registrationFullEMailSubject
+        mbody = emevent.registrationFullEMailBody
+        mtemplate = 'email_registrationfull.pt'
+
+    template = MailBodyTemplate(mtemplate)
+    context = {'mailbody': mbody, 'emevent': emevent, 'reg': reg}
+    message = template(context=context)
+
+    if mfrom == None or mfrom == '':
+        return False
+
+    for address in mto:
+        mh.send(message, address, mfrom, msubject)
+
+    return True
+
+
 def canAdd(folder, type_name):
     folder.setConstrainTypesMode(1)
     folder.setLocallyAllowedTypes((BASE_TYPE_NAME + type_name,))
@@ -476,18 +555,24 @@ def addFoldersForEventFormsFolder(emevent, event):
         if 'session-calendar' not in emevent.objectIds():
             addSessionCalendarFolder(emevent)
 
-    id = emevent.invokeFactory('Folder', 'registrations',
-        title='Registrations')
+    id = emevent.invokeFactory(
+                        'Folder',
+                        'registrations',
+                        title='Registrations')
     canAdd(emevent[id], 'Registration')
 
     # add a folder to hold travel accommodations
-    id = emevent.invokeFactory('Folder', 'travel-accommodations',
-        title='Travel Accommodations')
+    id = emevent.invokeFactory(
+                        'Folder',
+                        'travel-accommodations',
+                        title='Travel Accommodations')
     canAdd(emevent[id], 'TravelAccommodation')
 
     # add a folder to hold lodging accommodations
-    id = emevent.invokeFactory('Folder', 'lodging-accommodations',
-        title='Lodging Accommodations')
+    id = emevent.invokeFactory(
+                        'Folder',
+                        'lodging-accommodations',
+                        title='Lodging Accommodations')
     canAdd(emevent[id], 'LodgingAccommodation')
 
 

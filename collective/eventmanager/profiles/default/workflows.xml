@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
-<object name="portal_workflow">
+<object name="portal_workflow" meta_type="Plone Workflow Tool">
+    <object
+        name="collective.eventmanager.Registration_workflow"
+        meta_type="Workflow"/>
     <bindings>
         <type type_id="collective.eventmanager.Registration">
-            <bound-workflow workflow_id="collective.eventmanager.Registration_workflow" />
+            <bound-workflow workflow_id="collective.eventmanager.Registration_workflow"/>
         </type>
     </bindings>
 </object>

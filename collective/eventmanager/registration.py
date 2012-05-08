@@ -4,6 +4,8 @@ from plone.directives import form, dexterity
 from plone.z3cform.fieldsets import utils
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from Products.CMFCore.utils import getToolByName
+
+from collective.eventmanager.event import sendEMail
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
 
@@ -34,10 +36,6 @@ def getNumApprovedAndConfirmed(context):
     return len(brains)
 
 
-def sendEMail(reg, emailtype):
-    pass
-
-
 @grok.subscribe(IRegistration, IObjectAddedEvent)
 def handleNewRegistration(reg, event):
     parentevent = reg.__parent__.__parent__
@@ -52,21 +50,21 @@ def handleNewRegistration(reg, event):
 
     # private registration means manual adding of registrations
     if hasPrivateReg:
-        workflowTool.doActionFor(reg, 'approve')
+        workflowTool.doActionFor(parentevent, 'approve')
 
     # haven't hit max, 'approve'
     elif maxreg == None or numRegApproved <= maxreg:
         workflowTool.doActionFor(reg, 'approve')
-        sendEMail(reg, 'registration successful')
+        sendEMail(parentevent, 'thank you', [reg.description], reg)
 
     # waiting list, and hit max == remain 'submitted' (on waiting list)
     elif hasWaitingList:
-        sendEMail(reg, 'on waiting list')
+        sendEMail(parentevent, 'on waiting list', [reg.description], reg)
 
     # all other cases, 'deny'
     else:
         workflowTool.doActionFor(reg, 'deny')
-        sendEMail(reg, 'registration full')
+        sendEMail(parentevent, 'registration full', [reg.description], reg)
 
 
 class View(grok.View):
