@@ -31,4 +31,13 @@
     type="theme"
     name="em"
     />
+
+  <browser:page
+    name="emailsenderform"
+    for="collective.eventmanager.event.IEMEvent"
+    class="collective.eventmanager.event.EMailSenderForm"
+    template="event_templates/emailsenderform.pt"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.eventmanager.interfaces.ILayer"
+    />
 </configure>

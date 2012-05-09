@@ -10,6 +10,12 @@ from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from datetime import datetime
 from Products.CMFCore.utils import getToolByName
 from zope.pagetemplate.pagetemplatefile import PageTemplateFile
+from Products.Five.browser import BrowserView
+
+from email import encoders
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
 
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
@@ -474,6 +480,10 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
         )
 
 
+class IEMailSenderForm(interface.Interface):
+    pass
+
+
 class MailBodyTemplate(PageTemplateFile):
     def pt_getContext(self, args=(), options={}, **kw):
         rval = PageTemplateFile.pt_getContext(self, args=args)
@@ -507,15 +517,44 @@ def sendEMail(emevent, emailtype, mto=[], reg=None):
         mbody = emevent.registrationFullEMailBody
         mtemplate = 'email_registrationfull.pt'
 
-    template = MailBodyTemplate(mtemplate)
-    context = {'mailbody': mbody, 'emevent': emevent, 'reg': reg}
-    message = template(context=context)
+    elif emailtype == 'announcement':
+        mfrom = emevent.announcementEMailFrom
+        msubject = emevent.announcementEMailSubject
+        mbody = emevent.announcementEMailBody
+        mtemplate = 'email_announcement.pt'
+
+    elif emailtype == 'confirmation':
+        mfrom = emevent.confirmationEMailFrom
+        msubject = emevent.confirmationEMailSubject
+        mbody = emevent.confirmationEMailBody
+        mtemplate = 'email_confirmation.pt'
 
     if mfrom == None or mfrom == '':
         return False
 
+    template = MailBodyTemplate(mtemplate)
+    context = {'mailbody': mbody, 'emevent': emevent, 'reg': reg}
+    message = template(context=context)
+
+    msg = None
+    if emailtype == 'confirmation':
+        msg = MIMEMultipart(message)
+        msg['Subject'] = msubject
+        msg['From'] = mfrom
+
+        #attachment = MIMEBase('maintype', 'subtype')
+        #attachment.set_payload(file)
+        #encoders.encode_base64(attachment)
+        #attachment.add_header('Content-Disposition', 'attachment', filename=filename)
+        #msg.attach(attachment)
+    else:
+        msg = MIMEText(message)
+        msg['Subject'] = msubject
+        msg['From'] = mfrom
+
     for address in mto:
-        mh.send(message, address, mfrom, msubject)
+        msg['To'] = address
+        mh.send(msg)
 
     return True
 
@@ -603,3 +642,37 @@ class View(grok.View):
     grok.require('zope2.View')
     grok.name('view')
     grok.layer(ILayer)
+
+
+class EMailSenderForm(BrowserView):
+    """Presents a page that allows an event admin to send out
+       registraiton and confirmation emails manually"""
+
+    def __call__(self):
+        self.emailSent = False
+        if self.request.form is not None \
+                and len(self.request.form) > 0 \
+                and 'submit' in self.request.form:
+
+            button = self.request.form['submit']
+            tolist = self.request.form['emailtoaddresses'].splitlines()
+            if button == 'Send Announcement':
+                sendEMail(self.__parent__, 'announcement', tolist)
+            elif button == 'Send Confirmation Request':
+                sendEMail(self.__parent__, 'confirmation', tolist)
+
+            self.emailSent = True
+
+        return super(EMailSenderForm, self).__call__()
+
+    def registrationEMailList(self):
+        regfolder = self.__parent__.registrations
+        return ''.join(["\"%s\" <%s>\n"
+                           % (regfolder[reg].title, regfolder[reg].description)
+                       for reg in regfolder])
+
+    def showMessageEMailSent(self):
+        if getattr(self, 'emailSent', None) != None:
+            return self.emailSent
+
+        return False

@@ -1,0 +1,3 @@
+<tal:root>
+<p tal:replace="context/mailbody"/>
+</tal:root>
