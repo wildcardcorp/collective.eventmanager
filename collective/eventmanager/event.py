@@ -109,6 +109,12 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             required=False,
         )
 
+    locationDescription = schema.Text(
+            title=_(u"Description of Location"),
+            description=_(u"A short description of the location"),
+            required=False,
+        )
+
     maxRegistrations = schema.Int(
             title=_(u"Maximum Registrations Available"),
             description=_(u"The maximum amount of registrations to accept "
@@ -214,64 +220,81 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
         )
 
     # === ANNOUNCEMENT EMAIL ===
-    form.fieldset(
-            "announcmentemailsettings",
-            label=_(u"Announcement EMail Settings"),
-            fields=[
-                'sendAnnouncementEMail',
-                'sendAnnouncementEMailTo',
-                'announcementEMailFrom',
-                'announcementEMailSubject',
-                'announcementEMailBody'
-            ])
+    #form.fieldset(
+    #        "announcmentemailsettings",
+    #        label=_(u"Announcement EMail Settings"),
+    #        fields=[
+    #            'sendAnnouncementEMail',
+    #            'sendAnnouncementEMailTo',
+    #            'announcementEMailFrom',
+    #            'announcementEMailSubject',
+    #            'announcementEMailBody'
+    #        ])
 
-    # sent to a list of email addresses, either manually by an administrator
-    # or automatically when registration opens
-    sendAnnouncementEMail = schema.Bool(
-            title=_(u"Send Announcement EMail Automatically"),
-            description=_(u"Send an announcement email when event registration"
-                          u" opens, otherwise an administrator can send"
-                          u" the annoucement email at any time"),
-            required=True,
-            default=False,
-        )
-    announcementEMailFrom = schema.TextLine(
-            title=_(u"EMail address to send Announcement EMail from"),
-            description=_(u"The EMail address to use in the From field"),
-            required=False,
-        )
-    sendAnnouncementEMailTo = schema.Text(
-            title=_(u"EMail addresses to send Announcement to"),
-            description=_(u"list of addresses separated by commas or newlines "
-                          u"to send the announcement email to. This field "
-                          u"can be left blank if the announcement will "
-                          u"not be sent automatically"),
-            required=False,
-        )
-    announcementEMailSubject = schema.TextLine(
-            title=_(u"Annoucement EMail Subject"),
-            description=_(u"The subject of the EMail announcing the event"),
-            required=False,
-            default=_(u"A New Event is Available"),
-        )
-    announcementEMailBody = schema.Text(
-            title=_(u"Announcement EMail Body"),
-            description=_(u"The content of the EMail announcing the event"),
-            required=False,
-            default=_(u"")
-        )
+    ## sent to a list of email addresses, either manually by an administrator
+    ## or automatically when registration opens
+    #sendAnnouncementEMail = schema.Bool(
+    #        title=_(u"Send Announcement EMail Automatically"),
+    #        description=_(u"Send an announcement email when event registration"
+    #                      u" opens, otherwise an administrator can send"
+    #                      u" the annoucement email at any time"),
+    #        required=True,
+    #        default=False,
+    #    )
+    #announcementEMailFrom = schema.TextLine(
+    #        title=_(u"EMail address to send Announcement EMail from"),
+    #        description=_(u"The EMail address to use in the From field"),
+    #        required=False,
+    #    )
+    #sendAnnouncementEMailTo = schema.Text(
+    #        title=_(u"EMail addresses to send Announcement to"),
+    #        description=_(u"list of addresses separated by commas or newlines "
+    #                      u"to send the announcement email to. This field "
+    #                      u"can be left blank if the announcement will "
+    #                      u"not be sent automatically"),
+    #        required=False,
+    #    )
+    #announcementEMailSubject = schema.TextLine(
+    #        title=_(u"Annoucement EMail Subject"),
+    #        description=_(u"The subject of the EMail announcing the event"),
+    #        required=False,
+    #        default=_(u"A New Event is Available"),
+    #    )
+    #announcementEMailBody = schema.Text(
+    #        title=_(u"Announcement EMail Body"),
+    #        description=_(u"The content of the EMail announcing the event"),
+    #        required=False,
+    #        default=_(u"")
+    #    )
 
     # === THANK YOU EMAIL ===
     form.fieldset(
             "thankyouemailsettings",
             label=_(u"Thank You EMail Settings"),
             fields=[
+                'thankYouIncludeConfirmation',
                 'thankYouEMailFrom',
                 'thankYouEMailSubject',
-                'thankYouEMailBody'
+                'thankYouEMailBody',
+                'thankYouEMailAttachment1',
+                'thankYouEMailAttachment2',
+                'thankYouEMailAttachment3',
+                'thankYouEMailAttachment4'
             ])
 
     # this email gets sent as soon as a person has completed registration
+    # if the confirmation is to be included, then a confirmation message and
+    # link will be included in the sent email. A separate confirmation email
+    # can be sent from the EMail Sender tab of an EM Event page.
+    thankYouIncludeConfirmation = schema.Bool(
+            title=_(u"Include Confirmation Link and Message"),
+            description=_(u"When enabled, a confirmation message and link "
+                          u"will be included in the the thank you "
+                          u"message -- you can also manually send "
+                          u"confirmation messages via the 'EMail Sender' tab"),
+            required=True,
+            default=False,
+        )
     thankYouEMailFrom = schema.TextLine(
             title=_(u"EMail address to send Thank You from"),
             description=_(u"The EMail address to use in the From field"),
@@ -295,77 +318,29 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             default=_(u"Thank you for registering for this event."),
         )
 
-    # === CONFIRMATION EMAIL ===
-    form.fieldset(
-            "confirmationemailsettings",
-            label=_(u"Confirmation EMail Settings"),
-            fields=[
-                'sendConfirmationEMailAutomatically',
-                'sendConfirmationEMailOn',
-                'confirmationEMailFrom',
-                'confirmationEMailSubject',
-                'confirmationEMailBody',
-                'confirmationEMailAttachment1',
-                'confirmationEMailAttachment2',
-                'confirmationEMailAttachment3',
-                'confirmationEMailAttachment4'
-            ])
-
-    # this email gets sent either automatically on the date/time indicated,
-    # or manually by an administrator.
-    sendConfirmationEMailAutomatically = schema.Bool(
-            title=_(u"Send Confirmation EMail Manually"),
-            description=_(u"If checked, a confirmation email will be sent to "
-                          u"everyone registered for the event on the "
-                          u"date/time specified"),
-            required=True,
-            default=False,
-        )
-    sendConfirmationEMailOn = schema.Datetime(
-            title=_(u"Date/Time to Send Confirmation EMail"),
-            description=_(u"If no value is entered, no email will be sent"),
-            required=False,
-        )
-    confirmationEMailFrom = schema.TextLine(
-            title=_(u"EMail address to send Confirmation EMail from"),
-            description=_(u"The EMail address to use in the From field"),
-            required=False,
-        )
-    confirmationEMailSubject = schema.TextLine(
-            title=_(u"Confirmation EMail Subject"),
-            description=_(u"The subject of the email sent on the confirmation "
-                          u"date and time"),
-            required=False,
-            default=_(u"Please confirm your registration"),
-        )
-    confirmationEMailBody = schema.Text(
-            title=_(u"Confirmation EMail Body"),
-            description=_(u"The content of the email sent on the confirmation "
-                          u"date and time"),
-            required=False,
-            default=_(u""),
-        )
-    confirmationEMailAttachment1 = NamedBlobFile(
+    # these are the values that are automatically included when a
+    # thankyou/confirmation email is sent
+    thankYouEMailAttachment1 = NamedBlobFile(
             title=_(u"First email attachment"),
-            description=_(u"A file attached to the confirmation email"),
+            description=_(u"A file attached to the email"),
             required=False,
         )
 
-    confirmationEMailAttachment2 = NamedBlobFile(
+    thankYouEMailAttachment2 = NamedBlobFile(
             title=_(u"Second email attachment"),
-            description=_(u"A file attached to the confirmation email"),
+            description=_(u"A file attached to the email"),
             required=False,
         )
 
-    confirmationEMailAttachment3 = NamedBlobFile(
+    thankYouEMailAttachment3 = NamedBlobFile(
             title=_(u"Third email attachment"),
-            description=_(u"A file attached to the confirmation email"),
+            description=_(u"A file attached to the email"),
             required=False,
         )
 
-    confirmationEMailAttachment4 = NamedBlobFile(
+    thankYouEMailAttachment4 = NamedBlobFile(
             title=_(u"Fourth email attachment"),
-            description=_(u"A file attached to the confirmation email"),
+            description=_(u"A file attached to the email"),
             required=False,
         )
 
@@ -375,7 +350,7 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             label=_(u"Registration Full EMail Settings"),
             fields=[
                 'sendRegistrationFullEMail',
-                'registrationEMailFrom',
+                'registrationFullEMailFrom',
                 'registrationFullEMailSubject',
                 'registrationFullEMailBody'
             ])
@@ -491,7 +466,7 @@ class MailBodyTemplate(PageTemplateFile):
         return options
 
 
-def sendEMail(emevent, emailtype, mto=[], reg=None):
+def sendEMail(emevent, emailtype, mto=[], reg=None, attachments=[]):
     mfrom = ''
     msubject = ''
     mbody = ''
@@ -503,7 +478,11 @@ def sendEMail(emevent, emailtype, mto=[], reg=None):
         mfrom = emevent.thankYouEMailFrom
         msubject = emevent.thankYouEMailSubject
         mbody = emevent.thankYouEMailBody
-        mtemplate = 'email_thankyou.pt'
+        if emevent.thankYouIncludeConfirmation:
+            mtemplate = 'email_thankyou_includeConfirmation.pt'
+            attachments.append('attachment1')
+        else:
+            mtemplate = 'email_thankyou.pt'
 
     elif emailtype == 'on waiting list':
         mfrom = emevent.waitingListEMailFrom
@@ -536,25 +515,28 @@ def sendEMail(emevent, emailtype, mto=[], reg=None):
     context = {'mailbody': mbody, 'emevent': emevent, 'reg': reg}
     message = template(context=context)
 
-    msg = None
-    if emailtype == 'confirmation':
-        msg = MIMEMultipart(message)
-        msg['Subject'] = msubject
-        msg['From'] = mfrom
-
-        #attachment = MIMEBase('maintype', 'subtype')
-        #attachment.set_payload(file)
-        #encoders.encode_base64(attachment)
-        #attachment.add_header('Content-Disposition', 'attachment', filename=filename)
-        #msg.attach(attachment)
-    else:
-        msg = MIMEText(message)
-        msg['Subject'] = msubject
-        msg['From'] = mfrom
-
     for address in mto:
+        msg = None
+        if attachments != None and len(attachments) > 0:
+            msg = MIMEMultipart(message)
+            msg['Subject'] = msubject
+            msg['From'] = mfrom
+
+            #import pdb; pdb.set_trace()
+            #attachment = MIMEBase('maintype', 'subtype')
+            #attachment.set_payload(file)
+            #encoders.encode_base64(attachment)
+            #attachment.add_header('Content-Disposition', 'attachment', filename=filename)
+            #msg.attach(attachment)
+        else:
+            msg = MIMEText(message)
+            msg['Subject'] = msubject
+            msg['From'] = mfrom
+
         msg['To'] = address
         mh.send(msg)
+
+    #mh.send('message', 'to@example.com', 'from@example.com', 'subject')
 
     return True
 
@@ -654,11 +636,11 @@ class EMailSenderForm(BrowserView):
                 and len(self.request.form) > 0 \
                 and 'submit' in self.request.form:
 
-            button = self.request.form['submit']
+            emailtype = self.request.form['emailtype']
             tolist = self.request.form['emailtoaddresses'].splitlines()
-            if button == 'Send Announcement':
+            if emailtype == 'announcement':
                 sendEMail(self.__parent__, 'announcement', tolist)
-            elif button == 'Send Confirmation Request':
+            elif emailtype == 'confirmation':
                 sendEMail(self.__parent__, 'confirmation', tolist)
 
             self.emailSent = True
