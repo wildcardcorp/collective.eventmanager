@@ -27,18 +27,22 @@
 
         <div tal:replace="structure provider:plone.abovecontentbody" />
 
-        <form action='emailsenderform' method='POST'>
+        <div>
+            <input type='checkbox' name='includeRegistrations' value='includeRegistrations' checked='checked' />
+            <label for='includeRegistrations'>Include Registrations</label>
+        </div>
+        <form action='emailsenderform' method='POST' enctype='multipart/form-data'>
             <div>
                 <input type='radio' name='emailtype' value='announcement' />
                 <label for='emailtype'>Announcement</label>
-                <input type='radio' name='emailtype' value='confirmation' />
+                <input type='radio' name='emailtype' value='confirmation' checked='checked' />
                 <label for='emailtype'>Confirmation</label>
                 <input type='radio' name='emailtype' value='other' />
                 <label for='emailtype'>Other</label>
             </div>
             <div>
                 <label for='emailfromaddress'>EMail Address to Send EMail From</label>
-                <input type='text' name='emailfromaddress' />
+                <input type='text' name='emailfromaddress' tal:attributes="value python:view.confirmationFrom()" />
             </div>
             <div>
                 <label for='emailtoaddresses'>EMail Addressess to Send EMail To</label>
@@ -47,11 +51,11 @@
             </div>
             <div>
                 <label for='emailsubject'>EMail Subject</label>
-                <input type='text' name='emailsubject' />
+                <input type='text' name='emailsubject' tal:attributes="value python:view.confirmationSubject()" />
             </div>
             <div>
-                <label for='emailadditionalbody'>EMail Message (in addition to default value)</label>
-                <textarea type='text' name='emailadditionalbody'></textarea>
+                <label for='emailbody'>EMail Message</label>
+                <textarea type='text' name='emailbody' tal:content="python:view.confirmationBody()"></textarea>
             </div>
             <div>
                 <label for='attachment1'>Attachment 1</label>

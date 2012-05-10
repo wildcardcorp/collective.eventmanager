@@ -466,11 +466,13 @@ class MailBodyTemplate(PageTemplateFile):
         return options
 
 
-def sendEMail(emevent, emailtype, mto=[], reg=None, attachments=[]):
-    mfrom = ''
-    msubject = ''
-    mbody = ''
+def sendEMail(emevent, emailtype, mto=[], reg=None, attachments=[],
+              deffrom=None, defsubject=None, defmsg=None):
+    mfrom = deffrom
+    msubject = defsubject
+    mbody = defmsg
     mtemplate = ''
+    mattachments = attachments
 
     mh = getToolByName(emevent, 'MailHost')
 
@@ -496,17 +498,14 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, attachments=[]):
         mbody = emevent.registrationFullEMailBody
         mtemplate = 'email_registrationfull.pt'
 
+    elif emailtype == 'confirmation':
+        mtemplate = 'email_confirmation.pt'
+
     elif emailtype == 'announcement':
-        mfrom = emevent.announcementEMailFrom
-        msubject = emevent.announcementEMailSubject
-        mbody = emevent.announcementEMailBody
         mtemplate = 'email_announcement.pt'
 
-    elif emailtype == 'confirmation':
-        mfrom = emevent.confirmationEMailFrom
-        msubject = emevent.confirmationEMailSubject
-        mbody = emevent.confirmationEMailBody
-        mtemplate = 'email_confirmation.pt'
+    elif emailtype == 'other':
+        mtemplate = 'email_other.pt'
 
     if mfrom == None or mfrom == '':
         return False
@@ -523,11 +522,13 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, attachments=[]):
             msg['From'] = mfrom
 
             #import pdb; pdb.set_trace()
-            #attachment = MIMEBase('maintype', 'subtype')
-            #attachment.set_payload(file)
-            #encoders.encode_base64(attachment)
-            #attachment.add_header('Content-Disposition', 'attachment', filename=filename)
-            #msg.attach(attachment)
+            for attachment in attachments:
+                amsg = MIMEBase('application', 'octet-stream')
+                amsg.set_payload(attachment['data'])
+                encoders.encode_base64(amsg)
+                amsg.add_header('Content-Disposition', 'attachment',
+                                filename=attachment['name'])
+                msg.attach(amsg)
         else:
             msg = MIMEText(message)
             msg['Subject'] = msubject
@@ -638,10 +639,28 @@ class EMailSenderForm(BrowserView):
 
             emailtype = self.request.form['emailtype']
             tolist = self.request.form['emailtoaddresses'].splitlines()
-            if emailtype == 'announcement':
-                sendEMail(self.__parent__, 'announcement', tolist)
-            elif emailtype == 'confirmation':
-                sendEMail(self.__parent__, 'confirmation', tolist)
+            attachments = []
+            if self.request.form['attachment1'].filename != '':
+                attachments.append({
+                    'name': self.request.form['attachment1'].filename,
+                    'data': self.request.form['attachment1'].read()})
+            if self.request.form['attachment2'].filename != '':
+                attachments.append({
+                    'name': self.request.form['attachment2'].filename,
+                    'data': self.request.form['attachment2'].read()})
+            if self.request.form['attachment3'].filename != '':
+                attachments.append({
+                    'name': self.request.form['attachment3'].filename,
+                    'data': self.request.form['attachment3'].read()})
+            if self.request.form['attachment4'].filename != '':
+                attachments.append({
+                    'name': self.request.form['attachment4'].filename,
+                    'data': self.request.form['attachment4'].read()})
+            mfrom = self.request.form['emailfromaddress']
+            msubject = self.request.form['emailsubject']
+            mbody = self.request.form['emailbody']
+            sendEMail(self.__parent__, emailtype, tolist, None, attachments,
+                      mfrom, msubject, mbody)
 
             self.emailSent = True
 
@@ -658,3 +677,12 @@ class EMailSenderForm(BrowserView):
             return self.emailSent
 
         return False
+
+    def confirmationFrom(self):
+        return self.__parent__.thankYouEMailFrom
+
+    def confirmationSubject(self):
+        return self.__parent__.thankYouEMailSubject
+
+    def confirmationBody(self):
+        return self.__parent__.thankYouEMailBody
