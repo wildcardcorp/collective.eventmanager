@@ -70,4 +70,12 @@
             visible="True">
         <permission value="Modify portal content"/>
     </action>
+    <action title="Registration Status"
+            action_id="registrationstatusform"
+            category="object"
+            condition_expr=""
+            url_expr="string:${object_url}/registrationstatusform"
+            visible="True">
+        <permission value="Modify portal content"/>
+    </action>
 </object>

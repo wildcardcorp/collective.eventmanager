@@ -460,6 +460,10 @@ class IEMailSenderForm(interface.Interface):
     pass
 
 
+class IRegistrationStatusForm(interface.Interface):
+    pass
+
+
 class MailBodyTemplate(PageTemplateFile):
     def pt_getContext(self, args=(), options={}, **kw):
         rval = PageTemplateFile.pt_getContext(self, args=args)
@@ -691,3 +695,23 @@ class EMailSenderForm(BrowserView):
 
     def confirmationBody(self):
         return self.__parent__.thankYouEMailBody
+
+
+class RegistrationStatusForm(BrowserView):
+    """Creates a form that an event adminsitrator can manage registrations
+    currently on the waiting list"""
+
+    def getRegistrationsWithStatus(self, status):
+        wf = getToolByName(self, 'portal_workflow')
+        wfstr = "collective.eventmanager.Registration_workflow"
+        items = [r for r in self.__parent__.registrations]
+        registrations = []
+        for reg in items:
+            regstatus = wf.getStatusOf(wfstr,
+                                       self.__parent__.registrations[reg])
+            reviewstate = regstatus['review_state']
+            if reviewstate != None \
+                    and reviewstate.lower() == status.lower():
+                registrations.append(self.__parent__.registrations[reg])
+
+        return registrations

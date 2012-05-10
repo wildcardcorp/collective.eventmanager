@@ -40,4 +40,14 @@
     permission="cmf.ModifyPortalContent"
     layer="collective.eventmanager.interfaces.ILayer"
     />
+
+  <browser:page
+    name="registrationstatusform"
+    for="collective.eventmanager.event.IEMEvent"
+    class="collective.eventmanager.event.RegistrationStatusForm"
+    template="event_templates/registrationstatusform.pt"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.eventmanager.interfaces.ILayer"
+    />
+
 </configure>

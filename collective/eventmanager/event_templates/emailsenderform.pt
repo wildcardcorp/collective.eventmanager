@@ -27,10 +27,6 @@
 
         <div tal:replace="structure provider:plone.abovecontentbody" />
 
-        <div>
-            <input type='checkbox' name='includeRegistrations' value='includeRegistrations' checked='checked' />
-            <label for='includeRegistrations'>Include Registrations</label>
-        </div>
         <form action='emailsenderform' method='POST' enctype='multipart/form-data'>
             <div>
                 <input type='radio' name='emailtype' value='announcement' />
