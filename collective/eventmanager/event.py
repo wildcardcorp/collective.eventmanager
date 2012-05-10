@@ -11,6 +11,7 @@ from datetime import datetime
 from Products.CMFCore.utils import getToolByName
 from zope.pagetemplate.pagetemplatefile import PageTemplateFile
 from Products.Five.browser import BrowserView
+from plone.protect import protect, CheckAuthenticator
 
 from email import encoders
 from email.mime.text import MIMEText
@@ -637,34 +638,38 @@ class EMailSenderForm(BrowserView):
                 and len(self.request.form) > 0 \
                 and 'submit' in self.request.form:
 
-            emailtype = self.request.form['emailtype']
-            tolist = self.request.form['emailtoaddresses'].splitlines()
-            attachments = []
-            if self.request.form['attachment1'].filename != '':
-                attachments.append({
-                    'name': self.request.form['attachment1'].filename,
-                    'data': self.request.form['attachment1'].read()})
-            if self.request.form['attachment2'].filename != '':
-                attachments.append({
-                    'name': self.request.form['attachment2'].filename,
-                    'data': self.request.form['attachment2'].read()})
-            if self.request.form['attachment3'].filename != '':
-                attachments.append({
-                    'name': self.request.form['attachment3'].filename,
-                    'data': self.request.form['attachment3'].read()})
-            if self.request.form['attachment4'].filename != '':
-                attachments.append({
-                    'name': self.request.form['attachment4'].filename,
-                    'data': self.request.form['attachment4'].read()})
-            mfrom = self.request.form['emailfromaddress']
-            msubject = self.request.form['emailsubject']
-            mbody = self.request.form['emailbody']
-            sendEMail(self.__parent__, emailtype, tolist, None, attachments,
-                      mfrom, msubject, mbody)
-
-            self.emailSent = True
+            self._handlePost(self.request)
 
         return super(EMailSenderForm, self).__call__()
+
+    @protect(CheckAuthenticator)
+    def _handlePost(self, REQUEST=None):
+        emailtype = self.request.form['emailtype']
+        tolist = self.request.form['emailtoaddresses'].splitlines()
+        attachments = []
+        if self.request.form['attachment1'].filename != '':
+            attachments.append({
+                'name': self.request.form['attachment1'].filename,
+                'data': self.request.form['attachment1'].read()})
+        if self.request.form['attachment2'].filename != '':
+            attachments.append({
+                'name': self.request.form['attachment2'].filename,
+                'data': self.request.form['attachment2'].read()})
+        if self.request.form['attachment3'].filename != '':
+            attachments.append({
+                'name': self.request.form['attachment3'].filename,
+                'data': self.request.form['attachment3'].read()})
+        if self.request.form['attachment4'].filename != '':
+            attachments.append({
+                'name': self.request.form['attachment4'].filename,
+                'data': self.request.form['attachment4'].read()})
+        mfrom = self.request.form['emailfromaddress']
+        msubject = self.request.form['emailsubject']
+        mbody = self.request.form['emailbody']
+        sendEMail(self.__parent__, emailtype, tolist, None, attachments,
+                  mfrom, msubject, mbody)
+
+        self.emailSent = True
 
     def registrationEMailList(self):
         regfolder = self.__parent__.registrations

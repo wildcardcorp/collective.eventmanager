@@ -76,6 +76,8 @@
             <div>
                 <input type='submit' name='submit' value='Send EMail' />
             </div>
+
+            <span tal:replace="structure context/@@authenticator/authenticator" />
         </form>
 
         <div tal:replace="structure provider:plone.belowcontentbody" />
