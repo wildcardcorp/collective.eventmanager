@@ -23,85 +23,85 @@
 
         <div tal:replace="structure provider:plone.abovecontentbody" />
 
-        <h2>On Waiting List</h2>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Submitted')) <= 0">
-          There are no registrations on the waiting list.
-        </div>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Submitted')) > 0">
-          <ul>
-            <li tal:repeat="item python:view.getRegistrationsWithStatus('Submitted')">
-              <input type='checkbox' /> <span tal:content="python:item.title" />
-            </li>
-          </ul>
-          <input type='button' value='Approve' />
-          <input type='button' value='Confirm' />
-          <input type='button' value='Cancel' />
-          <input type='button' value='Deny' />
-        </div>
+        <form action='registrationstatusform' method='POST'>
+          <div>
+            <input type='submit' name='submit' value='Wait List' />
+            <input type='submit' name='submit' value='Approve' />
+            <input type='submit' name='submit' value='Confirm' />
+            <input type='submit' name='submit' value='Cancel' />
+            <input type='submit' name='submit' value='Deny' />
+          </div>
 
-        <h2>Approved</h2>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Approved')) <= 0">
-          There are no registrations that have been approved, but not completed.
-        </div>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Approved')) > 0">
-          <ul>
-            <li tal:repeat="item python:view.getRegistrationsWithStatus('Approved')">
-              <input type='checkbox' /> <span tal:content="python:item.title" />
-            </li>
-          </ul>
-          <input type='button' value='Wait List' />
-          <input type='button' value='Confirm' />
-          <input type='button' value='Cancel' />
-          <input type='button' value='Deny' />
-        </div>
+          <h2>On Waiting List</h2>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Submitted')) <= 0">
+            There are no registrations on the waiting list.
+          </div>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Submitted')) > 0">
+            <ul>
+              <li tal:repeat="item python:view.getRegistrationsWithStatus('Submitted')">
+                <input type='checkbox' name='submitted' tal:attributes="value python:item.getId()" /> <span tal:content="python:item.title" />
+              </li>
+            </ul>
+          </div>
 
-        <h2>Confirmed</h2>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Confirmed')) <= 0">
-          There are no registrations that have been confirmed.
-        </div>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Confirmed')) > 0">
-          <ul>
-            <li tal:repeat="item python:view.getRegistrationsWithStatus('Confirmed')">
-              <input type='checkbox' /> <span tal:content="python:item.title" />
-            </li>
-          </ul>
-          <input type='button' value='Wait List' />
-          <input type='button' value='Approve' />
-          <input type='button' value='Cancel' />
-          <input type='button' value='Deny' />
-        </div>
+          <h2>Approved</h2>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Approved')) <= 0">
+            There are no registrations that have been approved, but not completed.
+          </div>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Approved')) > 0">
+            <ul>
+              <li tal:repeat="item python:view.getRegistrationsWithStatus('Approved')">
+                <input type='checkbox' name='approved' tal:attributes="value python:item.getId()" /> <span tal:content="python:item.title" />
+              </li>
+            </ul>
+          </div>
 
-        <h2>Cancelled</h2>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Cancelled')) <= 0">
-          There are no registrations that have been cancelled.
-        </div>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Cancelled')) > 0">
-          <ul>
-            <li tal:repeat="item python:view.getRegistrationsWithStatus('Cancelled')">
-              <input type='checkbox' /> <span tal:content="python:item.title" />
-            </li>
-          </ul>
-          <input type='button' value='Wait List' />
-          <input type='button' value='Approve' />
-          <input type='button' value='Confirm' />
-          <input type='button' value='Deny' />
-        </div>
+          <h2>Confirmed</h2>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Confirmed')) <= 0">
+            There are no registrations that have been confirmed.
+          </div>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Confirmed')) > 0">
+            <ul>
+              <li tal:repeat="item python:view.getRegistrationsWithStatus('Confirmed')">
+                <input type='checkbox' name='confirmed' tal:attributes="value python:item.getId()" /> <span tal:content="python:item.title" />
+              </li>
+            </ul>
+          </div>
 
-        <h2>Denied</h2>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Denied')) <= 0">
-          There are no registrations that have been denied.
-        </div>
-        <div tal:condition="python: len(view.getRegistrationsWithStatus('Denied')) > 0">
-          <ul>
-            <li tal:repeat="item python:view.getRegistrationsWithStatus('Denied')">
-              <input type='checkbox' /> <span tal:content="python:item.title" />
-            </li>
-          </ul>
-          <input type='button' value='Wait List' />
-          <input type='button' value='Approve' />
-          <input type='button' value='Confirm' />
-          <input type='button' value='Cancel' />
-        </div>
+          <h2>Cancelled</h2>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Cancelled')) <= 0">
+            There are no registrations that have been cancelled.
+          </div>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Cancelled')) > 0">
+            <ul>
+              <li tal:repeat="item python:view.getRegistrationsWithStatus('Cancelled')">
+                <input type='checkbox' name='cancelled' tal:attributes="value python:item.getId()" /> <span tal:content="python:item.title" />
+              </li>
+            </ul>
+          </div>
+
+          <h2>Denied</h2>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Denied')) <= 0">
+            There are no registrations that have been denied.
+          </div>
+          <div tal:condition="python: len(view.getRegistrationsWithStatus('Denied')) > 0">
+            <ul>
+              <li tal:repeat="item python:view.getRegistrationsWithStatus('Denied')">
+                <input type='checkbox' name='denied' tal:attributes="value python:item.getId()" /> <span tal:content="python:item.title" />
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <input type='button' value='Wait List' />
+            <input type='button' value='Approve' />
+            <input type='button' value='Confirm' />
+            <input type='button' value='Cancel' />
+            <input type='button' value='Deny' />
+          </div>
+
+          <span tal:replace="structure context/@@authenticator/authenticator" />
+        </form>
 
         <div tal:replace="structure provider:plone.belowcontentbody" />
 

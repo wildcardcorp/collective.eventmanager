@@ -471,13 +471,13 @@ class MailBodyTemplate(PageTemplateFile):
         return options
 
 
-def sendEMail(emevent, emailtype, mto=[], reg=None, attachments=[],
+def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
               deffrom=None, defsubject=None, defmsg=None):
     mfrom = deffrom
     msubject = defsubject
     mbody = defmsg
     mtemplate = ''
-    mattachments = attachments
+    mattachments = defattachments
 
     mh = getToolByName(emevent, 'MailHost')
 
@@ -487,7 +487,7 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, attachments=[],
         mbody = emevent.thankYouEMailBody
         if emevent.thankYouIncludeConfirmation:
             mtemplate = 'email_thankyou_includeConfirmation.pt'
-            attachments.append('attachment1')
+            # TODO: add attachments for confirmation
         else:
             mtemplate = 'email_thankyou.pt'
 
@@ -521,13 +521,13 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, attachments=[],
 
     for address in mto:
         msg = None
-        if attachments != None and len(attachments) > 0:
+        if mattachments != None and len(mattachments) > 0:
             msg = MIMEMultipart(message)
             msg['Subject'] = msubject
             msg['From'] = mfrom
 
             #import pdb; pdb.set_trace()
-            for attachment in attachments:
+            for attachment in mattachments:
                 amsg = MIMEBase('application', 'octet-stream')
                 amsg.set_payload(attachment['data'])
                 encoders.encode_base64(amsg)
@@ -648,28 +648,28 @@ class EMailSenderForm(BrowserView):
 
     @protect(CheckAuthenticator)
     def _handlePost(self, REQUEST=None):
-        emailtype = self.request.form['emailtype']
-        tolist = self.request.form['emailtoaddresses'].splitlines()
+        emailtype = REQUEST.form['emailtype']
+        tolist = REQUEST.form['emailtoaddresses'].splitlines()
         attachments = []
-        if self.request.form['attachment1'].filename != '':
+        if REQUEST.form['attachment1'].filename != '':
             attachments.append({
-                'name': self.request.form['attachment1'].filename,
-                'data': self.request.form['attachment1'].read()})
-        if self.request.form['attachment2'].filename != '':
+                'name': REQUEST.form['attachment1'].filename,
+                'data': REQUEST.form['attachment1'].read()})
+        if REQUEST.form['attachment2'].filename != '':
             attachments.append({
-                'name': self.request.form['attachment2'].filename,
-                'data': self.request.form['attachment2'].read()})
-        if self.request.form['attachment3'].filename != '':
+                'name': REQUEST.form['attachment2'].filename,
+                'data': REQUEST.form['attachment2'].read()})
+        if REQUEST.form['attachment3'].filename != '':
             attachments.append({
-                'name': self.request.form['attachment3'].filename,
-                'data': self.request.form['attachment3'].read()})
-        if self.request.form['attachment4'].filename != '':
+                'name': REQUEST.form['attachment3'].filename,
+                'data': REQUEST.request.form['attachment3'].read()})
+        if REQUEST.form['attachment4'].filename != '':
             attachments.append({
-                'name': self.request.form['attachment4'].filename,
-                'data': self.request.form['attachment4'].read()})
-        mfrom = self.request.form['emailfromaddress']
-        msubject = self.request.form['emailsubject']
-        mbody = self.request.form['emailbody']
+                'name': REQUEST.form['attachment4'].filename,
+                'data': REQUEST.form['attachment4'].read()})
+        mfrom = REQUEST.form['emailfromaddress']
+        msubject = REQUEST.form['emailsubject']
+        mbody = REQUEST.form['emailbody']
         sendEMail(self.__parent__, emailtype, tolist, None, attachments,
                   mfrom, msubject, mbody)
 
@@ -700,6 +700,68 @@ class EMailSenderForm(BrowserView):
 class RegistrationStatusForm(BrowserView):
     """Creates a form that an event adminsitrator can manage registrations
     currently on the waiting list"""
+
+    def __call__(self):
+        if self.request.form is not None \
+                and len(self.request.form) > 0 \
+                and 'submit' in self.request.form:
+
+            self._handlePost(self.request)
+
+        return super(RegistrationStatusForm, self).__call__()
+
+    @protect(CheckAuthenticator)
+    def _handlePost(self, REQUEST):
+        subtype = REQUEST.form['submit']
+        idlist_submitted = []
+        idlist_approved = []
+        idlist_confirmed = []
+        idlist_cancelled = []
+        idlist_denied = []
+        if 'submitted' in REQUEST.form:
+            idlist_submitted = [a for a in REQUEST.form['submitted']]
+        if 'approved' in REQUEST.form:
+            idlist_approved = [a for a in REQUEST.form['approved']]
+        if 'confirmed' in REQUEST.form:
+            idlist_confirmed = [a for a in REQUEST.form['confirmed']]
+        if 'cancelled' in REQUEST.form:
+            idlist_cancelled = [a for a in REQUEST.form['cancelled']]
+        if 'denied' in REQUEST.form:
+            idlist_denied = [a for a in REQUEST.form['denied']]
+
+        if subtype == 'Wait List':
+            self._doActions(idlist_approved, ['cancel', 'modify'])
+            self._doActions(idlist_confirmed, ['cancel', 'modify'])
+            self._doActions(idlist_cancelled, ['modify'])
+            self._doActions(idlist_denied, ['modify'])
+        elif subtype == 'Approve':
+            self._doActions(idlist_submitted, ['approve'])
+            self._doActions(idlist_confirmed, ['cancel', 'approve'])
+            self._doActions(idlist_cancelled, ['approve'])
+            self._doActions(idlist_denied, ['approve'])
+        elif subtype == 'Confirm':
+            self._doActions(idlist_submitted, ['approve', 'confirm'])
+            self._doActions(idlist_approved, ['confirm'])
+            self._doActions(idlist_cancelled, ['approve', 'confirm'])
+            self._doActions(idlist_denied, ['approve', 'confirm'])
+        elif subtype == 'Cancel':
+            self._doActions(idlist_submitted, ['cancel'])
+            self._doActions(idlist_approved, ['cancel'])
+            self._doActions(idlist_confirmed, ['cancel'])
+            self._doActions(idlist_denied, ['cancel'])
+        elif subtype == 'Deny':
+            self._doActions(idlist_submitted, ['deny'])
+            self._doActions(idlist_approved, ['deny'])
+            self._doActions(idlist_confirmed, ['deny'])
+            self._doActions(idlist_cancelled, ['deny'])
+            pass
+
+    def _doActions(self, idlist=[], actions=[]):
+        for id in idlist:
+            reg = self.__parent__.registrations[id]
+            wf = getToolByName(reg, "portal_workflow")
+            for action in actions:
+                wf.doActionFor(reg, action)
 
     def getRegistrationsWithStatus(self, status):
         wf = getToolByName(self, 'portal_workflow')
