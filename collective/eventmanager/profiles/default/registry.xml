@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<registry>
+    <records interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" />
+      <record field="announcement" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.announcement">
+    <value />
+  </record>
+  <record field="announcement_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.announcement_htmlbody">
+    <field type="plone.registry.field.Text">
+      <title>HTML Body</title>
+    </field>
+    <value>html body</value>
+  </record>
+  <record field="announcement_subject" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.announcement_subject">
+    <field type="plone.registry.field.TextLine">
+      <title>Announcement Subject</title>
+    </field>
+    <value>Announcement Subject</value>
+  </record>
+  <record field="announcement_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.announcement_textbody">
+    <field type="plone.registry.field.Text">
+      <title>Plain Text Body</title>
+    </field>
+    <value>plone body</value>
+  </record>
+  <record field="confirmation" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.confirmation">
+    <value />
+  </record>
+  <record field="confirmation_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.confirmation_htmlbody">
+    <field type="plone.registry.field.Text">
+      <title>Confirmation HTML Body</title>
+    </field>
+    <value>html body</value>
+  </record>
+  <record field="confirmation_subject" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.confirmation_subject">
+    <field type="plone.registry.field.TextLine">
+      <title>Confirmation Subject</title>
+    </field>
+    <value>Confirmation Subject</value>
+  </record>
+  <record field="confirmation_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.confirmation_textbody">
+    <field type="plone.registry.field.Text">
+      <title>Confirmation Plain Text Body</title>
+    </field>
+    <value>plone body</value>
+  </record>
+  <record field="onwaitinglist" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.onwaitinglist">
+    <value />
+  </record>
+  <record field="onwaitinglist_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.onwaitinglist_htmlbody">
+    <field type="plone.registry.field.Text">
+      <title>On waiting list HTML Body</title>
+    </field>
+    <value>html body</value>
+  </record>
+  <record field="onwaitinglist_subject" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.onwaitinglist_subject">
+    <field type="plone.registry.field.TextLine">
+      <title>On waiting list Subject</title>
+    </field>
+    <value>On waiting list Subject</value>
+  </record>
+  <record field="onwaitinglist_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.onwaitinglist_textbody">
+    <field type="plone.registry.field.Text">
+      <title>On waiting list Plain Text Body</title>
+    </field>
+    <value>plone body</value>
+  </record>
+  <record field="other" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.other">
+    <value />
+  </record>
+  <record field="other_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.other_htmlbody">
+    <field type="plone.registry.field.Text">
+      <title>Other HTML Body</title>
+    </field>
+    <value>html body</value>
+  </record>
+  <record field="other_subject" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.other_subject">
+    <field type="plone.registry.field.TextLine">
+      <title>Other Subject</title>
+    </field>
+    <value>Other Subject</value>
+  </record>
+  <record field="other_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.other_textbody">
+    <field type="plone.registry.field.Text">
+      <title>Other Plain Text Body</title>
+    </field>
+    <value>plone body</value>
+  </record>
+  <record field="registrationfull" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.registrationfull">
+    <value />
+  </record>
+  <record field="registrationfull_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.registrationfull_htmlbody">
+    <field type="plone.registry.field.Text">
+      <title>Registraion full HTML Body</title>
+    </field>
+    <value>html body</value>
+  </record>
+  <record field="registrationfull_subject" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.registrationfull_subject">
+    <field type="plone.registry.field.TextLine">
+      <title>Registraion full Subject</title>
+    </field>
+    <value>Registration full Subject</value>
+  </record>
+  <record field="registrationfull_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.registrationfull_textbody">
+    <field type="plone.registry.field.Text">
+      <title>Registraion full Plain Text Body</title>
+    </field>
+    <value>plone body</value>
+  </record>
+  <record field="thankyou" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou">
+    <value />
+  </record>
+  <record field="thankyou_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_htmlbody">
+    <field type="plone.registry.field.Text">
+      <title>Thank you HTML Body</title>
+    </field>
+    <value>html body</value>
+  </record>
+  <record field="thankyou_subject" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_subject">
+    <field type="plone.registry.field.TextLine">
+      <title>Thank you Subject</title>
+    </field>
+    <value>Thank you Subject</value>
+  </record>
+  <record field="thankyou_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_textbody">
+    <field type="plone.registry.field.Text">
+      <title>Thank you Plain Text Body</title>
+    </field>
+    <value>plone body</value>
+  </record>
+  <record field="thankyou_with_confirmation" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_with_confirmation">
+    <value />
+  </record>
+  <record field="thankyou_with_confirmation_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_with_confirmation_htmlbody">
+    <field type="plone.registry.field.Text">
+      <title>Thank you with confirmation HTML Body</title>
+    </field>
+    <value>html body</value>
+  </record>
+  <record field="thankyou_with_confirmation_subject" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_with_confirmation_subject">
+    <field type="plone.registry.field.TextLine">
+      <title>Thank you with confirmation Subject</title>
+    </field>
+    <value>Thank you with confirmation Subject</value>
+  </record>
+  <record field="thankyou_with_confirmation_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_with_confirmation_textbody">
+    <field type="plone.registry.field.Text">
+      <title>Thank you with confirmation Plain Text Body</title>
+    </field>
+    <value>plone body</value>
+  </record>
+</registry>

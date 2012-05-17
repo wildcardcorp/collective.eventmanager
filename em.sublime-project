@@ -1,0 +1,9 @@
+{
+	"folders":
+	[
+		{
+			"path": "/Applications/Plone4.1/zinstance/src/collective.eventmanager",
+            "folder_exclude_patterns": ["var", "resources", "extras", "eggs", "parts", "develop-eggs", ".codeintel", "bin"]
+		}
+	]
+}

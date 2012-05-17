@@ -29,7 +29,7 @@ setup(name='collective.eventmanager',
           'plone.app.referenceablebehavior',
           'plone.app.relationfield',
           'plone.namedfile [blobs]',
-          'collective.z3cform.datagridfield',
+          'collective.z3cform.datagridfield>=0.11',
           'plone.directives.dexterity',
           'plone.directives.form',
           'Solgema.fullcalendar',
@@ -39,6 +39,7 @@ setup(name='collective.eventmanager',
           'collective.geo.mapwidget',
           'plone.resource',
           'plone.protect',
+          'mako'
       ],
       extras_require={
             'test': ['plone.app.testing', ]

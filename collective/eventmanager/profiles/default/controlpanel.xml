@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<object name="portal_controlpanel" 
+    meta_type="Plone Control Panel Tool"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n" 
+    i18n:domain="fbi.bankrobbers">
+
+    <configlet title="EM Email Templates" action_id="em-email-templates"
+        appId="collective.eventmanager" category="Products" condition_expr=""
+        url_expr="string:${portal_url}/@@em-email-templates"
+        visible="True" i18n:attributes="title">
+        <permission>Manage Portal</permission>
+    </configlet>
+
+</object>
