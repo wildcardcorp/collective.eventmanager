@@ -3,13 +3,12 @@ from zope import schema, interface
 from plone.directives import form
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
-from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from plone.namedfile.field import NamedBlobFile
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from datetime import datetime
 from Products.CMFCore.utils import getToolByName
-from zope.pagetemplate.pagetemplatefile import PageTemplateFile
+from mako.template import Template
 from Products.Five.browser import BrowserView
 from plone.protect import protect, CheckAuthenticator
 from collective.z3cform.mapwidget.widget import MapFieldWidget
@@ -17,6 +16,9 @@ from email import encoders
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
+from collective.z3cform.mapwidget.widget import MapFieldWidget
+from collective.eventmanager.vocabularies import \
+    RegistrationRowAvailableFieldTypes
 
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
@@ -41,7 +43,7 @@ class IRegistrationFieldRow(interface.Interface):
 
     fieldtype = schema.Choice(
             title=u"Field Type",
-            vocabulary=registrationRowAvailableFieldTypes,
+            vocabulary=RegistrationRowAvailableFieldTypes,
             required=True,
         )
     required = schema.Bool(
@@ -425,19 +427,11 @@ class IRegistrationStatusForm(interface.Interface):
     pass
 
 
-class MailBodyTemplate(PageTemplateFile):
-    def pt_getContext(self, args=(), options={}, **kw):
-        rval = PageTemplateFile.pt_getContext(self, args=args)
-        options.update(rval)
-        return options
-
-
 def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
               deffrom=None, defsubject=None, defmsg=None):
     mfrom = deffrom
     msubject = defsubject
     mbody = defmsg
-    mtemplate = ''
     mattachments = defattachments
 
     mh = getToolByName(emevent, 'MailHost')
@@ -446,39 +440,32 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
         mfrom = emevent.thankYouEMailFrom
         msubject = emevent.thankYouEMailSubject
         mbody = emevent.thankYouEMailBody
-        if emevent.thankYouIncludeConfirmation:
-            mtemplate = 'email_thankyou_includeConfirmation.pt'
-            # TODO: add attachments for confirmation
-        else:
-            mtemplate = 'email_thankyou.pt'
 
     elif emailtype == 'on waiting list':
         mfrom = emevent.waitingListEMailFrom
         msubject = emevent.waitingListEMailSubject
         mbody = emevent.waitingListEMailBody
-        mtemplate = 'email_onwaitinglist.pt'
 
     elif emailtype == 'registration full':
         mfrom = emevent.registrationFullEMailFrom
         msubject = emevent.registrationFullEMailSubject
         mbody = emevent.registrationFullEMailBody
-        mtemplate = 'email_registrationfull.pt'
 
     elif emailtype == 'confirmation':
-        mtemplate = 'email_confirmation.pt'
-
+        #mtemplate = 'email_confirmation.pt'
+        pass
     elif emailtype == 'announcement':
-        mtemplate = 'email_announcement.pt'
-
+        #mtemplate = 'email_announcement.pt'
+        pass
     elif emailtype == 'other':
-        mtemplate = 'email_other.pt'
+        #mtemplate = 'email_other.pt'
+        pass
 
     if mfrom == None or mfrom == '':
         return False
 
-    template = MailBodyTemplate(mtemplate)
-    context = {'mailbody': mbody, 'emevent': emevent, 'reg': reg}
-    message = template(context=context)
+    template = Template(mbody)
+    message = template.render(emevent=emevent, reg=reg)
 
     for address in mto:
         msg = None
@@ -508,18 +495,18 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
     return True
 
 
-def canAdd(folder, type_name):
+def _canAdd(folder, type_name):
     folder.setConstrainTypesMode(1)
     folder.setLocallyAllowedTypes((BASE_TYPE_NAME + type_name,))
 
 
-def addSessionsFolder(emevent):
+def _addSessionsFolder(emevent):
     # add a folder to hold sessions
     id = emevent.invokeFactory('Folder', 'sessions', title="Sessions")
-    canAdd(emevent[id], 'Session')
+    _canAdd(emevent[id], 'Session')
 
 
-def addSessionCalendarFolder(emevent):
+def _addSessionCalender(emevent):
     # add an ATTopic to display a calendar for sessions, if
     # sessions are enabled
     idval = emevent.invokeFactory('Topic', 'session-calendar',
@@ -539,29 +526,29 @@ def addFoldersForEventFormsFolder(emevent, event):
     # add session container and a session calendar
     if emevent.enableSessions:
         if 'sessions' not in emevent.objectIds():
-            addSessionsFolder(emevent)
+            _addSessionsFolder(emevent)
         if 'session-calendar' not in emevent.objectIds():
-            addSessionCalendarFolder(emevent)
+            _addSessionCalender(emevent)
 
     id = emevent.invokeFactory(
                         'Folder',
                         'registrations',
                         title='Registrations')
-    canAdd(emevent[id], 'Registration')
+    _canAdd(emevent[id], 'Registration')
 
     # add a folder to hold travel accommodations
     id = emevent.invokeFactory(
                         'Folder',
                         'travel-accommodations',
                         title='Travel Accommodations')
-    canAdd(emevent[id], 'Accommodation')
+    _canAdd(emevent[id], 'Accommodation')
 
     # add a folder to hold lodging accommodations
     id = emevent.invokeFactory(
                         'Folder',
                         'lodging-accommodations',
                         title='Lodging Accommodations')
-    canAdd(emevent[id], 'Accommodation')
+    _canAdd(emevent[id], 'Accommodation')
 
 
 @grok.subscribe(IEMEvent, IObjectModifiedEvent)
@@ -576,9 +563,9 @@ def checkEventForSessionsState(emevent, event):
             emevent.manage_delObjects(['session-calendar'])
     else:
         if 'sessions' not in ids:
-            addSessionsFolder(emevent)
+            _addSessionsFolder(emevent)
         if 'session-calendar' not in ids:
-            addSessionCalendarFolder(emevent)
+            _addSessionCalender(emevent)
 
 
 class View(grok.View):
@@ -746,3 +733,4 @@ class RegistrationStatusForm(BrowserView):
                 registrations.append(self.__parent__.registrations[reg])
 
         return registrations
+

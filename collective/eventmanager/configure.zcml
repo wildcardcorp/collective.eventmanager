@@ -59,5 +59,11 @@
     layer="collective.eventmanager.interfaces.ILayer"
     permission="zope2.View"
     />
-
+  
+  <browser:page
+    name="em-email-templates"
+    for="Products.CMFCore.interfaces._content.ISiteRoot"
+    class=".emailtemplates.EmailTemplateConfiglet"
+    layer=".interfaces.ILayer"
+    permission="cmf.ManagePortal" />
 </configure>
