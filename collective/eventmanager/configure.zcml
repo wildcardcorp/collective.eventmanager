@@ -50,16 +50,6 @@
     layer="collective.eventmanager.interfaces.ILayer"
     />
 
-  <browser:viewlet
-    name="collective.geo.kml.kmlcontentviewlet"
-    for="collective.geo.geographer.interfaces.IGeoreferenceable"
-    class="collective.eventmanager.viewlets.MapAccommodationsViewlet"
-    manager="plone.app.layout.viewlets.interfaces.IAboveContentBody"
-    template="viewlets_templates/mapaccommodationsviewlet.pt"
-    layer="collective.eventmanager.interfaces.ILayer"
-    permission="zope2.View"
-    />
-  
   <browser:page
     name="em-email-templates"
     for="Products.CMFCore.interfaces._content.ISiteRoot"

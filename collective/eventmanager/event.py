@@ -17,22 +17,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from collective.z3cform.mapwidget.widget import MapFieldWidget
-from collective.eventmanager.vocabularies import \
-    RegistrationRowAvailableFieldTypes
 
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
-
-
-registrationRowAvailableFieldTypes = SimpleVocabulary(
-    [SimpleTerm(value=u'TextLine', title=u'Text Line'),
-     SimpleTerm(value=u'Text', title=u'Text Area'),
-     SimpleTerm(value=u'Float', title=u'Number'),
-     SimpleTerm(value=u'Bool', title=u'Check Box'),
-     SimpleTerm(value=u'Datetime', title=u'Date/Time'),
-     SimpleTerm(value=u'URI', title=u'URL')]
-    )
+from collective.eventmanager.vocabularies import \
+    RegistrationRowAvailableFieldTypes
 
 
 class IRegistrationFieldRow(interface.Interface):
