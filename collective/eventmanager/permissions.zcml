@@ -18,20 +18,8 @@
         title="Event Manager: Add Session Folder"
         />
     <permission
-        id="collective.eventmanager.AddTravelAccommodation"
-        title="Event Manager: Add Travel Accommodation"
-        />
-    <permission
-        id="collective.eventmanager.AddTravelAccommodationFolder"
-        title="Event Manager: Add Travel Accommodation Folder"
-        />
-    <permission
-        id="collective.eventmanager.AddLodgingAccommodation"
-        title="Event Manager: Add Lodging Accommodation"
-        />
-    <permission
-        id="collective.eventmanager.AddLodgingAccommodationFolder"
-        title="Event Manager: Add Lodging Accommodation Folder"
+        id="collective.eventmanager.AddAccommodation"
+        title="Event Manager: Add Accommodation"
         />
     <permission
         id="collective.eventmanager.AddRegistration"

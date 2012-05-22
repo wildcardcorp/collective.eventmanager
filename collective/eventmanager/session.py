@@ -3,6 +3,8 @@ from zope import schema
 from plone.directives import form
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from datetime import datetime
+from collective.z3cform.mapwidget.widget import MapFieldWidget
+
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
 
@@ -41,6 +43,19 @@ class ISession(form.Schema, ISolgemaFullcalendarMarker):
             description=_(u"The maximum number of registrants that can "
                           u"participate in this session, if left empty "
                           u"there is no limit"),
+            required=False,
+        )
+
+    form.widget(location=MapFieldWidget)
+    location = schema.TextLine(
+            title=_(u"Location"),
+            description=_(u"Address of the location of the session"),
+            required=False,
+        )
+
+    locationDescription = schema.Text(
+            title=_(u"Description of Location"),
+            description=_(u"A short description of the location"),
             required=False,
         )
 

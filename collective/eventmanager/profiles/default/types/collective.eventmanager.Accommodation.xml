@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <object
-    name="collective.eventmanager.TravelAccommodation"
+    name="collective.eventmanager.Accommodation"
     meta_type="Dexterity FTI"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     i18n:domain="collective.eventmanager">
 
     <!-- Basic properties -->
-    <property name="title" i18n:translate="">Travel Accommodation</property>
-    <property name="description" i18n:translate="">An accommodation for travel</property>
+    <property name="title" i18n:translate="">Accommodation</property>
+    <property name="description" i18n:translate="">An accommodation (for travel, lodging, etc)</property>
     <property name="allow_discussion">False</property>
 
     <!-- Hierarchy control -->
@@ -19,9 +19,9 @@
     </property>
 
     <!-- Schema, class and security -->
-    <property name="schema">collective.eventmanager.travelaccommodation.ITravelAccommodation</property>
+    <property name="schema">collective.eventmanager.accommodation.IAccommodation</property>
     <property name="klass">plone.dexterity.content.Container</property>
-    <property name="add_permission">collective.eventmanager.AddTravelAccommodation</property>
+    <property name="add_permission">collective.eventmanager.AddAccommodation</property>
 
     <!-- enabled behaviors -->
     <property name="behaviors">

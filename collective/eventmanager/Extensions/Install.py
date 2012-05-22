@@ -3,8 +3,7 @@ from collective.eventmanager.config import BASE_TYPE_NAME
 
 _types_add_allowable = (
     'Session',
-    'TravelAccommodation',
-    'LodgingAccommodation',
+    'Accommodation',
     'Registration')
 
 

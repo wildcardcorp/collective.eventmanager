@@ -32,9 +32,9 @@ class TestTypes(BaseTest):
         event.sessions.invokeFactory(
             'collective.eventmanager.Session', 'ses')
         event['travel-accommodations'].invokeFactory(
-            'collective.eventmanager.TravelAccommodation', 'tra')
+            'collective.eventmanager.Accommodation', 'tra')
         event['lodging-accommodations'].invokeFactory(
-            'collective.eventmanager.LodgingAccommodation', 'lod')
+            'collective.eventmanager.Accommodation', 'lod')
 
 
 def test_suite():

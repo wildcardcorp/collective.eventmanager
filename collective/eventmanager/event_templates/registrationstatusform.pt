@@ -33,6 +33,7 @@
           </div>
 
           <h2>On Waiting List</h2>
+          <em>If you move registrations from the waiting list to the approved or confirmed state, the 'off waiting list' email (configured under the 'Edit' tab) will be sent, if the option is enabled.</em>
           <div tal:condition="python: len(view.getRegistrationsWithStatus('Submitted')) <= 0">
             There are no registrations on the waiting list.
           </div>

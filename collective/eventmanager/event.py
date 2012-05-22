@@ -12,7 +12,7 @@ from Products.CMFCore.utils import getToolByName
 from zope.pagetemplate.pagetemplatefile import PageTemplateFile
 from Products.Five.browser import BrowserView
 from plone.protect import protect, CheckAuthenticator
-
+from collective.z3cform.mapwidget.widget import MapFieldWidget
 from email import encoders
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -21,7 +21,6 @@ from email.mime.base import MIMEBase
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
-from collective.z3cform.mapwidget.widget import MapFieldWidget
 
 
 registrationRowAvailableFieldTypes = SimpleVocabulary(
@@ -220,54 +219,6 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             required=False,
         )
 
-    # === ANNOUNCEMENT EMAIL ===
-    #form.fieldset(
-    #        "announcmentemailsettings",
-    #        label=_(u"Announcement EMail Settings"),
-    #        fields=[
-    #            'sendAnnouncementEMail',
-    #            'sendAnnouncementEMailTo',
-    #            'announcementEMailFrom',
-    #            'announcementEMailSubject',
-    #            'announcementEMailBody'
-    #        ])
-
-    ## sent to a list of email addresses, either manually by an administrator
-    ## or automatically when registration opens
-    #sendAnnouncementEMail = schema.Bool(
-    #        title=_(u"Send Announcement EMail Automatically"),
-    #        description=_(u"Send an announcement email when event registration"
-    #                      u" opens, otherwise an administrator can send"
-    #                      u" the annoucement email at any time"),
-    #        required=True,
-    #        default=False,
-    #    )
-    #announcementEMailFrom = schema.TextLine(
-    #        title=_(u"EMail address to send Announcement EMail from"),
-    #        description=_(u"The EMail address to use in the From field"),
-    #        required=False,
-    #    )
-    #sendAnnouncementEMailTo = schema.Text(
-    #        title=_(u"EMail addresses to send Announcement to"),
-    #        description=_(u"list of addresses separated by commas or newlines "
-    #                      u"to send the announcement email to. This field "
-    #                      u"can be left blank if the announcement will "
-    #                      u"not be sent automatically"),
-    #        required=False,
-    #    )
-    #announcementEMailSubject = schema.TextLine(
-    #        title=_(u"Annoucement EMail Subject"),
-    #        description=_(u"The subject of the EMail announcing the event"),
-    #        required=False,
-    #        default=_(u"A New Event is Available"),
-    #    )
-    #announcementEMailBody = schema.Text(
-    #        title=_(u"Announcement EMail Body"),
-    #        description=_(u"The content of the EMail announcing the event"),
-    #        required=False,
-    #        default=_(u"")
-    #    )
-
     # === THANK YOU EMAIL ===
     form.fieldset(
             "thankyouemailsettings",
@@ -396,6 +347,7 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                 'waitingListEMailFrom',
                 'waitingListEMailSubject',
                 'waitingListEMailBody',
+                'sendOffWaitingListEMail',
                 'offWaitingListEMailSubject',
                 'offWaitingListEMailBody'
             ])
@@ -431,6 +383,15 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                       u"available, but you have been put on a waiting "
                       u"list and will receive another email should a "
                       u"registration become available")
+        )
+    sendOffWaitingListEMail = schema.Bool(
+            title=_(u"Send EMail When Registration Moves off Waiting List"),
+            description=_(u"When an admin moves a registration from the "
+                          u"waiting list to be either approved or "
+                          u"confirmed, the 'off waiting list' email is "
+                          u"sent if this option is checked"),
+            required=False,
+            default=False
         )
     offWaitingListEMailSubject = schema.TextLine(
             title=_(u"Off Waiting List EMail Subject"),
@@ -593,14 +554,14 @@ def addFoldersForEventFormsFolder(emevent, event):
                         'Folder',
                         'travel-accommodations',
                         title='Travel Accommodations')
-    canAdd(emevent[id], 'TravelAccommodation')
+    canAdd(emevent[id], 'Accommodation')
 
     # add a folder to hold lodging accommodations
     id = emevent.invokeFactory(
                         'Folder',
                         'lodging-accommodations',
                         title='Lodging Accommodations')
-    canAdd(emevent[id], 'LodgingAccommodation')
+    canAdd(emevent[id], 'Accommodation')
 
 
 @grok.subscribe(IEMEvent, IObjectModifiedEvent)
@@ -713,21 +674,11 @@ class RegistrationStatusForm(BrowserView):
     @protect(CheckAuthenticator)
     def _handlePost(self, REQUEST):
         subtype = REQUEST.form['submit']
-        idlist_submitted = []
-        idlist_approved = []
-        idlist_confirmed = []
-        idlist_cancelled = []
-        idlist_denied = []
-        if 'submitted' in REQUEST.form:
-            idlist_submitted = [a for a in REQUEST.form['submitted']]
-        if 'approved' in REQUEST.form:
-            idlist_approved = [a for a in REQUEST.form['approved']]
-        if 'confirmed' in REQUEST.form:
-            idlist_confirmed = [a for a in REQUEST.form['confirmed']]
-        if 'cancelled' in REQUEST.form:
-            idlist_cancelled = [a for a in REQUEST.form['cancelled']]
-        if 'denied' in REQUEST.form:
-            idlist_denied = [a for a in REQUEST.form['denied']]
+        idlist_submitted = self._getActionsFor('submitted', REQUEST)
+        idlist_approved = self._getActionsFor('approved', REQUEST)
+        idlist_confirmed = self._getActionsFor('confirmed', REQUEST)
+        idlist_cancelled = self._getActionsFor('cancelled', REQUEST)
+        idlist_denied = self._getActionsFor('denied', REQUEST)
 
         if subtype == 'Wait List':
             self._doActions(idlist_approved, ['cancel', 'modify'])
@@ -735,12 +686,14 @@ class RegistrationStatusForm(BrowserView):
             self._doActions(idlist_cancelled, ['modify'])
             self._doActions(idlist_denied, ['modify'])
         elif subtype == 'Approve':
-            self._doActions(idlist_submitted, ['approve'])
+            sendm = self.__parent__.sendOffWaitingListEMail
+            self._doActions(idlist_submitted, ['approve'], sendm)
             self._doActions(idlist_confirmed, ['cancel', 'approve'])
             self._doActions(idlist_cancelled, ['approve'])
             self._doActions(idlist_denied, ['approve'])
         elif subtype == 'Confirm':
-            self._doActions(idlist_submitted, ['approve', 'confirm'])
+            sendm = self.__parent__.sendOffWaitingListEMail
+            self._doActions(idlist_submitted, ['approve', 'confirm'], sendm)
             self._doActions(idlist_approved, ['confirm'])
             self._doActions(idlist_cancelled, ['approve', 'confirm'])
             self._doActions(idlist_denied, ['approve', 'confirm'])
@@ -756,12 +709,28 @@ class RegistrationStatusForm(BrowserView):
             self._doActions(idlist_cancelled, ['deny'])
             pass
 
-    def _doActions(self, idlist=[], actions=[]):
+    def _getActionsFor(self, actiontype, REQUEST):
+        if actiontype in REQUEST.form:
+            if type(REQUEST.form[actiontype]) == list:
+                return REQUEST.form[actiontype]
+            else:
+                return [REQUEST.form[actiontype]]
+
+        return []
+
+    def _doActions(self, idlist=[], actions=[], sendwaitlistemail=False):
         for id in idlist:
             reg = self.__parent__.registrations[id]
             wf = getToolByName(reg, "portal_workflow")
             for action in actions:
                 wf.doActionFor(reg, action)
+            if sendwaitlistemail:
+                mfrom = self.__parent__.waitingListEMailFrom
+                mto = reg.description
+                msubject = self.__parent__.offWaitingListEMailSubject
+                mbody = self.__parent__.offWaitingListEMailBody
+                mh = getToolByName(self.__parent__, 'MailHost')
+                mh.send(mbody, mto, mfrom, msubject)
 
     def getRegistrationsWithStatus(self, status):
         wf = getToolByName(self, 'portal_workflow')
