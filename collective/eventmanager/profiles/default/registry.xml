@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 <registry>
     <records interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" />
-      <record field="announcement" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.announcement">
-    <value />
-  </record>
   <record field="announcement_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.announcement_htmlbody">
     <field type="plone.registry.field.Text">
       <title>HTML Body</title>
@@ -21,9 +18,6 @@
       <title>Plain Text Body</title>
     </field>
     <value>plone body</value>
-  </record>
-  <record field="confirmation" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.confirmation">
-    <value />
   </record>
   <record field="confirmation_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.confirmation_htmlbody">
     <field type="plone.registry.field.Text">
@@ -43,9 +37,6 @@
     </field>
     <value>plone body</value>
   </record>
-  <record field="onwaitinglist" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.onwaitinglist">
-    <value />
-  </record>
   <record field="onwaitinglist_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.onwaitinglist_htmlbody">
     <field type="plone.registry.field.Text">
       <title>On waiting list HTML Body</title>
@@ -63,9 +54,6 @@
       <title>On waiting list Plain Text Body</title>
     </field>
     <value>plone body</value>
-  </record>
-  <record field="other" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.other">
-    <value />
   </record>
   <record field="other_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.other_htmlbody">
     <field type="plone.registry.field.Text">
@@ -85,9 +73,6 @@
     </field>
     <value>plone body</value>
   </record>
-  <record field="registrationfull" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.registrationfull">
-    <value />
-  </record>
   <record field="registrationfull_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.registrationfull_htmlbody">
     <field type="plone.registry.field.Text">
       <title>Registraion full HTML Body</title>
@@ -106,9 +91,6 @@
     </field>
     <value>plone body</value>
   </record>
-  <record field="thankyou" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou">
-    <value />
-  </record>
   <record field="thankyou_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_htmlbody">
     <field type="plone.registry.field.Text">
       <title>Thank you HTML Body</title>
@@ -126,9 +108,6 @@
       <title>Thank you Plain Text Body</title>
     </field>
     <value>plone body</value>
-  </record>
-  <record field="thankyou_with_confirmation" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_with_confirmation">
-    <value />
   </record>
   <record field="thankyou_with_confirmation_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_with_confirmation_htmlbody">
     <field type="plone.registry.field.Text">
