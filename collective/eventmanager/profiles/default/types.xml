@@ -3,4 +3,5 @@
     <object name="collective.eventmanager.Session" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.Accommodation" meta_type="Dexterity FTI" />
     <object name="collective.eventmanager.Registration" meta_type="Dexterity FTI" />
+    <object name="Folder" meta_type="Factory-based Type Information with dynamic views"/>
 </object>
