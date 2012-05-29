@@ -10,7 +10,14 @@
 <metal:content-core fill-slot="content-core">
     <metal:content-core define-macro="content-core">
 
-        TEST VIEW
+        <tal:registered tal:condition="view/registered">
+            You are registered for this event.
+        </tal:registered>
+        <tal:notregistered tal:condition="not: view/registered">
+            You are not
+            <a href="#"
+                tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?current-user=true">registered for this event</a>.
+        </tal:notregistered>
 
     </metal:content-core>
 </metal:content-core>

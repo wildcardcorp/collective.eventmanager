@@ -40,7 +40,8 @@ setup(name='collective.eventmanager',
           'collective.geo.kml',
           'plone.resource',
           'plone.protect',
-          'mako'
+          'mako',
+          'collective.autopermission'
       ],
       extras_require={
             'test': ['plone.app.testing', ]

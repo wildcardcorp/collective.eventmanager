@@ -16,7 +16,6 @@ from email import encoders
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
-from collective.z3cform.mapwidget.widget import MapFieldWidget
 
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
@@ -498,19 +497,14 @@ def _addSessionsFolder(emevent):
 
 def _addSessionCalender(emevent):
     # Add a collections object for a calendar if available.
-    idval = emevent.invokeFactory('Collection', 'session-calendar',
+    idval = emevent.invokeFactory('Topic', 'session-calendar',
                                   title="Session Calendar")
     sessioncal = emevent[idval]
-    sessioncal.query = [{
-        'i': 'portal_type',
-        'o': 'plone.app.querystring.operation.selection.is',
-        'v': ['collective.eventmanager.Session']
-    },
-    {
-        'i': 'path',
-        'o': 'plone.app.querystring.operation.string.relativePath',
-        'v': '../sessions'
-    }]
+    criterion = sessioncal.addCriterion('Type', 'ATPortalTypeCriterion')
+    criterion.setValue('Session')
+    criterion = sessioncal.addCriterion('path', 'ATRelativePathCriterion')
+    criterion.setRelativePath('../sessions')
+    sessioncal.setLayout('solgemafullcalendar_view')
 
 
 @grok.subscribe(IEMEvent, IObjectAddedEvent)
@@ -572,6 +566,20 @@ class View(grok.View):
     grok.require('zope2.View')
     grok.name('view')
     grok.layer(ILayer)
+
+    @property
+    def registered(self):
+        mt = getToolByName(self.context, 'portal_membership')
+        if mt.isAnonymousUser():
+            return False
+        # XXX should be optimized
+        member = mt.getAuthenticatedMember()
+        username = member.getUserName()
+        registrationfolder = self.context.registrations
+        for registration in registrationfolder.objectValues():
+            if registration.email == username:
+                return True
+        return False
 
 
 class EMailSenderForm(BrowserView):

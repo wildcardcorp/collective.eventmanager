@@ -14,10 +14,6 @@
         title="Event Manager: Add Session"
         />
     <permission
-        id="collective.eventmanager.AddSessionFolder"
-        title="Event Manager: Add Session Folder"
-        />
-    <permission
         id="collective.eventmanager.AddAccommodation"
         title="Event Manager: Add Accommodation"
         />
@@ -26,7 +22,8 @@
         title="Event Manager: Add Registration"
         />
     <permission
-        id="collective.eventmanager.AddRegistrationFolder"
-        title="Event Manager: Add Registration Folder"
+        id="collective.eventmanager.ManageRegistrations"
+        title="Event Manager: Manage Registrations"
         />
+
 </configure>
