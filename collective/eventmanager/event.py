@@ -497,16 +497,20 @@ def _addSessionsFolder(emevent):
 
 
 def _addSessionCalender(emevent):
-    # add an ATTopic to display a calendar for sessions, if
-    # sessions are enabled
-    idval = emevent.invokeFactory('Topic', 'session-calendar',
-        title="Session Calendar")
+    # Add a collections object for a calendar if available.
+    idval = emevent.invokeFactory('Collection', 'session-calendar',
+                                  title="Session Calendar")
     sessioncal = emevent[idval]
-    criterion = sessioncal.addCriterion('Type', 'ATPortalTypeCriterion')
-    criterion.setValue('Session')
-    criterion = sessioncal.addCriterion('path', 'ATRelativePathCriterion')
-    criterion.setRelativePath('../sessions')
-    sessioncal.setLayout('solgemafullcalendar_view')
+    sessioncal.query = [{
+        'i': 'portal_type',
+        'o': 'plone.app.querystring.operation.selection.is',
+        'v': ['collective.eventmanager.Session']
+    },
+    {
+        'i': 'path',
+        'o': 'plone.app.querystring.operation.string.relativePath',
+        'v': '../sessions'
+    }]
 
 
 @grok.subscribe(IEMEvent, IObjectAddedEvent)
