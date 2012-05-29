@@ -18,6 +18,9 @@
         <element value="Image" />
         <element value="Topic" />
         <element value="Folder" />
+        <element value="collective.eventmanager.Accommodation" />
+        <element value="collective.eventmanager.Registration" />
+        <element value="collective.eventmanager.Session" />
     </property>
 
     <!-- Schema, class and security -->
