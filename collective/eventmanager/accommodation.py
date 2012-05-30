@@ -22,6 +22,12 @@ class IAccommodation(form.Schema):
             required=False,
         )
 
+    locationDescription = schema.Text(
+            title=_(u"Description of Location"),
+            description=_(u"A short description of the location"),
+            required=False,
+        )
+
 
 class View(grok.View):
     """Default view (called "@@view"") for an accommodation.
@@ -40,7 +46,7 @@ class View(grok.View):
         # setup map widget
         portal = getToolByName(self.context, "portal_url")
         mw = MapWidget(self, self.request, portal)
-        mw.mapid = 'accommodationlocation'
+        mw.mapid = self.MAP_CSS_CLASS
         mw.addClass(self.MAP_CSS_CLASS)
         self.mapfields = [mw]
 
@@ -60,9 +66,3 @@ class View(grok.View):
 
         return "cgmap.state['" + self.MAP_CSS_CLASS + "'] = " \
                + str(settings) + ";"
-
-    def mapwidth(self):
-        return 'inherit'
-
-    def mapheight(self):
-        return '500px'

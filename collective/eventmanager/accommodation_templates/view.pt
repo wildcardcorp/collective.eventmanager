@@ -11,15 +11,16 @@
 <metal:content-core fill-slot="content-core">
     <metal:content-core define-macro="content-core">
 
-        <style type='text/css' tal:content="python: '.accommodationlocation {height: ' + view.mapheight() + '; width: ' + view.mapwidth() + ';}'">
-        </style>
-
         <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
 
         <script type='text/javascript' tal:content="python: view.cgmapSettings()">
         </script>
 
         <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
+
+        <div class='accommodation_location_description'
+             tal:content='python: context.locationDescription'>
+        </div>
 
     </metal:content-core>
 </metal:content-core>

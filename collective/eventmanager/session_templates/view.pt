@@ -5,12 +5,43 @@
       lang="en"
       metal:use-macro="context/main_template/macros/master"
       i18n:domain="collective.eventmanager">
+
 <body>
 
 <metal:content-core fill-slot="content-core">
     <metal:content-core define-macro="content-core">
 
-        TEST VIEW
+        <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
+
+        <script type='text/javascript' tal:content="python: view.cgmapSettings()">
+        </script>
+
+        <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
+
+        <div class='session_datetime'>
+            <div tal:condition="python: context.start == context.end">
+                This is an all day event on <span tal:content="python: context.start.strftime('%m/%d/%y')" />.
+            </div>
+            <div tal:condition="python: context.start != context.end">
+                The session goes from <span tal:content="python: context.start.strftime('%m/%d/%y %I:%M%p')" />
+                to <span tal:content="python: context.end.strftime('%m/%d/%y %I:%M%p')" />
+            </div>
+        </div>
+
+        <div class='session_max_participants'
+             tal:condition="python: context.maxParticipants != None and context.maxParticipants > 0">
+            <span tal:content="python: context.maxParticipants" /> participants can
+            attend this session.
+        </div>
+
+        <div class='session_description_of_location'
+             tal:content='python: context.locationDescription'>
+        </div>
+
+        <div class='session_presenter'>
+            <h2>Presenting <span tal:content='python: context.contactName' /></h2>
+            <div tal:content='python: context.contactDetails' />
+        </div>
 
     </metal:content-core>
 </metal:content-core>
