@@ -13,6 +13,7 @@ from Products.statusmessages.interfaces import IStatusMessage
 from zope.component import getMultiAdapter
 from z3c.form.interfaces import IErrorViewSnippet
 from z3c.form import button
+import random
 
 
 class IRegistration(form.Schema):
@@ -44,21 +45,36 @@ def validateEmail(value):
 
 def getNumApprovedAndConfirmed(context):
     catalog = getToolByName(context, 'portal_catalog')
-    searchDict = {
-        'query': ('/'.join(context.getPhysicalPath())),
-        'depth': 1,
-        'portal_type': 'collective.eventmanager.Registration',
-        'review_state': 'approved'}
-    count = len(catalog.searchResults(searchDict))
-    searchDict['review_state'] = 'confirmed'
-
-    return count + len(catalog.searchResults(searchDict))
+    return len(catalog(
+        path={'query': '/'.join(context.getPhysicalPath()),
+              'depth': 1},
+        portal_type='collective.eventmanager.Registration',
+        review_state=('approved', 'confirmed')))
 
 
 @grok.subscribe(IRegistration, IObjectAddedEvent)
 def handleNewRegistration(reg, event):
     parentevent = reg.__parent__.__parent__
     regfolderish = reg.__parent__
+
+    # first, check if the user needs to be created
+    user = getToolByName(reg, 'acl_users').getUserById(reg.email)
+    if not user:
+        # create member and make him owner of registration object
+        regtool = getToolByName(reg, 'portal_registration')
+        member = regtool.addMember(reg.email, regtool.generatePassword(),
+            properties={
+                'fullname': reg.title, 'email': reg.email,
+                'username': reg.email
+            })
+        # should we do a different email than password reset?
+        # more like, hey, can account was create, set your password!
+        regtool.mailPassword(reg.email, reg.REQUEST)
+        user = member.getUser()
+    reg.manage_setLocalRoles(reg.email, ["Owner"])
+    # Make sure user is owner of this sucker
+    reg.reindexObjectSecurity()
+
     hasWaitingList = parentevent.enableWaitingList
     hasPrivateReg = parentevent.privateRegistration
     #isPrivateEvent = parentevent.privateEvent
@@ -70,16 +86,13 @@ def handleNewRegistration(reg, event):
     # private registration means manual adding of registrations
     if hasPrivateReg:
         workflowTool.doActionFor(parentevent, 'approve')
-
     # haven't hit max, 'approve'
-    elif maxreg == None or numRegApproved <= maxreg:
+    elif maxreg == None or numRegApproved < maxreg:
         workflowTool.doActionFor(reg, 'approve')
         sendEMail(parentevent, 'thank you', [reg.email], reg)
-
     # waiting list, and hit max == remain 'submitted' (on waiting list)
     elif hasWaitingList:
         sendEMail(parentevent, 'on waiting list', [reg.email], reg)
-
     # all other cases, 'deny'
     else:
         workflowTool.doActionFor(reg, 'deny')
@@ -159,6 +172,13 @@ def addDynamicFields(form, reg_fields):
 class EditForm(dexterity.EditForm):
     grok.context(IRegistration)
 
+    def updateWidgets(self):
+        super(dexterity.EditForm, self).updateWidgets()
+        # can't actually edit these as they can be descructive.
+        # should delete and then re-add
+        self.widgets['email'].mode = 'display'
+        self.widgets['title'].mode = 'display'
+
     def updateFields(self):
         super(dexterity.EditForm, self).updateFields()
         em = self.context.__parent__.__parent__
@@ -201,7 +221,7 @@ class AddForm(dexterity.AddForm):
         data, errors = self.extractData()
         # XXX before we save, we need to make sure there aren't
         # XXX already registrations for same user.
-        # XXX Make faster!
+        # XXX Make faster! Index and use catalog
         if not errors:
             email = data['email']
             for registration in self.context.objectValues():

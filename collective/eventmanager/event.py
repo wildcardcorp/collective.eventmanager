@@ -568,7 +568,32 @@ class View(grok.View):
     grok.layer(ILayer)
 
     @property
-    def registered(self):
+    def number_registered(self):
+        # XXX Optimize! catalog
+        registrationfolder = self.context.registrations
+        wftool = getToolByName(self.context, "portal_workflow")
+        count = 0
+        for reg in registrationfolder.objectValues():
+            status = wftool.getStatusOf(
+                "collective.eventmanager.Registration_workflow", reg)
+            if status['review_state'] in ('approved', 'confirmed'):
+                count += 1
+        return count
+
+    @property
+    def number_wait_list(self):
+        # XXX Optimize! catalog
+        registrationfolder = self.context.registrations
+        wftool = getToolByName(self.context, "portal_workflow")
+        count = 0
+        for reg in registrationfolder.objectValues():
+            status = wftool.getStatusOf(
+                "collective.eventmanager.Registration_workflow", reg)
+            if status['review_state'] in ('submitted',):
+                count += 1
+        return count
+
+    def getRegistration(self):
         mt = getToolByName(self.context, 'portal_membership')
         if mt.isAnonymousUser():
             return False
@@ -576,10 +601,26 @@ class View(grok.View):
         member = mt.getAuthenticatedMember()
         username = member.getUserName()
         registrationfolder = self.context.registrations
-        for registration in registrationfolder.objectValues():
-            if registration.email == username:
-                return True
-        return False
+        for reg in registrationfolder.objectValues():
+            if reg.email == username:
+                return reg
+
+    @property
+    def registered(self):
+        reg = self.getRegistration()
+        if reg is None:
+            return False
+        return True
+
+    @property
+    def waiting_list(self):
+        reg = self.getRegistration()
+        if reg is None:
+            return False
+        wftool = getToolByName(self.context, "portal_workflow")
+        status = wftool.getStatusOf(
+            "collective.eventmanager.Registration_workflow", reg)
+        return status['review_state'] != 'approved'
 
 
 class EMailSenderForm(BrowserView):
