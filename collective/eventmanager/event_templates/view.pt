@@ -8,9 +8,32 @@
 <body>
 
 <metal:content-core fill-slot="content-core">
-    <metal:content-core define-macro="content-core">
-
-        TEST VIEW
+  <metal:content-core define-macro="content-core"
+    tal:define="reg view/getRegistration;
+                num_reg view/number_registered;
+                num_wait view/number_wait_list;">
+    <tal:registered tal:condition="view/registered">
+      <tal:waiting tal:condition="view/waiting_list">
+        You are on the wait list for this event.
+      </tal:waiting>
+      <tal:notwaiting tal:condition="not: view/waiting_list">
+        You are registered for this event.
+      </tal:notwaiting>
+      <a tal:attributes="href string:${reg/absolute_url}/view">
+        View registration settings.
+      </a>
+    </tal:registered>
+    <tal:notregistered tal:condition="not: view/registered">
+      You are not
+      <a href="#"
+          tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?current-user=true">registered for this event</a>.
+    </tal:notregistered>
+    <p tal:condition="num_reg">
+      There are <span class="num" tal:content="num_reg" /> registered.
+    </p>
+    <p tal:condition="num_wait">
+      There are <span class="num" tal:content="num_wait" /> on the wait list.
+    </p>
 
     </metal:content-core>
 </metal:content-core>

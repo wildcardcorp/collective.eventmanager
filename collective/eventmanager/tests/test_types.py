@@ -27,8 +27,9 @@ class TestTypes(BaseTest):
         self.portal.invokeFactory('collective.eventmanager.EMEvent',
                 'testem3')
         event = self.portal.testem3
-        event.registrations.invokeFactory(
-            'collective.eventmanager.Registration', 'reg')
+        #event.registrations.invokeFactory(
+        #    'collective.eventmanager.Registration', 'reg',
+        #    title='something', email='test@test.com')
         event.sessions.invokeFactory(
             'collective.eventmanager.Session', 'ses')
         event['travel-accommodations'].invokeFactory(

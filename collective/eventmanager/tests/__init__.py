@@ -48,21 +48,18 @@ class PublicEventTest(BaseTest):
         # first registration
         resultingregid = self.emevent.registrations.invokeFactory(
                         'collective.eventmanager.Registration',
-                        'Test Registration 1')
+                        'Test Registration 1', email=TEST_USER_ID)
         resultingreg1 = self.emevent.registrations[resultingregid]
-        numReg = getNumApprovedAndConfirmed(resultingreg1)
-        self.assertTrue(numReg >= 1)
+        self.assertTrue(len(self.emevent.registrations.objectIds()) >= 1)
         status = self.workflowTool.getStatusOf(
             "collective.eventmanager.Registration_workflow", resultingreg1)
         self.assertEqual(status['review_state'], first_state)
 
-        # second registration
         resultingregid = self.emevent.registrations.invokeFactory(
                         'collective.eventmanager.Registration',
-                        'Test Registration 2')
+                        'Test Registration 2', email='test@test.com')
         resultingreg2 = self.emevent.registrations[resultingregid]
-        numReg = getNumApprovedAndConfirmed(resultingreg2)
-        self.assertTrue(numReg >= 2)
+        self.assertTrue(len(self.emevent.registrations.objectIds()) >= 2)
         status = self.workflowTool.getStatusOf(
             "collective.eventmanager.Registration_workflow", resultingreg2)
         self.assertEqual(status['review_state'], second_state)

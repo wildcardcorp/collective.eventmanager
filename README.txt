@@ -23,3 +23,12 @@ git clone git@github.com:zombified/collective.eventmanager.git
 cd collective.eventmanager
 /path/to/python bootstrap.py
 ./bin/buildout
+
+
+Getpaid
+-------
+
+- to run buildout on mac, you need to install swig
+
+sudo port install swig
+sudo port install swig-python

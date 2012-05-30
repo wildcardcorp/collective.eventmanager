@@ -13,12 +13,6 @@
             <role name="Owner" />
             <role name="Contributor" />
         </permission>
-        <permission name="Event Manager: Add Session Folder" acquire="True">
-            <role name="Manager" />
-            <role name="Site Administrator" />
-            <role name="Owner" />
-            <role name="Contributor" />
-        </permission>
         <permission name="Event Manager: Add Accommodation" acquire="True">
             <role name="Manager" />
             <role name="Site Administrator" />
@@ -31,11 +25,9 @@
             <role name="Owner" />
             <role name="Contributor" />
         </permission>
-        <permission name="Event Manager: Add Registration Folder" acquire="True">
+        <permission name="Event Manager: Manage Registrations" acquire="True">
             <role name="Manager" />
             <role name="Site Administrator" />
-            <role name="Owner" />
-            <role name="Contributor" />
         </permission>
     </permissions>
 </rolemap>

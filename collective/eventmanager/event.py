@@ -16,7 +16,6 @@ from email import encoders
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
-from collective.z3cform.mapwidget.widget import MapFieldWidget
 
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
@@ -498,19 +497,14 @@ def _addSessionsFolder(emevent):
 
 def _addSessionCalender(emevent):
     # Add a collections object for a calendar if available.
-    idval = emevent.invokeFactory('Collection', 'session-calendar',
+    idval = emevent.invokeFactory('Topic', 'session-calendar',
                                   title="Session Calendar")
     sessioncal = emevent[idval]
-    sessioncal.query = [{
-        'i': 'portal_type',
-        'o': 'plone.app.querystring.operation.selection.is',
-        'v': ['collective.eventmanager.Session']
-    },
-    {
-        'i': 'path',
-        'o': 'plone.app.querystring.operation.string.relativePath',
-        'v': '../sessions'
-    }]
+    criterion = sessioncal.addCriterion('Type', 'ATPortalTypeCriterion')
+    criterion.setValue('Session')
+    criterion = sessioncal.addCriterion('path', 'ATRelativePathCriterion')
+    criterion.setRelativePath('../sessions')
+    sessioncal.setLayout('solgemafullcalendar_view')
 
 
 @grok.subscribe(IEMEvent, IObjectAddedEvent)
@@ -572,6 +566,61 @@ class View(grok.View):
     grok.require('zope2.View')
     grok.name('view')
     grok.layer(ILayer)
+
+    @property
+    def number_registered(self):
+        # XXX Optimize! catalog
+        registrationfolder = self.context.registrations
+        wftool = getToolByName(self.context, "portal_workflow")
+        count = 0
+        for reg in registrationfolder.objectValues():
+            status = wftool.getStatusOf(
+                "collective.eventmanager.Registration_workflow", reg)
+            if status['review_state'] in ('approved', 'confirmed'):
+                count += 1
+        return count
+
+    @property
+    def number_wait_list(self):
+        # XXX Optimize! catalog
+        registrationfolder = self.context.registrations
+        wftool = getToolByName(self.context, "portal_workflow")
+        count = 0
+        for reg in registrationfolder.objectValues():
+            status = wftool.getStatusOf(
+                "collective.eventmanager.Registration_workflow", reg)
+            if status['review_state'] in ('submitted',):
+                count += 1
+        return count
+
+    def getRegistration(self):
+        mt = getToolByName(self.context, 'portal_membership')
+        if mt.isAnonymousUser():
+            return False
+        # XXX should be optimized
+        member = mt.getAuthenticatedMember()
+        username = member.getUserName()
+        registrationfolder = self.context.registrations
+        for reg in registrationfolder.objectValues():
+            if reg.email == username:
+                return reg
+
+    @property
+    def registered(self):
+        reg = self.getRegistration()
+        if reg is None:
+            return False
+        return True
+
+    @property
+    def waiting_list(self):
+        reg = self.getRegistration()
+        if reg is None:
+            return False
+        wftool = getToolByName(self.context, "portal_workflow")
+        status = wftool.getStatusOf(
+            "collective.eventmanager.Registration_workflow", reg)
+        return status['review_state'] != 'approved'
 
 
 class EMailSenderForm(BrowserView):
