@@ -13,7 +13,6 @@ from Products.statusmessages.interfaces import IStatusMessage
 from zope.component import getMultiAdapter
 from z3c.form.interfaces import IErrorViewSnippet
 from z3c.form import button
-import random
 
 
 class IRegistration(form.Schema):
@@ -44,6 +43,8 @@ def validateEmail(value):
 
 
 def getNumApprovedAndConfirmed(context):
+    if context.portal_type == 'collective.eventmanager.Registration':
+        context = context.__parent__
     catalog = getToolByName(context, 'portal_catalog')
     return len(catalog(
         path={'query': '/'.join(context.getPhysicalPath()),
@@ -56,7 +57,6 @@ def getNumApprovedAndConfirmed(context):
 def handleNewRegistration(reg, event):
     parentevent = reg.__parent__.__parent__
     regfolderish = reg.__parent__
-
     # first, check if the user needs to be created
     user = getToolByName(reg, 'acl_users').getUserById(reg.email)
     if not user:
@@ -85,7 +85,7 @@ def handleNewRegistration(reg, event):
 
     # private registration means manual adding of registrations
     if hasPrivateReg:
-        workflowTool.doActionFor(parentevent, 'approve')
+        workflowTool.doActionFor(reg, 'approve')
     # haven't hit max, 'approve'
     elif maxreg == None or numRegApproved < maxreg:
         workflowTool.doActionFor(reg, 'approve')

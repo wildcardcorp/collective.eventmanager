@@ -29,6 +29,10 @@ class EventManager(PloneSandboxLayer):
         setRoles(portal, TEST_USER_ID, ('Member', 'Manager'))
         workflowTool = getToolByName(portal, 'portal_workflow')
         workflowTool.setDefaultChain('plone_workflow')
+        # second registration
+        regtool = getToolByName(portal, 'portal_registration')
+        regtool.addMember('test@test.com', regtool.generatePassword(),
+            properties={'email': 'test@test.com', 'username': 'test@test.com'})
 
 
 EventManager_FIXTURE = EventManager()
