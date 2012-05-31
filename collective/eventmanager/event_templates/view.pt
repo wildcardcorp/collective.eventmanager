@@ -23,6 +23,11 @@
         View registration settings.
       </a>
     </tal:registered>
+    <tal:pay tal:condition="python: reg and not reg.paid_fee and context.registrationFee">
+      <a tal:attributes="href string:${context/absolute_url}/@@pay-for-registration">
+        Pay for registration
+      </a>
+    </tal:pay>
     <tal:notregistered tal:condition="not: view/registered">
       You are not
       <a href="#"

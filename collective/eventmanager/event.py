@@ -1,3 +1,9 @@
+from zope.app.component.hooks import getSite
+from AccessControl import getSecurityManager
+from zope.component import getMultiAdapter
+from getpaid.core import interfaces
+from urllib import urlencode
+from Products.statusmessages.interfaces import IStatusMessage
 from five import grok
 from zope import schema, interface
 from plone.directives import form
@@ -146,9 +152,9 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             default=False
         )
 
-    requireFee = schema.Float(
+    registrationFee = schema.Float(
             title=_(u"Registration Fee"),
-            description=_(u"Fee to register for event"),
+            description=_(u"Fee to register for event. Leave at 0 if no fee."),
             required=True,
             default=0.0
         )
@@ -635,6 +641,37 @@ class View(grok.View):
         return status['review_state'] != 'approved'
 
 
+from Products.PloneGetPaid.browser.cart import ShoppingCartAddItem
+from getpaid.core.interfaces import ILineItemFactory
+from persistent.mapping import PersistentMapping
+from zope.annotation.interfaces import IAnnotations
+_getpaid_key = 'getpaid.configuration'
+class PayForEventView(ShoppingCartAddItem):
+
+    def __call__(self):
+        # first, make sure getpaid configuration for price is set.
+        annotations = IAnnotations(self.context)
+        if _getpaid_key not in annotations:
+            annotations[_getpaid_key] = PersistentMapping()
+        settings = annotations[_getpaid_key]
+        if 'price' not in settings or \
+                settings['price'] != self.context.registrationFee:
+            settings['price'] = self.context.registrationFee
+        # create a line item and add it to the cart
+        item_factory = getMultiAdapter((self.cart, self.context),
+            ILineItemFactory)
+
+        item_factory.create(quantity=1)
+        url = self.context.absolute_url() + '/@@getpaid-checkout-wizard'
+        return self.request.response.redirect(url)
+
+from Products.PloneGetPaid.browser.checkout import CheckoutAddress
+class CustomCheckoutAddress(CheckoutAddress):
+    def customise_widgets(self, fields):
+        import pdb; pdb.set_trace()
+        super(CustomCheckoutAddress, self).customise_widgets(fields)
+
+
 class EMailSenderForm(BrowserView):
     """Presents a page that allows an event admin to send out
        registraiton and confirmation emails manually"""
@@ -788,4 +825,3 @@ class RegistrationStatusForm(BrowserView):
                 registrations.append(self.__parent__.registrations[reg])
 
         return registrations
-
