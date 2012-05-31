@@ -12,28 +12,67 @@
     tal:define="reg view/getRegistration;
                 num_reg view/number_registered;
                 num_wait view/number_wait_list;">
-    <tal:registered tal:condition="view/registered">
-      <tal:waiting tal:condition="view/waiting_list">
-        You are on the wait list for this event.
-      </tal:waiting>
-      <tal:notwaiting tal:condition="not: view/waiting_list">
-        You are registered for this event.
-      </tal:notwaiting>
-      <a tal:attributes="href string:${reg/absolute_url}/view">
-        View registration settings.
-      </a>
-    </tal:registered>
-    <tal:notregistered tal:condition="not: view/registered">
-      You are not
-      <a href="#"
-          tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?current-user=true">registered for this event</a>.
-    </tal:notregistered>
-    <p tal:condition="num_reg">
-      There are <span class="num" tal:content="num_reg" /> registered.
-    </p>
-    <p tal:condition="num_wait">
-      There are <span class="num" tal:content="num_wait" /> on the wait list.
-    </p>
+
+      <tal:registered tal:condition="view/registered">
+        <tal:waiting tal:condition="view/waiting_list">
+          You are on the wait list for this event.
+        </tal:waiting>
+        <tal:notwaiting tal:condition="not: view/waiting_list">
+          You are registered for this event.
+        </tal:notwaiting>
+        <a tal:attributes="href string:${reg/absolute_url}/view">
+          View registration settings.
+        </a>
+      </tal:registered>
+      <tal:notregistered tal:condition="not: view/registered">
+        You are not
+        <a href="#"
+           tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?current-user=true">registered for this event</a>.
+      </tal:notregistered>
+      <p tal:condition="num_reg">
+        There are <span class="num" tal:content="num_reg" />
+        <span tal:condition='python: context.maxRegistrations != None'>
+          of <span tal:replace='python: context.maxRegistrations' />
+        </span>
+        registered.
+      </p>
+      <p tal:condition="num_wait">
+        There are <span class="num" tal:content="num_wait" /> on the wait list.
+      </p>
+
+
+      <div class='event_datetime'>
+        <div tal:condition="python: context.start == context.end">
+          This is an all day event on <span tal:content="python: context.start.strftime('%m/%d/%y')" />.
+        </div>
+        <div tal:condition="python: context.start != context.end">
+          The event goes from <span tal:content="python: context.start.strftime('%m/%d/%y %I:%M%p')" />
+          to <span tal:content="python: context.end.strftime('%m/%d/%y %I:%M%p')" />.
+        </div>
+      </div>
+
+      <div class='event_registration_datetime'>
+        Registration opens <span tal:content="python: context.registrationOpen.strftime('%m/%d/%y %I:%M%p')" />.
+        <div tal:condition="python: context.registrationClosed != None" ><span tal:content="python: context.registrationClosed.strftime('%m/%d/%y %I:%M%p')" /></div>
+      </div>
+
+      <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
+      <script type='text/javascript' tal:content="python: view.cgmapSettings()">
+      </script>
+      <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
+
+      <div class='event_location_description' tal:content='python: context.locationDescription'>
+      </div>
+
+      <div class='event_flyer' tal:condition='python: context.flyer != None'>
+        <a href='./@@display-file/flyer'>Event Flyer</a>
+      </div>
+
+      <div class='event_contact' tal:condition='python: context.contactName != None or context.contactDetails != None'>
+          <h2>Event Contact Information</h2>
+          <div tal:content='python: context.contactName' />
+          <div tal:content='python: context.contactDetails' />
+      </div>
 
     </metal:content-core>
 </metal:content-core>

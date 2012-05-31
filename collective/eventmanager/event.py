@@ -1,3 +1,5 @@
+import string
+
 from five import grok
 from zope import schema, interface
 from plone.directives import form
@@ -11,6 +13,7 @@ from Products.CMFCore.utils import getToolByName
 from mako.template import Template
 from Products.Five.browser import BrowserView
 from plone.protect import protect, CheckAuthenticator
+from collective.geo.mapwidget.browser.widget import MapWidget
 from collective.z3cform.mapwidget.widget import MapFieldWidget
 from email import encoders
 from email.mime.text import MIMEText
@@ -567,6 +570,18 @@ class View(grok.View):
     grok.name('view')
     grok.layer(ILayer)
 
+    MAP_CSS_CLASS = 'eventlocation'
+
+    def __call__(self):
+        # setup map widget
+        portal = getToolByName(self.context, "portal_url")
+        mw = MapWidget(self, self.request, portal)
+        mw.mapid = self.MAP_CSS_CLASS
+        mw.addClass(self.MAP_CSS_CLASS)
+        self.mapfields = [mw]
+
+        return super(View, self).__call__()
+
     @property
     def number_registered(self):
         # XXX Optimize! catalog
@@ -621,6 +636,22 @@ class View(grok.View):
         status = wftool.getStatusOf(
             "collective.eventmanager.Registration_workflow", reg)
         return status['review_state'] != 'approved'
+
+
+    def cgmapSettings(self):
+        settings = {}
+
+        coords = [0, 0]
+        if self.context.location != None \
+                and self.context.location[0:6] == u'POINT(':
+            coords = string.split(self.context.location[6:-1], ' ')
+
+        settings['lon'] = float(coords[0])
+        settings['lat'] = float(coords[1])
+        settings['zoom'] = 16
+
+        return "cgmap.state['" + self.MAP_CSS_CLASS + "'] = " \
+               + str(settings) + ";"
 
 
 class EMailSenderForm(BrowserView):
