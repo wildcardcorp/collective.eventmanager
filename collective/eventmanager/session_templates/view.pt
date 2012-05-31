@@ -20,7 +20,7 @@
 
         <div class='session_datetime'>
             <div tal:condition="python: context.start == context.end">
-                This is an all day event on <span tal:content="python: context.start.strftime('%m/%d/%y')" />.
+                This is an all day session on <span tal:content="python: context.start.strftime('%m/%d/%y')" />.
             </div>
             <div tal:condition="python: context.start != context.end">
                 The session goes from <span tal:content="python: context.start.strftime('%m/%d/%y %I:%M%p')" />

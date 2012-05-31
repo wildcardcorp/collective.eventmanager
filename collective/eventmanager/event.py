@@ -1,9 +1,5 @@
-from zope.app.component.hooks import getSite
-from AccessControl import getSecurityManager
 from zope.component import getMultiAdapter
-from getpaid.core import interfaces
-from urllib import urlencode
-from Products.statusmessages.interfaces import IStatusMessage
+import string
 from five import grok
 from zope import schema, interface
 from plone.directives import form
@@ -17,6 +13,7 @@ from Products.CMFCore.utils import getToolByName
 from mako.template import Template
 from Products.Five.browser import BrowserView
 from plone.protect import protect, CheckAuthenticator
+from collective.geo.mapwidget.browser.widget import MapWidget
 from collective.z3cform.mapwidget.widget import MapFieldWidget
 from email import encoders
 from email.mime.text import MIMEText
@@ -30,6 +27,12 @@ from collective.eventmanager.vocabularies import \
     RegistrationRowAvailableFieldTypes
 from Products.PloneGetPaid.interfaces import IBuyableMarker
 from zope.interface import alsoProvides
+from Products.PloneGetPaid.browser.checkout import CheckoutAddress
+from Products.PloneGetPaid.browser.cart import ShoppingCartAddItem
+from getpaid.core.interfaces import ILineItemFactory
+from persistent.mapping import PersistentMapping
+from zope.annotation.interfaces import IAnnotations
+_getpaid_key = 'getpaid.configuration'
 
 
 class IRegistrationFieldRow(interface.Interface):
@@ -585,6 +588,18 @@ class View(grok.View):
     grok.name('view')
     grok.layer(ILayer)
 
+    MAP_CSS_CLASS = 'eventlocation'
+
+    def __call__(self):
+        # setup map widget
+        portal = getToolByName(self.context, "portal_url")
+        mw = MapWidget(self, self.request, portal)
+        mw.mapid = self.MAP_CSS_CLASS
+        mw.addClass(self.MAP_CSS_CLASS)
+        self.mapfields = [mw]
+
+        return super(View, self).__call__()
+
     @property
     def number_registered(self):
         # XXX Optimize! catalog
@@ -640,12 +655,22 @@ class View(grok.View):
             "collective.eventmanager.Registration_workflow", reg)
         return status['review_state'] != 'approved'
 
+    def cgmapSettings(self):
+        settings = {}
 
-from Products.PloneGetPaid.browser.cart import ShoppingCartAddItem
-from getpaid.core.interfaces import ILineItemFactory
-from persistent.mapping import PersistentMapping
-from zope.annotation.interfaces import IAnnotations
-_getpaid_key = 'getpaid.configuration'
+        coords = [0, 0]
+        if self.context.location != None \
+                and self.context.location[0:6] == u'POINT(':
+            coords = string.split(self.context.location[6:-1], ' ')
+
+        settings['lon'] = float(coords[0])
+        settings['lat'] = float(coords[1])
+        settings['zoom'] = 16
+
+        return "cgmap.state['" + self.MAP_CSS_CLASS + "'] = " \
+               + str(settings) + ";"
+
+
 class PayForEventView(ShoppingCartAddItem):
 
     def __call__(self):
@@ -665,10 +690,9 @@ class PayForEventView(ShoppingCartAddItem):
         url = self.context.absolute_url() + '/@@getpaid-checkout-wizard'
         return self.request.response.redirect(url)
 
-from Products.PloneGetPaid.browser.checkout import CheckoutAddress
+
 class CustomCheckoutAddress(CheckoutAddress):
     def customise_widgets(self, fields):
-        import pdb; pdb.set_trace()
         super(CustomCheckoutAddress, self).customise_widgets(fields)
 
 
