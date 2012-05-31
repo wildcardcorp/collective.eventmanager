@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<import-steps>
+ <import-step id="collective.eventmanager.setup" version="1"
+              handler="collective.eventmanager.setuphandlers.install"
+              title="event manager install">
+ </import-step>
+</import-steps>
+

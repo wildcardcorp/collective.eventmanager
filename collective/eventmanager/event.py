@@ -25,6 +25,8 @@ from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.vocabularies import \
     RegistrationRowAvailableFieldTypes
+from Products.PloneGetPaid.interfaces import IBuyableMarker
+from zope.interface import alsoProvides
 
 
 class IRegistrationFieldRow(interface.Interface):
@@ -145,6 +147,13 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                           u"registration, check this field"),
             required=True,
             default=False
+        )
+
+    requireFee = schema.Float(
+            title=_(u"Registration Fee"),
+            description=_(u"Fee to register for event"),
+            required=True,
+            default=0.0
         )
 
     privateRegistration = schema.Bool(
@@ -513,6 +522,9 @@ def _addSessionCalender(emevent):
 @grok.subscribe(IEMEvent, IObjectAddedEvent)
 def addFoldersForEventFormsFolder(emevent, event):
     """Adds the forms and folders required for an emevent"""
+
+    # make buyable
+    alsoProvides(emevent, IBuyableMarker)
 
     # add session container and a session calendar
     if emevent.enableSessions:

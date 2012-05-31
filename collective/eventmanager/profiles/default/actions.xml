@@ -1,0 +1,15 @@
+<object name="portal_actions" meta_type="Plone Actions Tool">
+    <action-provider name="portal_actions"
+        xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+        i18n:domain="plone">
+        <action title="Payment Settings"
+                action_id="buyable"
+                category="object"
+                condition_expr="python:path('object/@@getpaid_control').isPayable()"
+                url_expr="string:${object_url}/@@edit-payable"
+                visible="False"
+                i18n:attributes="title">
+            <permission>Modify portal content</permission>
+        </action>
+    </action-provider>
+</object>

@@ -8,16 +8,22 @@
 <body>
 
 <metal:content-core fill-slot="content-core">
-    <metal:content-core define-macro="content-core">
-
-        <tal:item tal:repeat="item view/dynamicFields">
-            <div>
-                <h3 tal:content="python: item['name']" />
-                <p tal:content="structure python: view.getDisplayValueFor(item)"></p>
-            </div>
-        </tal:item>
-
-    </metal:content-core>
+  <metal:content-core define-macro="content-core"
+    tal:define="event view/event;
+                state view/review_state;">
+    <tal:pay tal:condition="view/require_payment">
+      You must 
+      <a tal:attributes="href string:${context/absolute_url}/pay">
+        pay before you can finish registration
+      </a>.
+    </tal:pay>
+    <dl>
+      <tal:item tal:repeat="item view/dynamicFields">
+        <dt tal:content="python: item['name']" />
+        <dd tal:content="structure python: view.getDisplayValueFor(item)" />
+      </tal:item>
+    </dl>
+  </metal:content-core>
 </metal:content-core>
 
 </body>
