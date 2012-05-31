@@ -77,7 +77,6 @@ def handleNewRegistration(reg, event):
 
     hasWaitingList = parentevent.enableWaitingList
     hasPrivateReg = parentevent.privateRegistration
-    #isPrivateEvent = parentevent.privateEvent
     maxreg = parentevent.maxRegistrations
     numRegApproved = getNumApprovedAndConfirmed(regfolderish)
 
@@ -109,6 +108,30 @@ class View(grok.View):
     grok.require('zope2.View')
     grok.name('view')
     grok.layer(ILayer)
+
+    @property
+    def event(self):
+        return self.context.__parent__.__parent__
+
+    @property
+    def review_state(self):
+        workflowTool = getToolByName(self.context, "portal_workflow")
+        status = workflowTool.getStatusOf(
+            "collective.eventmanager.Registration_workflow", self.context)
+        return status['review_state']
+
+    @property
+    def require_payment(self):
+        return self.event.requirePayment and not self.context.paid_fee \
+            and self.review_state == 'submitted' and self.room_available
+
+    @property
+    def room_available(self):
+        event = self.event
+        num = getNumApprovedAndConfirmed(self.context)
+        if not event.maxRegistrations:
+            return True
+        return num < event.maxRegistrations
 
     def dynamicFields(self):
         registrationFields = \

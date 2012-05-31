@@ -8,5 +8,6 @@
         <dependency>profile-Solgema.fullcalendar:default</dependency>
         <dependency>profile-collective.geo.mapwidget:default</dependency>
         <dependency>profile-collective.geo.kml:default</dependency>
+        <dependency>profile-Products.PloneGetPaid:default</dependency>
     </dependencies>
 </metadata>
