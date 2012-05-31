@@ -24,11 +24,9 @@ def install(context):
     site = context.getSite()
 
     # remove portlets
-    import pdb; pdb.set_trace()
     column = getUtility(IPortletManager, name="plone.rightcolumn",
                         context=site)
     manager = getMultiAdapter((site, column), IPortletAssignmentMapping)
     for name in manager.keys():
         if type(manager[name]) in _getpaid_portlet_types:
             del manager[name]
-

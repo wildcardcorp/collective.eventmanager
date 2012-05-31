@@ -149,9 +149,9 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             default=False
         )
 
-    requireFee = schema.Float(
+    registrationFee = schema.Float(
             title=_(u"Registration Fee"),
-            description=_(u"Fee to register for event"),
+            description=_(u"Fee to register for event. Leave at 0 if no fee."),
             required=True,
             default=0.0
         )
@@ -620,35 +620,26 @@ class View(grok.View):
                 count += 1
         return count
 
-    def getRegistration(self):
-        mt = getToolByName(self.context, 'portal_membership')
-        if mt.isAnonymousUser():
-            return False
-        # XXX should be optimized
-        member = mt.getAuthenticatedMember()
-        username = member.getUserName()
-        registrationfolder = self.context.registrations
-        for reg in registrationfolder.objectValues():
-            if reg.email == username:
-                return reg
+    @property
+    def reg(self):
+        from collective.eventmanager.registration import getRegistration
+        return getRegistration(self.context)
 
     @property
     def registered(self):
-        reg = self.getRegistration()
-        if reg is None:
+        if self.reg is None:
             return False
         return True
 
     @property
     def waiting_list(self):
-        reg = self.getRegistration()
-        if reg is None:
+        if self.reg is None:
             return False
         wftool = getToolByName(self.context, "portal_workflow")
         status = wftool.getStatusOf(
-            "collective.eventmanager.Registration_workflow", reg)
+            "collective.eventmanager.Registration_workflow",
+            self.reg)
         return status['review_state'] != 'approved'
-
 
     def cgmapSettings(self):
         settings = {}

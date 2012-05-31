@@ -1,0 +1,100 @@
+<metal:page use-macro="context/@@getpaid-content-template/content_space"
+    i18n:domain="plonegetpaid">
+  <metal:block fill-slot="getpaid_content">
+
+    <script language="javascript">
+    function swapVisibility(fromWho, toWho){
+        window.document.getElementById(fromWho).style.display = 'none';
+        window.document.getElementById(toWho).style.display = 'inline'
+    }
+    $(document).ready(function(){
+      $('#save_order_template').hide();
+    });
+    </script>
+
+    <h3 i18n:translate="heading_checkout"> Checkout </h3>
+
+  <form action="."
+        tal:attributes="action request/URL"
+    method="post"
+    enctype="multipart/form-data">
+
+    <div class="hidden_fields"
+     tal:content="structure view/hidden_inputs"> </div>
+
+    <div class="portalMessage" tal:content="view/status" tal:condition="view/status"> </div>
+    <div metal:use-macro="here/global_statusmessage/macros/portal_message">
+        Portal status message
+    </div>
+
+      <div>
+     <div style="float:left; width:30%">
+      <fieldset tal:define="widgets python: view.getWidgetsBySectionName('billing_address')">
+        <legend i18n:translate=""> Billing Address </legend>
+        <div metal:use-macro="context/@@getpaid-form-valuesonly/fieldset"> </div>
+      </fieldset>
+     </div>
+   <div style="float: left; padding-left: 3em; width: 30%;"
+        tal:define="ship_same_billing request/form.ship_same_billing|nothing;
+                shipping_address python: ship_same_billing and 'billing_address' or 'shipping_address'">
+      <fieldset tal:define="widgets python: view.getWidgetsBySectionName(shipping_address)">
+        <legend i18n:translate=""> Mailing Address </legend>
+        <tal:block tal:repeat="widget widgets">
+            <tal:sameAsBill tal:condition="not:repeat/widget/start">
+                <span class="widget" tal:content="structure widget"/><br/>
+            </tal:sameAsBill>
+        </tal:block>
+      </fieldset>
+   </div>
+      </div>
+
+      <div class="visualClear"><!-- --></div>
+
+
+      <div class="cart-listing">
+         <fieldset>
+             <legend i18n:translate=""> Shopping Cart </legend>
+             <div tal:replace="structure view/renderCart">cart</div>
+
+             <div tal:replace="structure provider:getpaid.belowcartresume" />
+
+            <div id="save_order_template_entry" style="display: none">
+                <label for="order_template_entry_name" id="order_template_entry_name_label" i18n:translate="">Order template name</label>
+                <div class="formHelp"
+                i18n:translate="" id="order_template_entry_name_help_text">A name you can remember this order template by.</div>
+                <input type="text" id="order_template_entry_name" name="order_template_entry_name" />
+            </div>
+
+            <input type="button" id="save_order_template" class="standalone" name="save_order_template" value="Save this order as a template" onclick="swapVisibility('save_order_template','save_order_template_entry')" i18n:attributes="value" />
+
+        </fieldset>
+
+      </div>
+
+      <div>
+      <fieldset tal:define="widgets python: view.getWidgetsBySectionName('payment')"
+                tal:condition="widgets">
+        <legend i18n:translate=""> Payment Details </legend>
+        <div metal:use-macro="context/@@getpaid-form/fieldset"> </div>
+      </fieldset>
+     </div>
+
+      <div id="actionsView">
+        <span class="actionButtons"
+              tal:condition="view/availableActions">
+            <tal:loop tal:repeat="action view/availableActions">
+              <input type="submit" class="button context"
+                   id="" name="" value=""
+                   tal:attributes="id action/__name__;
+                                   name action/__name__;
+                                   value python:str(action.label);"
+                   i18n:attributes="value" />
+            </tal:loop>
+        </span>
+      </div>
+
+  </form>
+  <metal:legal use-macro="context/@@legal-disclaimers-links/links" />
+
+  </metal:block>
+</metal:page>

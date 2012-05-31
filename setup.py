@@ -41,7 +41,8 @@ setup(name='collective.eventmanager',
           'plone.resource',
           'plone.protect',
           'mako',
-          'collective.autopermission'
+          'Products.PloneGetPaid',
+          'getpaid.wizard'
       ],
       extras_require={
             'test': ['plone.app.testing', ]
