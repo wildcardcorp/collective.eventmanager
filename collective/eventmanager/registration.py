@@ -5,7 +5,7 @@ from plone.z3cform.fieldsets import utils
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from Products.CMFCore.utils import getToolByName
 
-from collective.eventmanager.event import sendEMail
+from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
 from zope.component.hooks import getSite
@@ -13,6 +13,7 @@ from Products.statusmessages.interfaces import IStatusMessage
 from zope.component import getMultiAdapter
 from z3c.form.interfaces import IErrorViewSnippet
 from z3c.form import button
+from collective.eventmanager.utils import getNumApprovedAndConfirmed
 
 
 class IRegistration(form.Schema):
@@ -40,33 +41,6 @@ def validateEmail(value):
     registration = getToolByName(getSite(), 'portal_registration')
     if not registration.isValidEmail(value):
         raise schema.ValidationError("Invalid email address")
-
-
-def getRegistration(context):
-    """
-    context must be an event
-    """
-    mt = getToolByName(context, 'portal_membership')
-    if mt.isAnonymousUser():
-        return False
-    # XXX should be optimized
-    member = mt.getAuthenticatedMember()
-    username = member.getUserName()
-    registrationfolder = context.registrations
-    for reg in registrationfolder.objectValues():
-        if reg.email == username:
-            return reg
-
-
-def getNumApprovedAndConfirmed(context):
-    if context.portal_type == 'collective.eventmanager.Registration':
-        context = context.__parent__
-    catalog = getToolByName(context, 'portal_catalog')
-    return len(catalog(
-        path={'query': '/'.join(context.getPhysicalPath()),
-              'depth': 1},
-        portal_type='collective.eventmanager.Registration',
-        review_state=('approved', 'confirmed')))
 
 
 @grok.subscribe(IRegistration, IObjectAddedEvent)

@@ -1,7 +1,12 @@
 from zope.interface import Interface
 from zope import schema
-from collective.eventmanager import EventManagerMessageFactory as _
 from plone.app.registry.browser import controlpanel
+from email.MIMEText import MIMEText
+from email import encoders
+from email.mime.base import MIMEBase
+from mako.template import Template
+from email.MIMEMultipart import MIMEMultipart
+from Products.CMFCore.utils import getToolByName
 
 
 class IEMailTemplateSettings(Interface):
@@ -48,3 +53,70 @@ class EmailTemplateEditForm(controlpanel.RegistryEditForm):
 
 class EmailTemplateConfiglet(controlpanel.ControlPanelFormWrapper):
     form = EmailTemplateEditForm
+
+
+def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
+              deffrom=None, defsubject=None, defmsg=None):
+    mfrom = deffrom
+    msubject = defsubject
+    mbody = defmsg
+    mattachments = defattachments
+
+    mh = getToolByName(emevent, 'MailHost')
+
+    if emailtype == 'thank you':
+        mfrom = emevent.thankYouEMailFrom
+        msubject = emevent.thankYouEMailSubject
+        mbody = emevent.thankYouEMailBody
+
+    elif emailtype == 'on waiting list':
+        mfrom = emevent.waitingListEMailFrom
+        msubject = emevent.waitingListEMailSubject
+        mbody = emevent.waitingListEMailBody
+
+    elif emailtype == 'registration full':
+        mfrom = emevent.registrationFullEMailFrom
+        msubject = emevent.registrationFullEMailSubject
+        mbody = emevent.registrationFullEMailBody
+
+    elif emailtype == 'confirmation':
+        #mtemplate = 'email_confirmation.pt'
+        pass
+    elif emailtype == 'announcement':
+        #mtemplate = 'email_announcement.pt'
+        pass
+    elif emailtype == 'other':
+        #mtemplate = 'email_other.pt'
+        pass
+
+    if mfrom == None or mfrom == '':
+        return False
+
+    template = Template(mbody)
+    message = template.render(emevent=emevent, reg=reg)
+
+    for address in mto:
+        msg = None
+        if mattachments != None and len(mattachments) > 0:
+            msg = MIMEMultipart(message)
+            msg['Subject'] = msubject
+            msg['From'] = mfrom
+
+            for attachment in mattachments:
+                amsg = MIMEBase('application', 'octet-stream')
+                amsg.set_payload(attachment['data'])
+                encoders.encode_base64(amsg)
+                amsg.add_header('Content-Disposition', 'attachment',
+                                filename=attachment['name'])
+                msg.attach(amsg)
+        else:
+            msg = MIMEText(message)
+            msg['Subject'] = msubject
+            msg['From'] = mfrom
+
+        msg['To'] = address
+        mh.send(msg)
+
+    #mh.send('message', 'to@example.com', 'from@example.com', 'subject')
+
+    return True

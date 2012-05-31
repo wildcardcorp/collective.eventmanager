@@ -6,8 +6,6 @@ import unittest
 from plone.app.testing import TEST_USER_ID
 from collective.eventmanager.interfaces import ILayer
 from zope.interface import alsoProvides
-from collective.eventmanager.registration import \
-    getNumApprovedAndConfirmed
 
 
 class BaseTest(unittest.TestCase):

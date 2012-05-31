@@ -6,6 +6,7 @@ from zope.annotation.interfaces import IAnnotations
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from zope.formlib import form
 from Products.PloneGetPaid.i18n import _
+from collective.eventmanager.utils import findRegistrationObject
 from Products.PloneGetPaid.browser.checkout import \
     CheckoutAddress as BaseCheckoutAddress, \
     CheckoutReviewAndPay as BaseCheckoutReviewAndPay
@@ -42,8 +43,7 @@ class CheckoutAddress(BaseCheckoutAddress):
     def getWidgetsBySectionName(self, section_name):
         widgets = super(CheckoutAddress, self).getWidgetsBySectionName(
             section_name)
-        from collective.eventmanager.registration import getRegistration
-        reg = getRegistration(self.context)
+        reg = findRegistrationObject(self.context)
         for widget in [w for w in widgets]:
             if widget.name in self.fields_to_hide:
                 widgets.remove(widget)
@@ -62,8 +62,7 @@ class CheckoutReviewAndPay(BaseCheckoutReviewAndPay):
     def getWidgetsBySectionName(self, section_name):
         widgets = super(CheckoutReviewAndPay, self).getWidgetsBySectionName(
             section_name)
-        from collective.eventmanager.registration import getRegistration
-        reg = getRegistration(self.context)
+        reg = findRegistrationObject(self.context)
         for widget in [w for w in widgets]:
             if widget.name == 'form.name_on_card':
                 widget._missing = reg.email
@@ -73,6 +72,5 @@ class CheckoutReviewAndPay(BaseCheckoutReviewAndPay):
     def makePayment(self, action, data):
         super(CheckoutReviewAndPay, self).makePayment.success_handler(
             self, action, data)
-        from collective.eventmanager.registration import getRegistration
-        reg = getRegistration(self.context)
+        reg = findRegistrationObject(self.context)
         reg.paid_fee = True

@@ -9,15 +9,10 @@ from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from datetime import datetime
 from Products.CMFCore.utils import getToolByName
-from mako.template import Template
 from Products.Five.browser import BrowserView
 from plone.protect import protect, CheckAuthenticator
 from collective.geo.mapwidget.browser.widget import MapWidget
 from collective.z3cform.mapwidget.widget import MapFieldWidget
-from email import encoders
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
 
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
@@ -26,6 +21,8 @@ from collective.eventmanager.vocabularies import \
     RegistrationRowAvailableFieldTypes
 from Products.PloneGetPaid.interfaces import IBuyableMarker
 from zope.interface import alsoProvides
+from collective.eventmanager.emailtemplates import sendEMail
+from collective.eventmanager.utils import findRegistrationObject
 
 
 class IRegistrationFieldRow(interface.Interface):
@@ -427,74 +424,6 @@ class IRegistrationStatusForm(interface.Interface):
     pass
 
 
-def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
-              deffrom=None, defsubject=None, defmsg=None):
-    mfrom = deffrom
-    msubject = defsubject
-    mbody = defmsg
-    mattachments = defattachments
-
-    mh = getToolByName(emevent, 'MailHost')
-
-    if emailtype == 'thank you':
-        mfrom = emevent.thankYouEMailFrom
-        msubject = emevent.thankYouEMailSubject
-        mbody = emevent.thankYouEMailBody
-
-    elif emailtype == 'on waiting list':
-        mfrom = emevent.waitingListEMailFrom
-        msubject = emevent.waitingListEMailSubject
-        mbody = emevent.waitingListEMailBody
-
-    elif emailtype == 'registration full':
-        mfrom = emevent.registrationFullEMailFrom
-        msubject = emevent.registrationFullEMailSubject
-        mbody = emevent.registrationFullEMailBody
-
-    elif emailtype == 'confirmation':
-        #mtemplate = 'email_confirmation.pt'
-        pass
-    elif emailtype == 'announcement':
-        #mtemplate = 'email_announcement.pt'
-        pass
-    elif emailtype == 'other':
-        #mtemplate = 'email_other.pt'
-        pass
-
-    if mfrom == None or mfrom == '':
-        return False
-
-    template = Template(mbody)
-    message = template.render(emevent=emevent, reg=reg)
-
-    for address in mto:
-        msg = None
-        if mattachments != None and len(mattachments) > 0:
-            msg = MIMEMultipart(message)
-            msg['Subject'] = msubject
-            msg['From'] = mfrom
-
-            #import pdb; pdb.set_trace()
-            for attachment in mattachments:
-                amsg = MIMEBase('application', 'octet-stream')
-                amsg.set_payload(attachment['data'])
-                encoders.encode_base64(amsg)
-                amsg.add_header('Content-Disposition', 'attachment',
-                                filename=attachment['name'])
-                msg.attach(amsg)
-        else:
-            msg = MIMEText(message)
-            msg['Subject'] = msubject
-            msg['From'] = mfrom
-
-        msg['To'] = address
-        mh.send(msg)
-
-    #mh.send('message', 'to@example.com', 'from@example.com', 'subject')
-
-    return True
-
-
 def _canAdd(folder, type_name):
     folder.setConstrainTypesMode(1)
     folder.setLocallyAllowedTypes((BASE_TYPE_NAME + type_name,))
@@ -621,8 +550,7 @@ class View(grok.View):
 
     @property
     def reg(self):
-        from collective.eventmanager.registration import getRegistration
-        return getRegistration(self.context)
+        return findRegistrationObject(self.context)
 
     @property
     def registered(self):
