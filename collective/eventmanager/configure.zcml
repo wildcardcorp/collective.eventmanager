@@ -60,16 +60,22 @@
   <browser:page
     name="pay-for-registration"
     for="collective.eventmanager.event.IEMEvent"
-    class=".event.PayForEventView"
+    class=".checkout.PayForEventView"
     layer=".interfaces.ILayer"
     permission="zope2.View" />
-    
+
   <browser:page
-    name="checkout-address-info"
-    for="collective.eventmanager.event.IEMEvent"
-    class=".event.CustomCheckoutAddress"
-    layer=".interfaces.ILayer"
-    permission="zope2.View"
-    />
+     for="collective.eventmanager.event.IEMEvent"
+     name="checkout-address-info"
+     class=".checkout.CheckoutAddress"
+     permission="zope2.View"
+     />
+
+  <browser:page
+     for="collective.eventmanager.event.IEMEvent"
+     name="checkout-review-pay"
+     class=".checkout.CheckoutReviewAndPay"
+     permission="zope2.View"
+     />
 
 </configure>

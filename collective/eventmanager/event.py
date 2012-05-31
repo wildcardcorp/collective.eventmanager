@@ -1,4 +1,3 @@
-from zope.component import getMultiAdapter
 import string
 from five import grok
 from zope import schema, interface
@@ -27,12 +26,6 @@ from collective.eventmanager.vocabularies import \
     RegistrationRowAvailableFieldTypes
 from Products.PloneGetPaid.interfaces import IBuyableMarker
 from zope.interface import alsoProvides
-from Products.PloneGetPaid.browser.checkout import CheckoutAddress
-from Products.PloneGetPaid.browser.cart import ShoppingCartAddItem
-from getpaid.core.interfaces import ILineItemFactory
-from persistent.mapping import PersistentMapping
-from zope.annotation.interfaces import IAnnotations
-_getpaid_key = 'getpaid.configuration'
 
 
 class IRegistrationFieldRow(interface.Interface):
@@ -626,33 +619,25 @@ class View(grok.View):
                 count += 1
         return count
 
-    def getRegistration(self):
-        mt = getToolByName(self.context, 'portal_membership')
-        if mt.isAnonymousUser():
-            return False
-        # XXX should be optimized
-        member = mt.getAuthenticatedMember()
-        username = member.getUserName()
-        registrationfolder = self.context.registrations
-        for reg in registrationfolder.objectValues():
-            if reg.email == username:
-                return reg
+    @property
+    def reg(self):
+        from collective.eventmanager.registration import getRegistration
+        return getRegistration(self.context)
 
     @property
     def registered(self):
-        reg = self.getRegistration()
-        if reg is None:
+        if self.reg is None:
             return False
         return True
 
     @property
     def waiting_list(self):
-        reg = self.getRegistration()
-        if reg is None:
+        if self.reg is None:
             return False
         wftool = getToolByName(self.context, "portal_workflow")
         status = wftool.getStatusOf(
-            "collective.eventmanager.Registration_workflow", reg)
+            "collective.eventmanager.Registration_workflow",
+            self.reg)
         return status['review_state'] != 'approved'
 
     def cgmapSettings(self):
@@ -669,31 +654,6 @@ class View(grok.View):
 
         return "cgmap.state['" + self.MAP_CSS_CLASS + "'] = " \
                + str(settings) + ";"
-
-
-class PayForEventView(ShoppingCartAddItem):
-
-    def __call__(self):
-        # first, make sure getpaid configuration for price is set.
-        annotations = IAnnotations(self.context)
-        if _getpaid_key not in annotations:
-            annotations[_getpaid_key] = PersistentMapping()
-        settings = annotations[_getpaid_key]
-        if 'price' not in settings or \
-                settings['price'] != self.context.registrationFee:
-            settings['price'] = self.context.registrationFee
-        # create a line item and add it to the cart
-        item_factory = getMultiAdapter((self.cart, self.context),
-            ILineItemFactory)
-
-        item_factory.create(quantity=1)
-        url = self.context.absolute_url() + '/@@getpaid-checkout-wizard'
-        return self.request.response.redirect(url)
-
-
-class CustomCheckoutAddress(CheckoutAddress):
-    def customise_widgets(self, fields):
-        super(CustomCheckoutAddress, self).customise_widgets(fields)
 
 
 class EMailSenderForm(BrowserView):
