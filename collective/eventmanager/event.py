@@ -8,7 +8,7 @@ from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from plone.namedfile.field import NamedBlobFile
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
-from datetime import datetime
+from datetime import datetime, timedelta
 from Products.CMFCore.utils import getToolByName
 from mako.template import Template
 from Products.Five.browser import BrowserView
@@ -820,3 +820,11 @@ class RegistrationStatusForm(BrowserView):
 
         return registrations
 
+
+class EventRoster(BrowserView):
+    """A printable report for listing all registrations for the event"""
+
+    def eventDates(self):
+        datediff = (self.context.end - self.context.start).days
+        return [(self.context.start + timedelta(days=a))
+                    for a in range(datediff)]
