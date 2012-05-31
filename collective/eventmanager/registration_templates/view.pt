@@ -11,18 +11,25 @@
   <metal:content-core define-macro="content-core"
     tal:define="event view/event;
                 state view/review_state;">
+
     <tal:pay tal:condition="view/require_payment">
-      You must 
+      You must
       <a tal:attributes="href string:${context/absolute_url}/pay">
         pay before you can finish registration
       </a>.
     </tal:pay>
+
+    <div class='registration_email'>
+      <em>EMail Address:</em> <span tal:content="python: context.email" />
+    </div>
+
     <dl>
       <tal:item tal:repeat="item view/dynamicFields">
         <dt tal:content="python: item['name']" />
         <dd tal:content="structure python: view.getDisplayValueFor(item)" />
       </tal:item>
     </dl>
+
   </metal:content-core>
 </metal:content-core>
 
