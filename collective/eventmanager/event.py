@@ -1,11 +1,12 @@
-from zope import schema, interface
 from plone.directives import form
 from plone.namedfile.field import NamedBlobFile
-from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
+from zope import schema, interface
+from zope.annotation.interfaces import IAnnotations
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
-from datetime import datetime
 from collective.z3cform.mapwidget.widget import MapFieldWidget
-
+from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
+from persistent.dict import PersistentDict
+from datetime import datetime
 from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.vocabularies import \
     RegistrationRowAvailableFieldTypes
@@ -400,3 +401,29 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                       u"interested in attending, you can complete your "
                       u"registration by following the instructions below"),
         )
+
+
+class EventSettings(object):
+    use_interface = IEMEvent
+
+    def __init__(self, context):
+        self.context = context
+        annotations = IAnnotations(self.context)
+
+        self._metadata = annotations.get('collective.eventmanager', None)
+        if self._metadata is None:
+            self._metadata = PersistentDict()
+            annotations['collective.eventmanager'] = self._metadata
+
+    def __setattr__(self, name, value):
+        if name[0] == '_' or name in ['context', 'use_interface']:
+            self.__dict__[name] = value
+        else:
+            self._metadata[name] = value
+
+    def __getattr__(self, name):
+        default = None
+        if name in self.use_interface.names():
+            default = self.use_interface[name].default
+
+        return self._metadata.get(name, default)

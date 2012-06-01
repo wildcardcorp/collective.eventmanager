@@ -9,27 +9,22 @@
 
 <metal:content-core fill-slot="content-core">
   <metal:content-core define-macro="content-core"
-    tal:define="reg python: view.reg;
+    tal:define="reg view/getRegistration;
                 num_reg view/number_registered;
                 num_wait view/number_wait_list;">
 
-      <tal:registered tal:condition="python: view.registered">
-        <tal:waiting tal:condition="python: view.waiting_list">
+      <tal:registered tal:condition="view/registered">
+        <tal:waiting tal:condition="view/waiting_list">
           You are on the wait list for this event.
         </tal:waiting>
-        <tal:notwaiting tal:condition="python: not view.waiting_list">
+        <tal:notwaiting tal:condition="not: view/waiting_list">
           You are registered for this event.
         </tal:notwaiting>
         <a tal:attributes="href string:${reg/absolute_url}/view">
           View registration settings.
         </a>
       </tal:registered>
-      <tal:pay tal:condition="python: reg and not reg.paid_fee and context.registrationFee">
-       |  <a tal:attributes="href string:${context/absolute_url}/@@pay-for-registration">
-          Pay for registration
-        </a>
-      </tal:pay>
-      <tal:notregistered tal:condition="python: not view.registered">
+      <tal:notregistered tal:condition="not: view/registered">
         You are not
         <a href="#"
            tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?current-user=true">registered for this event</a>.

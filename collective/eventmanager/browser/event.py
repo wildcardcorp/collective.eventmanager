@@ -267,7 +267,40 @@ class EventRoster(grok.View):
     grok.name('eventroster')
     grok.layer(ILayer)
 
+    def initsettings(self):
+        self.settings = EventSettings(self.context)
+        if self.settings.eventAttendance is None:
+            self.settings.eventAttendance = PersistentDict()
+
+    def __call__(self):
+        return super(EventRoster, self).__call__()
+
     def eventDates(self):
         datediff = (self.context.end - self.context.start).days
         return [(self.context.start + timedelta(days=a))
                     for a in range(datediff)]
+
+    def toggleAttendanceState(self):
+        postitems = self.request.form.items()
+        regdate = None
+        regname = None
+        for i in range(len(postitems)):
+            if postitems[i][0] == 'dt':
+                regdate = postitems[i][1]
+            elif postitems[i][0] == 'reg':
+                regname = postitems[i][1]
+
+        key = regname + ',' + regdate
+        self.initsettings()
+        if key in self.settings.eventAttendance:
+            self.settings.eventAttendance[key] = not self.settings[key]
+        else:
+            self.settings.eventAttendance[key] = True
+
+    def getCheckedValue(self, reg, dt):
+        self.initsettings()
+        key = reg + ',' + dt
+        if key in self.settings.eventAttendance:
+            return 'checked'
+        else:
+            return ''
