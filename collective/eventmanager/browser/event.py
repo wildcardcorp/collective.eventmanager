@@ -3,10 +3,9 @@ from persistent.dict import PersistentDict
 from five import grok
 
 from Products.CMFCore.utils import getToolByName
+from Products.Five import BrowserView
 from collective.geo.mapwidget.browser.widget import MapWidget
 from plone.protect import protect, CheckAuthenticator
-from persistent.dict import PersistentDict
-from zope.annotation.interfaces import IAnnotations
 
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
@@ -264,21 +263,13 @@ class RegistrationStatusForm(grok.View):
         return registrations
 
 
-class EventRoster(grok.View):
+class EventRoster(BrowserView):
     """A printable report for listing all registrations for the event"""
-
-    grok.context(IEMEvent)
-    grok.require('cmf.ModifyPortalContent')
-    grok.name('eventroster')
-    grok.layer(ILayer)
 
     def initsettings(self):
         self.settings = EventSettings(self.context)
         if self.settings.eventAttendance is None:
             self.settings.eventAttendance = PersistentDict()
-
-    def __call__(self):
-        return super(EventRoster, self).__call__()
 
     def eventDates(self):
         datediff = (self.context.end - self.context.start).days
@@ -297,7 +288,6 @@ class EventRoster(grok.View):
 
         key = regname + ',' + regdate
         self.initsettings()
-        import pdb; pdb.set_trace()
         if key in self.settings.eventAttendance:
             self.settings.eventAttendance[key] = not self.settings[key]
         else:
