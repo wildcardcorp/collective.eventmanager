@@ -56,8 +56,7 @@ class CheckoutAddress(BaseCheckoutAddress):
 
 
 class CheckoutReviewAndPay(BaseCheckoutReviewAndPay):
-    template = ZopeTwoPageTemplateFile(
-        'checkout_templates/checkout-review-pay.pt')
+    template = ZopeTwoPageTemplateFile('templates/checkout-review-pay.pt')
 
     def getWidgetsBySectionName(self, section_name):
         widgets = super(CheckoutReviewAndPay, self).getWidgetsBySectionName(

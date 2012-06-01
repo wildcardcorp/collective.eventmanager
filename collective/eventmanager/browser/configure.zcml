@@ -1,0 +1,49 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:grok="http://namespaces.zope.org/grok"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="collective.eventmanager">
+
+  <grok:grok package="." />
+  <include package="plone.resource" file="meta.zcml"/>
+  <plone:static
+    directory="static"
+    type="theme"
+    name="em"
+    />
+  <include package="z3c.jbot" file="meta.zcml" />
+  <browser:jbot directory="jbot" />
+
+  <browser:page
+    name="pay-for-registration"
+    for="collective.eventmanager.event.IEMEvent"
+    class=".checkout.PayForEventView"
+    layer="..interfaces.ILayer"
+    permission="zope2.View" />
+
+  <browser:page
+     for="collective.eventmanager.event.IEMEvent"
+     name="checkout-address-info"
+     class=".checkout.CheckoutAddress"
+     permission="zope2.View"
+     layer="..interfaces.ILayer"
+     />
+
+  <browser:page
+     for="collective.eventmanager.event.IEMEvent"
+     name="checkout-review-pay"
+     class=".checkout.CheckoutReviewAndPay"
+     permission="zope2.View"
+     layer="..interfaces.ILayer"
+     />
+
+  <browser:page
+    name="em-email-templates"
+    for="Products.CMFCore.interfaces._content.ISiteRoot"
+    class=".controlpanel.EmailTemplateConfiglet"
+    layer="..interfaces.ILayer"
+    permission="cmf.ManagePortal" />
+
+</configure>

@@ -5,7 +5,7 @@ from plone.portlets.interfaces import IPortletAssignmentMapping
 
 
 def install(context):
-    print 'hi'
+
     if context.readDataFile('collective.eventmanager.txt') is None:
         return
 

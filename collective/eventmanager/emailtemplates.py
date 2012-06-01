@@ -1,11 +1,6 @@
 from zope.interface import Interface
 from zope import schema
-from plone.app.registry.browser import controlpanel
-from email.MIMEText import MIMEText
-from email import encoders
-from email.mime.base import MIMEBase
 from mako.template import Template
-from email.MIMEMultipart import MIMEMultipart
 from Products.CMFCore.utils import getToolByName
 
 
@@ -46,17 +41,13 @@ class IEMailTemplateSettings(Interface):
         title=u"Thank you with confirmation Plain Text Body")
 
 
-class EmailTemplateEditForm(controlpanel.RegistryEditForm):
-    schema = IEMailTemplateSettings
-    label = u'Event Manager Email Template Settings'
-
-
-class EmailTemplateConfiglet(controlpanel.ControlPanelFormWrapper):
-    form = EmailTemplateEditForm
-
-
 def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
               deffrom=None, defsubject=None, defmsg=None):
+    from email import encoders
+    from email import MIMEText
+    from email.mime.base import MIMEBase
+    from email import MIMEMultipart
+
     mfrom = deffrom
     msubject = defsubject
     mbody = defmsg

@@ -11,8 +11,6 @@
   <five:registerPackage package="." initialize=".initialize" />
   <includeDependencies package="." />
   <include file="permissions.zcml" />
-  <include package="z3c.jbot" file="meta.zcml" />
-
   <grok:grok package="." />
 
   <genericsetup:registerProfile
@@ -23,68 +21,6 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
-  <browser:jbot directory="jbot" />
-
-  <include package="plone.resource" file="meta.zcml"/>
-  <plone:static
-    directory="static"
-    type="theme"
-    name="em"
-    />
-
-  <browser:page
-    name="emailsenderform"
-    for="collective.eventmanager.event.IEMEvent"
-    class="collective.eventmanager.event.EMailSenderForm"
-    template="event_templates/emailsenderform.pt"
-    permission="cmf.ModifyPortalContent"
-    layer="collective.eventmanager.interfaces.ILayer"
-    />
-
-  <browser:page
-    name="registrationstatusform"
-    for="collective.eventmanager.event.IEMEvent"
-    class="collective.eventmanager.event.RegistrationStatusForm"
-    template="event_templates/registrationstatusform.pt"
-    permission="cmf.ModifyPortalContent"
-    layer="collective.eventmanager.interfaces.ILayer"
-    />
-
-  <browser:page
-    name="eventroster"
-    for="collective.eventmanager.event.IEMEvent"
-    class="collective.eventmanager.event.EventRoster"
-    template="event_templates/eventroster.pt"
-    permission="cmf.ModifyPortalContent"
-    layer="collective.eventmanager.interfaces.ILayer"
-    />
-
-  <browser:page
-    name="em-email-templates"
-    for="Products.CMFCore.interfaces._content.ISiteRoot"
-    class=".emailtemplates.EmailTemplateConfiglet"
-    layer=".interfaces.ILayer"
-    permission="cmf.ManagePortal" />
-
-  <browser:page
-    name="pay-for-registration"
-    for="collective.eventmanager.event.IEMEvent"
-    class=".checkout.PayForEventView"
-    layer=".interfaces.ILayer"
-    permission="zope2.View" />
-
-  <browser:page
-     for="collective.eventmanager.event.IEMEvent"
-     name="checkout-address-info"
-     class=".checkout.CheckoutAddress"
-     permission="zope2.View"
-     />
-
-  <browser:page
-     for="collective.eventmanager.event.IEMEvent"
-     name="checkout-review-pay"
-     class=".checkout.CheckoutReviewAndPay"
-     permission="zope2.View"
-     />
+  <include package=".browser" />
 
 </configure>
