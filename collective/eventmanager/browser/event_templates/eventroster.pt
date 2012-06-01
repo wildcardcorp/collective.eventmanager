@@ -71,7 +71,7 @@
             });
 
             jQuery('.event_roster_day input').bind('click', function(ev){
-              var posturl = jQuery('base').attr('href') + '/@@toggle-attendance-state';
+              var posturl = jQuery('base').attr('href') + '@@toggle-attendance-state';
               var data = {
                 'dt': jQuery(ev.target).attr('date'),
                 'reg': jQuery(ev.target).attr('registration'),

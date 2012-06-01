@@ -17,6 +17,14 @@
   <browser:jbot directory="jbot" />
 
   <browser:page
+    name='toggle-attendance-state'
+    for='collective.eventmanager.event.IEMEvent'
+    permission="cmf.ModifyPortalContent"
+    class="collective.eventmanager.browser.event.EventRoster"
+    attribute="toggleAttendanceState"
+    />
+
+  <browser:page
     name="pay-for-registration"
     for="collective.eventmanager.event.IEMEvent"
     class=".checkout.PayForEventView"

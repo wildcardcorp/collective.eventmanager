@@ -297,6 +297,7 @@ class EventRoster(grok.View):
 
         key = regname + ',' + regdate
         self.initsettings()
+        import pdb; pdb.set_trace()
         if key in self.settings.eventAttendance:
             self.settings.eventAttendance[key] = not self.settings[key]
         else:
@@ -305,6 +306,7 @@ class EventRoster(grok.View):
     def getCheckedValue(self, reg, dt):
         self.initsettings()
         key = reg + ',' + dt
+        #import pdb; pdb.set_trace()
         if key in self.settings.eventAttendance:
             return 'checked'
         else:
