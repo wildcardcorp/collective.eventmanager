@@ -23,14 +23,20 @@
 
         <div tal:replace="structure provider:plone.abovecontentbody" />
 
-        <span class='event_roster_day_prev'><a href='javascript:void(0);'>Previous Day</a></span><span class='event_roster_day_nav_spacer'> - </span><span class='event_roster_day_next'><a href='javascript:void(0);'>Next Day</a></span>
+        <div class='event_roster_nav'>
+          <span tal:repeat="eventday python:view.eventDates()">
+            <span tal:condition="not: repeat/eventday/start"> - </span>
+            <a href='javascript:void(0);' tal:content="python:eventday.strftime('%m/%d/%Y')" />
+          </span>
+        </div>
         <div class='event_roster_day' tal:repeat="eventday python:view.eventDates()">
           <h2>Roster for <span tal:content="python:eventday.strftime('%m/%d/%Y')" /></h2>
 
           <ul class='event_roster'>
             <li tal:repeat="item python:context.registrations">
               <span style='display:none' class='roster_ballotbox'>&#9744;</span>
-              <input type='checkbox' class='roster_attended' />
+              <input type='checkbox' class='roster_attended'
+                     tal:attributes="date python:eventday.strftime('%m/%d/%Y');registration python:item;checked  python:view.getCheckedValue(item, eventday.strftime('%m/%d/%Y'))" />
               <a tal:attributes="href python:'registrations/' + item"><span tal:replace="python:context.registrations[item].title" /></a> (<a tal:attributes="href python:'mailto:' + context.registrations[item].email"><span tal:replace="python:context.registrations[item].email" /></a>)
             </li>
           </ul>
@@ -44,78 +50,38 @@
                   && dt1.getFullYear() == dt2.getFullYear();
             }
 
-            function showhide_event_roster_day_nav() {
-              if(jQuery('.event_roster_day').length < 2) {
-                jQuery('.event_roster_day_prev').hide();
-                jQuery('.event_roster_day_nav_spacer').hide();
-                jQuery('.event_roster_day_next').hide();
-                return;
-              }
+            function showhide_event_roster_day_nav(dt) {
+              jQuery('.event_roster_day:visible').hide();
 
-              var prevshown = false;
-              var nextshown = false;
-
-              if(jQuery('.event_roster_day:visible').prev('.event_roster_day').length < 1) {
-                jQuery('.event_roster_day_prev').hide();
-                jQuery('.event_roster_day_nav_spacer').hide();
-              }
-              else {
-                jQuery('.event_roster_day_prev').show();
-                prevshown = true;
-              }
-              if(jQuery('.event_roster_day:visible').next('.event_roster_day').length < 1) {
-                jQuery('.event_roster_day_next').hide();
-                jQuery('.event_roster_day_nav_spacer').hide();
-              }
-              else {
-                jQuery('.event_roster_day_next').show();
-                nextshown = true;
-              }
-
-              if(prevshown && nextshown) {
-                jQuery('.event_roster_day_nav_spacer').show();
+              var curdate = new Date(dt);
+              var dailyrosters = jQuery('.event_roster_day');
+              var dates = jQuery(dailyrosters).find('h2 span');
+              for(var i = 0; i < dates.length; i++) {
+                if(samedate(new Date(jQuery(dates[i]).html()), curdate)) {
+                  jQuery(dailyrosters[i]).show();
+                  break;
+                }
               }
             }
 
-            // hide rosters for all days not the current day
-            // if no rosters match the current day, show the first
-            // day's roster
-            var dailyrosters = jQuery('.event_roster_day');
-            var dates = jQuery(dailyrosters).find('h2 span');
-            var curdate = new Date();
-            var samedatefound = false;
-            for(var i = 0; i < dates.length; i++) {
-              if(!samedate(new Date(jQuery(dates[i]).html()), curdate)){
-                jQuery(dailyrosters[i]).hide();
-              }
-              else
-              {
-                samedatefound = true;
-              }
-            }
-            if(dailyrosters.length > 0 && !samedatefound){
-              jQuery(dailyrosters[0]).show();
-            }
+            showhide_event_roster_day_nav((new Date()).toString());
 
-            showhide_event_roster_day_nav();
-
-            jQuery('.event_roster_day_prev a').bind('click', function(){
-              var cur = jQuery('.event_roster_day:visible');
-              var prev = jQuery(cur).prev('.event_roster_day');
-              if(prev.length > 0) {
-                jQuery(cur).hide();
-                jQuery(prev).show();
-              }
-              showhide_event_roster_day_nav();
+            jQuery('.event_roster_nav a').bind('click', function(ev){
+              showhide_event_roster_day_nav(jQuery(ev.target).html());
             });
-            jQuery('.event_roster_day_next a').bind('click', function(){
-              var cur = jQuery('.event_roster_day:visible');
-              var next = jQuery(cur).next('.event_roster_day');
-              if(next.length > 0) {
-                jQuery(cur).hide();
-                jQuery(next).show();
-              }
-              showhide_event_roster_day_nav();
+
+            jQuery('.event_roster_day input').bind('click', function(ev){
+              var posturl = jQuery('base').attr('href') + '/@@toggle-attendance-state';
+              var data = {
+                'dt': jQuery(ev.target).attr('date'),
+                'reg': jQuery(ev.target).attr('registration'),
+              };
+
+              jQuery('#kss-spinner').show();
+              jQuery.post(posturl, data, function(retdata) {
+
+                jQuery('#kss-spinner').hide();
+              });
             });
           })();
         </script>

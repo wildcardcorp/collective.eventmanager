@@ -1,32 +1,34 @@
 import string
+from datetime import datetime, timedelta
 
 from five import grok
-from zope import schema, interface
 from plone.directives import form
+from plone.namedfile.field import NamedBlobFile
+from plone.protect import protect, CheckAuthenticator
+from zope import schema, interface
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
-from plone.namedfile.field import NamedBlobFile
-from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
+from zope.interface import alsoProvides
+from zope.annotation.interfaces import IAnnotations
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
-from datetime import datetime, timedelta
 from Products.CMFCore.utils import getToolByName
-from mako.template import Template
 from Products.Five.browser import BrowserView
-from plone.protect import protect, CheckAuthenticator
+from Products.PloneGetPaid.interfaces import IBuyableMarker
+from mako.template import Template
 from collective.geo.mapwidget.browser.widget import MapWidget
 from collective.z3cform.mapwidget.widget import MapFieldWidget
+from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from email import encoders
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
+from persistent.dict import PersistentDict
 
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager import EventManagerMessageFactory as _
-from collective.eventmanager.vocabularies import \
-    RegistrationRowAvailableFieldTypes
-from Products.PloneGetPaid.interfaces import IBuyableMarker
-from zope.interface import alsoProvides
+from collective.eventmanager.vocabularies \
+    import RegistrationRowAvailableFieldTypes
 
 
 class IRegistrationFieldRow(interface.Interface):
@@ -812,10 +814,69 @@ class RegistrationStatusForm(BrowserView):
         return registrations
 
 
+class EventSettings(object):
+    use_interface = IEMEvent
+
+    def __init__(self, context):
+        self.context = context
+        annotations = IAnnotations(self.context)
+
+        self._metadata = annotations.get('collective.eventmanager', None)
+        if self._metadata is None:
+            self._metadata = PersistentDict()
+            annotations['collective.eventmanager'] = self._metadata
+
+    def __setattr__(self, name, value):
+        if name[0] == '_' or name in ['context', 'use_interface']:
+            self.__dict__[name] = value
+        else:
+            self._metadata[name] = value
+
+    def __getattr__(self, name):
+        default = None
+        if name in self.use_interface.names():
+            default = self.use_interface[name].default
+
+        return self._metadata.get(name, default)
+
+
 class EventRoster(BrowserView):
     """A printable report for listing all registrations for the event"""
+
+    def initsettings(self):
+        self.settings = EventSettings(self.context)
+        if self.settings.eventAttendance is None:
+            self.settings.eventAttendance = PersistentDict()
+
+    def __call__(self):
+        return super(EventRoster, self).__call__()
 
     def eventDates(self):
         datediff = (self.context.end - self.context.start).days
         return [(self.context.start + timedelta(days=a))
                     for a in range(datediff)]
+
+    def toggleAttendanceState(self):
+        postitems = self.request.form.items()
+        regdate = None
+        regname = None
+        for i in range(len(postitems)):
+            if postitems[i][0] == 'dt':
+                regdate = postitems[i][1]
+            elif postitems[i][0] == 'reg':
+                regname = postitems[i][1]
+
+        key = regname + ',' + regdate
+        self.initsettings()
+        if key in self.settings.eventAttendance:
+            self.settings.eventAttendance[key] = not self.settings[key]
+        else:
+            self.settings.eventAttendance[key] = True
+
+    def getCheckedValue(self, reg, dt):
+        self.initsettings()
+        key = reg + ',' + dt
+        if key in self.settings.eventAttendance:
+            return 'checked'
+        else:
+            return ''
