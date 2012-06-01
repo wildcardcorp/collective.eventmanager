@@ -78,4 +78,12 @@
             visible="True">
         <permission value="Modify portal content"/>
     </action>
+    <action title="Roster"
+            action_id="eventroster"
+            category="object"
+            condition_expr=""
+            url_expr="string:${object_url}/eventroster"
+            visible="True">
+        <permission value="Modify portal content"/>
+    </action>
 </object>

@@ -1,4 +1,5 @@
 import string
+
 from five import grok
 from zope import schema, interface
 from plone.directives import form
@@ -7,7 +8,7 @@ from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from plone.namedfile.field import NamedBlobFile
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
-from datetime import datetime
+from datetime import datetime, timedelta
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
 from plone.protect import protect, CheckAuthenticator
@@ -737,3 +738,12 @@ class RegistrationStatusForm(BrowserView):
                 registrations.append(self.__parent__.registrations[reg])
 
         return registrations
+
+
+class EventRoster(BrowserView):
+    """A printable report for listing all registrations for the event"""
+
+    def eventDates(self):
+        datediff = (self.context.end - self.context.start).days
+        return [(self.context.start + timedelta(days=a))
+                    for a in range(datediff)]

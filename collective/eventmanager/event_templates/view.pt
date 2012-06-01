@@ -48,17 +48,17 @@
 
       <div class='event_datetime'>
         <div tal:condition="python: context.start == context.end">
-          This is an all day event on <span tal:content="python: context.start.strftime('%m/%d/%y')" />.
+          This is an all day event on <span tal:content="python: context.start.strftime('%m/%d/%Y')" />.
         </div>
         <div tal:condition="python: context.start != context.end">
-          The event goes from <span tal:content="python: context.start.strftime('%m/%d/%y %I:%M%p')" />
-          to <span tal:content="python: context.end.strftime('%m/%d/%y %I:%M%p')" />.
+          The event goes from <span tal:content="python: context.start.strftime('%m/%d/%Y %I:%M%p')" />
+          to <span tal:content="python: context.end.strftime('%m/%d/%Y %I:%M%p')" />.
         </div>
       </div>
 
       <div class='event_registration_datetime'>
-        Registration opens <span tal:content="python: context.registrationOpen.strftime('%m/%d/%y %I:%M%p')" />.
-        <div tal:condition="python: context.registrationClosed != None" ><span tal:content="python: context.registrationClosed.strftime('%m/%d/%y %I:%M%p')" /></div>
+        Registration opens <span tal:content="python: context.registrationOpen.strftime('%m/%d/%Y %I:%M%p')" />.
+        <div tal:condition="python: context.registrationClosed != None" ><span tal:content="python: context.registrationClosed.strftime('%m/%d/%Y %I:%M%p')" /></div>
       </div>
 
       <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />

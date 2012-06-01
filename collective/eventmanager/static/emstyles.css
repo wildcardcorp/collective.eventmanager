@@ -16,3 +16,11 @@
     height: 500px;
     width: inherit;
 }
+
+.roster_ballotbox {
+    font-size: x-large;
+}
+
+.event_roster li {
+    list-style: none;
+}

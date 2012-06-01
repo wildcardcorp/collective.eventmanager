@@ -51,6 +51,15 @@
     />
 
   <browser:page
+    name="eventroster"
+    for="collective.eventmanager.event.IEMEvent"
+    class="collective.eventmanager.event.EventRoster"
+    template="event_templates/eventroster.pt"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.eventmanager.interfaces.ILayer"
+    />
+
+  <browser:page
     name="em-email-templates"
     for="Products.CMFCore.interfaces._content.ISiteRoot"
     class=".emailtemplates.EmailTemplateConfiglet"
