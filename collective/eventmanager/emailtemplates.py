@@ -1,7 +1,7 @@
 from zope.interface import Interface
 from zope import schema
-from mako.template import Template
 from Products.CMFCore.utils import getToolByName
+from mako.template import Template
 
 
 class IEMailTemplateSettings(Interface):

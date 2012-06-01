@@ -1,18 +1,23 @@
+from datetime import datetime
+
+from persistent.dict import PersistentDict
+from zope import schema
+from zope.interface import Interface
+from zope.annotation.interfaces import IAnnotations
+
 from plone.directives import form
 from plone.namedfile.field import NamedBlobFile
-from zope import schema, interface
-from zope.annotation.interfaces import IAnnotations
+
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from collective.z3cform.mapwidget.widget import MapFieldWidget
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
-from persistent.dict import PersistentDict
-from datetime import datetime
+
 from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.vocabularies import \
     RegistrationRowAvailableFieldTypes
 
 
-class IRegistrationFieldRow(interface.Interface):
+class IRegistrationFieldRow(Interface):
     name = schema.TextLine(
             title=u"Name",
             required=True,

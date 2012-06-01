@@ -1,14 +1,17 @@
-from collective.eventmanager.utils import getNumApprovedAndConfirmed
-from Products.CMFCore.utils import getToolByName
-from Products.PloneGetPaid.interfaces import IBuyableMarker
-from zope.interface import alsoProvides
-from collective.eventmanager.config import BASE_TYPE_NAME
 from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
+from zope.interface import alsoProvides
+
 from five import grok
+
+from Products.CMFCore.utils import getToolByName
+from Products.PloneGetPaid.interfaces import IBuyableMarker
+
 from collective.eventmanager.event import IEMEvent
-from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.registration import IRegistration
+from collective.eventmanager.utils import getNumApprovedAndConfirmed
+from collective.eventmanager.config import BASE_TYPE_NAME
+from collective.eventmanager.emailtemplates import sendEMail
 
 
 def _canAdd(folder, type_name):

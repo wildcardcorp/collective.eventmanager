@@ -1,13 +1,17 @@
-from five import grok
 from datetime import timedelta
+from persistent.dict import PersistentDict
+from five import grok
+
 from Products.CMFCore.utils import getToolByName
-from Products.Five.browser import BrowserView
+from plone.protect import protect, CheckAuthenticator
+
+from collective.geo.mapwidget.browser.widget import MapWidget
+
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
-from collective.geo.mapwidget.browser.widget import MapWidget
-from plone.protect import protect, CheckAuthenticator
 from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.utils import findRegistrationObject
+from collective.eventmanager.event import EventSettings
 
 
 class View(grok.View):

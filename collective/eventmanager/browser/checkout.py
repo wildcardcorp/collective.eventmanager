@@ -1,15 +1,19 @@
-from zope.component import getMultiAdapter
-from Products.PloneGetPaid.browser.cart import ShoppingCartAddItem
-from getpaid.core.interfaces import ILineItemFactory
 from persistent.mapping import PersistentMapping
+from zope.component import getMultiAdapter
 from zope.annotation.interfaces import IAnnotations
+
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from zope.formlib import form
+
+from Products.PloneGetPaid.browser.cart import ShoppingCartAddItem
+from getpaid.core.interfaces import ILineItemFactory
 from Products.PloneGetPaid.i18n import _
-from collective.eventmanager.utils import findRegistrationObject
 from Products.PloneGetPaid.browser.checkout import \
     CheckoutAddress as BaseCheckoutAddress, \
     CheckoutReviewAndPay as BaseCheckoutReviewAndPay
+
+from collective.eventmanager.utils import findRegistrationObject
+
 _getpaid_key = 'getpaid.configuration'
 
 

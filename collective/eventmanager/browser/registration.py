@@ -1,15 +1,17 @@
-from five import grok
-from plone.z3cform.fieldsets import utils
-from collective.eventmanager.interfaces import ILayer
-from Products.statusmessages.interfaces import IStatusMessage
 from zope.component import getMultiAdapter
+from zope import schema
+from five import grok
+
+from Products.statusmessages.interfaces import IStatusMessage
+from Products.CMFCore.utils import getToolByName
+from plone.z3cform.fieldsets import utils
 from z3c.form.interfaces import IErrorViewSnippet
 from z3c.form import button
+from plone.directives import dexterity
+
+from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
 from collective.eventmanager.registration import IRegistration
-from Products.CMFCore.utils import getToolByName
-from zope import schema
-from plone.directives import dexterity
 from collective.eventmanager import EventManagerMessageFactory as _
 
 
