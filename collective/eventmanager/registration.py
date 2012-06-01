@@ -1,9 +1,8 @@
 from zope import schema
-from plone.directives import form, dexterity
-from Products.CMFCore.utils import getToolByName
-
-from collective.eventmanager import EventManagerMessageFactory as _
 from zope.component.hooks import getSite
+from Products.CMFCore.utils import getToolByName
+from plone.directives import form, dexterity
+from collective.eventmanager import EventManagerMessageFactory as _
 
 
 class IRegistration(form.Schema):

@@ -1,5 +1,7 @@
-from five import grok
 from datetime import timedelta
+from persistent.dict import PersistentDict
+from five import grok
+
 from Products.CMFCore.utils import getToolByName
 from collective.geo.mapwidget.browser.widget import MapWidget
 from plone.protect import protect, CheckAuthenticator
@@ -10,6 +12,7 @@ from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.utils import findRegistrationObject
+from collective.eventmanager.event import EventSettings
 
 
 class View(grok.View):
@@ -259,32 +262,6 @@ class RegistrationStatusForm(grok.View):
                 registrations.append(self.__parent__.registrations[reg])
 
         return registrations
-
-
-class EventSettings(object):
-    use_interface = IEMEvent
-
-    def __init__(self, context):
-        self.context = context
-        annotations = IAnnotations(self.context)
-
-        self._metadata = annotations.get('collective.eventmanager', None)
-        if self._metadata is None:
-            self._metadata = PersistentDict()
-            annotations['collective.eventmanager'] = self._metadata
-
-    def __setattr__(self, name, value):
-        if name[0] == '_' or name in ['context', 'use_interface']:
-            self.__dict__[name] = value
-        else:
-            self._metadata[name] = value
-
-    def __getattr__(self, name):
-        default = None
-        if name in self.use_interface.names():
-            default = self.use_interface[name].default
-
-        return self._metadata.get(name, default)
 
 
 class EventRoster(grok.View):

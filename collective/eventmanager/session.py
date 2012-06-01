@@ -1,9 +1,8 @@
+from datetime import datetime
 from zope import schema
 from plone.directives import form
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
-from datetime import datetime
 from collective.z3cform.mapwidget.widget import MapFieldWidget
-
 from collective.eventmanager import EventManagerMessageFactory as _
 
 
