@@ -18,7 +18,7 @@
         <div tal:replace="structure provider:plone.abovecontenttitle" />
 
         <h1 class="documentFirstHeading">
-            Event Roster
+            Roster
         </h1>
 
         <div tal:replace="structure provider:plone.abovecontentbody" />
@@ -27,7 +27,7 @@
           <span tal:repeat="eventday python:view.eventDates()">
             <span tal:condition="not: repeat/eventday/start"> - </span>
             <a href='javascript:void(0);' tal:content="python:eventday.strftime('%m/%d/%Y')" />
-          </span>
+          </span> - <a href='javascript:void(0);' id='show_all_roster'>Show All</a>
         </div>
         <div class='event_roster_day' tal:repeat="eventday python:view.eventDates()">
           <h2>Roster for <span tal:content="python:eventday.strftime('%m/%d/%Y')" /></h2>
@@ -66,8 +66,12 @@
 
             showhide_event_roster_day_nav((new Date()).toString());
 
-            jQuery('.event_roster_nav a').bind('click', function(ev){
+            jQuery('.event_roster_nav span a').bind('click', function(ev){
               showhide_event_roster_day_nav(jQuery(ev.target).html());
+            });
+
+            jQuery('.event_roster_nav a#show_all_roster').bind('click', function(ev){
+              jQuery('.event_roster_day:hidden').show();
             });
 
             jQuery('.event_roster_day input').bind('click', function(ev){

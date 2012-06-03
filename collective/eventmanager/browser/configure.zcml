@@ -20,15 +20,15 @@
     name='eventroster'
     for='collective.eventmanager.event.IEMEvent'
     permission="cmf.ModifyPortalContent"
-    class="collective.eventmanager.browser.event.EventRoster"
-    template="event_templates/eventroster.pt"
+    class="collective.eventmanager.browser.event.EventRosterView"
+    template="templates/rosterview.pt"
     />
 
   <browser:page
     name='toggle-attendance-state'
     for='collective.eventmanager.event.IEMEvent'
     permission="cmf.ModifyPortalContent"
-    class="collective.eventmanager.browser.event.EventRoster"
+    class="collective.eventmanager.browser.event.EventRosterView"
     attribute="toggleAttendanceState"
     />
 

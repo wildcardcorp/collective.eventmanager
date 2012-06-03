@@ -11,7 +11,7 @@ from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.utils import findRegistrationObject
-from collective.eventmanager.event import EventSettings
+from collective.eventmanager.browser.rostersettings import RosterSettings
 
 
 class View(grok.View):
@@ -263,11 +263,14 @@ class RegistrationStatusForm(grok.View):
         return registrations
 
 
-class EventRoster(BrowserView):
-    """A printable report for listing all registrations for the event"""
+class EventRosterView(BrowserView):
+    """A report for listing all registrations for an event or session.
+    also provides an attendance checklist."""
+
+    use_interface = IEMEvent
 
     def initsettings(self):
-        self.settings = EventSettings(self.context)
+        self.settings = RosterSettings(self.context, self.use_interface)
         if self.settings.eventAttendance is None:
             self.settings.eventAttendance = PersistentDict()
 

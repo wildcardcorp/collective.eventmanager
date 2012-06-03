@@ -1,6 +1,7 @@
 from five import grok
 from Products.CMFCore.utils import getToolByName
 from collective.geo.mapwidget.browser.widget import MapWidget
+
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.session import ISession
 
