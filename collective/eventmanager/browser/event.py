@@ -1,8 +1,12 @@
 from datetime import timedelta
 from persistent.dict import PersistentDict
-from five import grok
+from mako.template import Template
+from email.MIMEText import MIMEText
 
+from five import grok
 from Products.CMFCore.utils import getToolByName
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 from Products.Five import BrowserView
 from collective.geo.mapwidget.browser.widget import MapWidget
 from plone.protect import protect, CheckAuthenticator
@@ -269,6 +273,26 @@ class EventRosterView(BrowserView):
 
     use_interface = IEMEvent
 
+    def makeDictFromPost(self, ints=[]):
+        """
+            'ints' is an array of strings that are key values in
+            the form post variables that should have their associated
+            values converted to integers. If a value cannot be
+            converted, it is set to None.
+        """
+        items = self.request.form.items()
+        values = {}
+        for i in range(len(items)):
+            if items[i][0] in ints:
+                try:
+                    values[items[i][0]] = int(items[i][1])
+                except ValueError:
+                    values[items[i][0]] = None
+            else:
+                values[items[i][0]] = items[i][1]
+
+        return values
+
     def initsettings(self):
         self.settings = RosterSettings(self.context, self.use_interface)
         if self.settings.eventAttendance is None:
@@ -280,14 +304,9 @@ class EventRosterView(BrowserView):
                     for a in range(datediff)]
 
     def toggleAttendanceState(self):
-        postitems = self.request.form.items()
-        regdate = None
-        regname = None
-        for i in range(len(postitems)):
-            if postitems[i][0] == 'dt':
-                regdate = postitems[i][1]
-            elif postitems[i][0] == 'reg':
-                regname = postitems[i][1]
+        postitems = self.makeDictFromPost()
+        regdate = postitems['dt']
+        regname = postitems['reg']
 
         key = regname + ',' + regdate
         self.initsettings()
@@ -304,3 +323,49 @@ class EventRosterView(BrowserView):
             return 'checked'
         else:
             return ''
+
+    def emailRoster(self):
+        postitems = self.makeDictFromPost()
+
+        if 'to' not in postitems or postitems['to'] == None \
+                or postitems['to'] == '':
+            return "no to address"
+        if 'from' not in postitems or postitems['from'] == None \
+                or postitems['from'] == '':
+            return "no to address"
+        elif 'text' not in postitems or postitems['text'] == None \
+                or postitems['text'] == '':
+            postitems['text'] = ''
+
+        registry = getUtility(IRegistry)
+        subject = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_subject'].value
+        message = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_htmlbody'].value
+        if subject == None:
+            subject = 'Roster for ' + self.context.title
+        if message == None:
+            message = ''
+
+        message += '<div>' + postitems['text'] + '</div>'
+
+        regs = [self.context.registrations[a]
+                    for a in self.context.registrations]
+
+        subjecttemplate = Template(subject)
+        bodytemplate = Template(message)
+        renderedsubject = subjecttemplate.render(emevent=self.context,
+                                                 registrations=regs)
+        renderedbody = bodytemplate.render(emevent=self.context,
+                                           registrations=regs)
+
+        mh = getToolByName(self.context, 'MailHost')
+        msg = MIMEText(renderedbody)
+        msg['Subject'] = renderedsubject
+        msg['From'] = postitems['from']
+        msg['To'] = postitems['to']
+        try:
+            mh.send(msg)
+        except Exception:
+            return 'failure'
+
+        return 'success'
+

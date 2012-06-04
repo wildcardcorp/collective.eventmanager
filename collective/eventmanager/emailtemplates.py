@@ -5,9 +5,9 @@ from mako.template import Template
 
 
 class IEMailTemplateSettings(Interface):
-    announcement_subject = schema.TextLine(title=u"Announcement Subject")
-    announcement_htmlbody = schema.Text(title=u"HTML Body")
-    announcement_textbody = schema.Text(title=u"Plain Text Body")
+    announcement_subject = schema.Text(title=u"Announcement Subject")
+    announcement_htmlbody = schema.Text(title=u"Announcement HTML Body")
+    announcement_textbody = schema.Text(title=u"Announcement Plain Text Body")
 
     confirmation_subject = schema.TextLine(title=u"Confirmation Subject")
     confirmation_htmlbody = schema.Text(title=u"Confirmation HTML Body")
@@ -39,6 +39,10 @@ class IEMailTemplateSettings(Interface):
         title=u"Thank you with confirmation HTML Body")
     thankyou_with_confirmation_textbody = schema.Text(
         title=u"Thank you with confirmation Plain Text Body")
+
+    roster_subject = schema.Text(title=u"Roster Subject")
+    roster_htmlbody = schema.Text(title=u"Roster HTML Body")
+    roster_textbody = schema.Text(title=u"Roster Plain Text Body")
 
 
 def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],

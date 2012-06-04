@@ -24,3 +24,16 @@
 .event_roster li {
     list-style: none;
 }
+
+.event_roster_day em {
+    font-size: .6em;
+    font-weight: normal;
+}
+
+.event_roster_day .event_roster_email_form {
+    display: none;
+}
+
+.event_roster_day .event_roster_email_form .form_actions {
+    text-align: right;
+}
