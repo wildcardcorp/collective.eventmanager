@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from persistent.dict import PersistentDict
 from mako.template import Template
 from email.MIMEText import MIMEText
@@ -368,4 +368,47 @@ class EventRosterView(BrowserView):
             return 'failure'
 
         return 'success'
+
+
+class ExportRegistrationsView(BrowserView):
+    def exportRegistrations(self):
+        filename = "registrations-%s.csv" \
+                        % (datetime.now().strftime('%m-%d-%Y'))
+        self.request.response.setHeader('Content-Type',
+                                        'text/plain')
+        self.request.response.setHeader('Content-Disposition',
+                                        'attachment; filename="%s"'
+                                            % (filename,))
+
+        cvsout = '"Name","EMail"'
+        # generate header row
+        fields = []
+        for fielddata in self.context.registrationFields:
+            fields.append(fielddata['name'])
+            cvsout += ',"%s"' % (fielddata['name'].replace('"', '""'),)
+        cvsout += "\n"
+
+        # get values for all the registrations
+        for regname in self.context.registrations:
+            reg = self.context.registrations[regname]
+
+            name = reg.title
+            email = reg.email
+            if email is None:
+                email = ''
+            cvsout += '"%s","%s"' % (name.replace('"', '""'),
+                                     email.replace('"', '""'))
+            for field in fields:
+                try:
+                    val = getattr(reg, field)
+                except AttributeError:
+                    val = ''
+                cvsout += ',"%s"' % (val.replace('"', '""'))
+
+            cvsout += "\n"
+
+        self.request.response.setBody(cvsout)
+
+    def exportRegistrationsAllowed(self):
+        return True
 

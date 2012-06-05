@@ -57,7 +57,10 @@ class View(grok.View):
         for fielddata in registrationFields:
             n = fielddata['name']
             t = fielddata['fieldtype']
-            v = getattr(self.context, fielddata['name'])
+            try:
+                v = getattr(self.context, fielddata['name'])
+            except AttributeError:
+                v = ''
 
             fields.append({
                 'name': n,

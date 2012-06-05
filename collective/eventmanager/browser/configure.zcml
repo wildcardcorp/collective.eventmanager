@@ -16,6 +16,26 @@
   <include package="z3c.jbot" file="meta.zcml" />
   <browser:jbot directory="jbot" />
 
+
+  <!-- Roster View //-->
+  <browser:page
+    name='export-registrations'
+    for='collective.eventmanager.event.IEMEvent'
+    permission="cmf.ModifyPortalContent"
+    class="collective.eventmanager.browser.event.ExportRegistrationsView"
+    attribute="exportRegistrations"
+    />
+
+  <browser:page
+    name='export-registrations-allowed'
+    for='collective.eventmanager.event.IEMEvent'
+    permission="zope.Public"
+    class="collective.eventmanager.browser.event.ExportRegistrationsView"
+    attribute="exportRegistrationsAllowed"
+    />
+
+
+  <!-- Roster View //-->
   <browser:page
     name='eventroster'
     for='collective.eventmanager.event.IEMEvent'
@@ -40,6 +60,8 @@
     attribute="emailRoster"
     />
 
+
+  <!-- Registration Payment //-->
   <browser:page
     name="pay-for-registration"
     for="collective.eventmanager.event.IEMEvent"
@@ -63,6 +85,8 @@
      layer="..interfaces.ILayer"
      />
 
+
+  <!-- EMail Templating //-->
   <browser:page
     name="em-email-templates"
     for="Products.CMFCore.interfaces._content.ISiteRoot"
