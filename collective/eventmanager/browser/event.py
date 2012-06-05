@@ -339,7 +339,7 @@ class EventRosterView(BrowserView):
 
         registry = getUtility(IRegistry)
         subject = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_subject'].value
-        message = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_htmlbody'].value
+        message = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_textbody'].value
         if subject == None:
             subject = 'Roster for ' + self.context.title
         if message == None:
