@@ -2,10 +2,8 @@ from datetime import datetime
 
 from zope import schema
 from zope.interface import Interface
-
 from plone.directives import form
 from plone.namedfile.field import NamedBlobFile
-
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from collective.z3cform.mapwidget.widget import MapFieldWidget
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
@@ -404,3 +402,4 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                       u"interested in attending, you can complete your "
                       u"registration by following the instructions below"),
         )
+

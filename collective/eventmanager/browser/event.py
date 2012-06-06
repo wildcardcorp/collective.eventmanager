@@ -150,11 +150,43 @@ class EMailSenderForm(grok.View):
 
         self.emailSent = True
 
-    def registrationEMailList(self):
+    def registrationEMailList(self, filtered=False):
         regfolder = self.__parent__.registrations
-        return ''.join(["\"%s\" <%s>\n"
+
+        # return all email addresses formatted for a text field
+        if not filtered:
+            return '"' + ','.join(['\\"%s\\" <%s>\\n'
                            % (regfolder[reg].title, regfolder[reg].description)
-                       for reg in regfolder])
+                       for reg in regfolder]) + '";'
+
+        # if there are no attendance settings for the context, then
+        # return all email addresses formatted for a text field
+        settings = RosterSettings(self.context, IEMEvent)
+        if settings.eventAttendance is None:
+            return '"' + ','.join(['\\"%s\\" <%s>\\n'
+                           % (regfolder[reg].title, regfolder[reg].description)
+                       for reg in regfolder]) + '";'
+
+        # get all the days an event is lasting
+        datediff = (self.context.end - self.context.start).days
+        evdates = [(self.context.start + timedelta(days=a))
+                    for a in range(datediff)]
+        # for each registration, see if there are any days that have an
+        # attendance record and add it to a list if non are found
+        noattendance = []
+        for r in regfolder:
+            found = False
+            for dt in evdates:
+                key = "%s,%s" % (r,dt.strftime('%m/%d/%Y'))
+                if key in settings.eventAttendance:
+                    found = True
+                    break
+            if not found:
+                noattendance.append(r)
+        # return list of emails addresses formated for a text field
+        return '"' + ','.join(['\\"%s\\" <%s>\\n'
+                        % (regfolder[reg].title, regfolder[reg].description)
+                    for reg in noattendance]) + '";'
 
     def showMessageEMailSent(self):
         if getattr(self, 'emailSent', None) != None:

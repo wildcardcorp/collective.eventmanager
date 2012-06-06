@@ -17,7 +17,7 @@
             meta_type="CMF Action Category">
         <object name="exportreg"
                 meta_type="CMF Action"
-                i18n:domain="collective.duplicateaction">
+                i18n:domain="collective.eventmanager">
             <property name="title" i18n:translate="">Export Registrations</property>
             <property name="description" i18n:translate=""></property>
             <property name="url_expr">string:$object_url/@@export-registrations</property>
