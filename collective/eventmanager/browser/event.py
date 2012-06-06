@@ -155,16 +155,16 @@ class EMailSenderForm(grok.View):
 
         # return all email addresses formatted for a text field
         if not filtered:
-            return '"' + ','.join(['\\"%s\\" <%s>\\n'
-                           % (regfolder[reg].title, regfolder[reg].description)
+            return '"' + ''.join(['\\"%s\\" <%s>\\n'
+                           % (regfolder[reg].title, regfolder[reg].email)
                        for reg in regfolder]) + '";'
 
         # if there are no attendance settings for the context, then
         # return all email addresses formatted for a text field
         settings = RosterSettings(self.context, IEMEvent)
         if settings.eventAttendance is None:
-            return '"' + ','.join(['\\"%s\\" <%s>\\n'
-                           % (regfolder[reg].title, regfolder[reg].description)
+            return '"' + ''.join(['\\"%s\\" <%s>\\n'
+                           % (regfolder[reg].title, regfolder[reg].email)
                        for reg in regfolder]) + '";'
 
         # get all the days an event is lasting
@@ -184,8 +184,8 @@ class EMailSenderForm(grok.View):
             if not found:
                 noattendance.append(r)
         # return list of emails addresses formated for a text field
-        return '"' + ','.join(['\\"%s\\" <%s>\\n'
-                        % (regfolder[reg].title, regfolder[reg].description)
+        return '"' + ''.join(['\\"%s\\" <%s>\\n'
+                        % (regfolder[reg].title, regfolder[reg].email)
                     for reg in noattendance]) + '";'
 
     def showMessageEMailSent(self):
