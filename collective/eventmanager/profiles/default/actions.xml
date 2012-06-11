@@ -13,21 +13,4 @@
             <permission>Modify portal content</permission>
         </action>
     </action-provider>
-    <object name="object_buttons"
-            meta_type="CMF Action Category">
-        <object name="exportreg"
-                meta_type="CMF Action"
-                i18n:domain="collective.eventmanager">
-            <property name="title" i18n:translate="">Export Registrations</property>
-            <property name="description" i18n:translate=""></property>
-            <property name="url_expr">string:$object_url/@@export-registrations</property>
-            <property name="link_target"></property>
-            <property name="icon_expr"></property>
-            <property name="available_expr">object/@@export-registrations-allowed|nothing</property>
-            <property name="permissions">
-                <element value="Add Portal Content" />
-            </property>
-            <property name="visible">True</property>
-        </object>
-    </object>
 </object>

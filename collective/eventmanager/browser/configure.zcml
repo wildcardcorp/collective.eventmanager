@@ -6,6 +6,8 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="collective.eventmanager">
 
+  <include file="menu.zcml" />
+
   <grok:grok package="." />
   <include package="plone.resource" file="meta.zcml"/>
   <plone:static
@@ -25,15 +27,6 @@
     class="collective.eventmanager.browser.event.ExportRegistrationsView"
     attribute="exportRegistrations"
     />
-
-  <browser:page
-    name='export-registrations-allowed'
-    for='collective.eventmanager.event.IEMEvent'
-    permission="zope.Public"
-    class="collective.eventmanager.browser.event.ExportRegistrationsView"
-    attribute="exportRegistrationsAllowed"
-    />
-
 
   <!-- Roster View //-->
   <browser:page

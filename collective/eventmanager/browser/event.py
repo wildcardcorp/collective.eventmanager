@@ -440,7 +440,3 @@ class ExportRegistrationsView(BrowserView):
             cvsout += "\n"
 
         self.request.response.setBody(cvsout)
-
-    def exportRegistrationsAllowed(self):
-        return True
-

@@ -62,28 +62,4 @@
             visible="True">
         <permission value="Modify portal content"/>
     </action>
-    <action title="EMail Sender"
-            action_id="emailsenderform"
-            category="object"
-            condition_expr=""
-            url_expr="string:${object_url}/emailsenderform"
-            visible="True">
-        <permission value="Modify portal content"/>
-    </action>
-    <action title="Registration Status"
-            action_id="registrationstatusform"
-            category="object"
-            condition_expr=""
-            url_expr="string:${object_url}/registrationstatusform"
-            visible="True">
-        <permission value="Modify portal content"/>
-    </action>
-    <action title="Roster"
-            action_id="eventroster"
-            category="object"
-            condition_expr=""
-            url_expr="string:${object_url}/eventroster"
-            visible="True">
-        <permission value="Modify portal content"/>
-    </action>
 </object>
