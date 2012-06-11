@@ -51,13 +51,25 @@
 
           <ul class='event_roster'>
             <li tal:repeat="item python:context.registrations">
-              <span style='display:none' class='roster_ballotbox'>&#9744;</span>
-              <input type='checkbox' class='roster_attended'
-                     tal:attributes="date python:eventday.strftime('%m/%d/%Y');registration python:item;checked  python:view.getCheckedValue(item, eventday.strftime('%m/%d/%Y'))" />
-              <a tal:attributes="href python:'registrations/' + item"><span tal:replace="python:context.registrations[item].title" /></a> (<a tal:attributes="href python:'mailto:' + context.registrations[item].email"><span tal:replace="python:context.registrations[item].email" /></a>)
+              <div tal:condition="python: context.registrations[item].noshow == False">
+                  <span style='display:none' class='roster_ballotbox'>&#9744;</span>
+                  <input type='checkbox' class='roster_attended'
+                         tal:attributes="date python:eventday.strftime('%m/%d/%Y');registration python:item;checked  python:view.getCheckedValue(item, eventday.strftime('%m/%d/%Y'))" />
+                  <a tal:attributes="href python:'registrations/' + item"><span tal:replace="python:context.registrations[item].title" /></a> (<a tal:attributes="href python:'mailto:' + context.registrations[item].email"><span tal:replace="python:context.registrations[item].email" /></a>)
+              </div>
             </li>
           </ul>
-        </div>
+      </div>
+
+      <div tal:condition="python:view.hasNoShow()">
+        <h2>Event No-Shows</h2>
+        <p>Here is a list of all registrations that have been marked as 'No Show'</p>
+        <ul>
+            <li tal:repeat="item python:view.noShows()">
+                <a tal:attributes="href python:'registrations/' + item"><span tal:replace="python:context.registrations[item].title" /></a> (<a tal:attributes="href python:'mailto:' + context.registrations[item].email"><span tal:replace="python:context.registrations[item].email" /></a>)
+            </li>
+        </ul>
+      </div>
 
         <script type='text/javascript'>
           (function() {

@@ -14,6 +14,15 @@ class IRegistration(form.Schema):
     # XXX to the user.
     email = schema.TextLine(title=_(u"EMail Address"))
 
+    form.mode(for_current_user='hidden')
+    dexterity.write_permission(
+            noshow='collective.eventmanager.ManageRegistrations')
+    noshow = schema.Bool(
+                title=_(u"No Show"),
+                default=False,
+                description=_(u"Set if the registration did not show at the "
+                              u"event"))
+
     dexterity.write_permission(
         paid_fee='collective.eventmanager.ManageRegistrations')
     paid_fee = schema.Bool(
