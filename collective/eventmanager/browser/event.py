@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from persistent.dict import PersistentDict
 from mako.template import Template
-from email.MIMEText import MIMEText
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 from five import grok
 from Products.CMFCore.utils import getToolByName
@@ -389,26 +390,37 @@ class EventRosterView(BrowserView):
 
         registry = getUtility(IRegistry)
         subject = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_subject'].value
-        message = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_textbody'].value
+        htmlmessage = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_htmlbody'].value
+        plainmessage = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_textbody'].value
         if subject == None:
             subject = 'Roster for ' + self.context.title
-        if message == None:
-            message = ''
+        if htmlmessage == None:
+            htmlmessage = ''
+        if plainmessage == None:
+            plainmessage = ''
 
-        message += '<div>' + postitems['text'] + '</div>'
+        htmlmessage += '<div>' + postitems['text'] + '</div>'
+        plainmessage += '\n\n' + postitems['text']
 
         regs = [self.context.registrations[a]
                     for a in self.context.registrations]
 
         subjecttemplate = Template(subject)
-        bodytemplate = Template(message)
+        htmltemplate = Template(htmlmessage)
+        plaintemplate = Template(plainmessage)
         renderedsubject = subjecttemplate.render(emevent=self.context,
                                                  registrations=regs)
-        renderedbody = bodytemplate.render(emevent=self.context,
+        renderedhtml = htmltemplate.render(emevent=self.context,
+                                           registrations=regs)
+        renderedplain = plaintemplate.render(emevent=self.context,
                                            registrations=regs)
 
         mh = getToolByName(self.context, 'MailHost')
-        msg = MIMEText(renderedbody)
+        msg = MIMEMultipart('alternative')
+        msgpart1 = MIMEText(renderedplain, 'plain')
+        msgpart2 = MIMEText(renderedhtml, 'html')
+        msg.attach(msgpart1)
+        msg.attach(msgpart2)
         msg['Subject'] = renderedsubject
         msg['From'] = postitems['from']
         msg['To'] = postitems['to']
@@ -462,3 +474,4 @@ class ExportRegistrationsView(BrowserView):
             cvsout += "\n"
 
         self.request.response.setBody(cvsout)
+
