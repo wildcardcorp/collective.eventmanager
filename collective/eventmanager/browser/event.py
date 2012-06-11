@@ -150,6 +150,13 @@ class EMailSenderForm(grok.View):
 
         self.emailSent = True
 
+    def registrationEMailListNoShows(self):
+        regfolder = self.__parent__.registrations
+        return '"' + ''.join(['\\"%s\\" <%s>\\n'
+                        % (regfolder[reg].title, regfolder[reg].email)
+                    for reg in regfolder
+                     if regfolder[reg].noshow]) + '";'
+
     def registrationEMailList(self, filtered=False):
         regfolder = self.__parent__.registrations
 
@@ -335,6 +342,17 @@ class EventRosterView(BrowserView):
         return [(self.context.start + timedelta(days=a))
                     for a in range(datediff)]
 
+    def hasNoShow(self):
+        for item in self.context.registrations:
+            if self.context.registrations[item].noshow:
+                return True
+
+        return False
+
+    def noShows(self):
+        return [a for a in self.context.registrations
+                   if self.context.registrations[a].noshow]
+
     def toggleAttendanceState(self):
         postitems = self.makeDictFromPost()
         regdate = postitems['dt']
@@ -412,7 +430,7 @@ class ExportRegistrationsView(BrowserView):
                                         'attachment; filename="%s"'
                                             % (filename,))
 
-        cvsout = '"Name","EMail"'
+        cvsout = '"Name","EMail","Is No Show?"'
         # generate header row
         fields = []
         for fielddata in self.context.registrationFields:
@@ -426,10 +444,14 @@ class ExportRegistrationsView(BrowserView):
 
             name = reg.title
             email = reg.email
+            noshow = ''
             if email is None:
                 email = ''
-            cvsout += '"%s","%s"' % (name.replace('"', '""'),
-                                     email.replace('"', '""'))
+            if reg.noshow:
+                noshow = 'Yes'
+            cvsout += '"%s","%s","%s"' % (name.replace('"', '""'),
+                                          email.replace('"', '""'),
+                                          noshow)
             for field in fields:
                 try:
                     val = getattr(reg, field)

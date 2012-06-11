@@ -31,11 +31,16 @@
                 tal:content="python:'var registrationEMailList = ' + view.registrationEMailList()"></script>
         <script style='text/javascript'
                 tal:content="python:'var registrationEMailListFiltered = ' + view.registrationEMailList(True)"></script>
+        <script style='text/javascript'
+                tal:content="python:'var registrationEMailListNoShows = ' + view.registrationEMailListNoShows()"></script>
         <script style='text/javascript'>
             function addAllRegistrations(filterNotAttendedYet) {
                 var filter = filterNotAttendedYet || false;
                 var regs = filter ? registrationEMailListFiltered : registrationEMailList;
                 jQuery('#emailtoaddresses').html(regs);
+            }
+            function addNoShowRegistrations() {
+                jQuery('#emailtoaddresses').html(registrationEMailListNoShows);
             }
         </script>
         <form action='emailsenderform' method='POST' enctype='multipart/form-data'>
@@ -58,7 +63,8 @@
                 <div>
                     enter one address per line
                     (<a href='javascript:void(0)' onclick='addAllRegistrations(); return false;'>all registrations</a>,
-                     <a href='javascript:void(0)' onclick='addAllRegistrations(true); return false;'>registrations that have not attended yet</a>) 
+                     <a href='javascript:void(0)' onclick='addAllRegistrations(true); return false;'>registrations that have not attended yet</a>,
+                     <a href='javascript:void(0)' onclick='addNoShowRegistrations(); return false;'>no shows</a>)
                 </div>
                 <p><textarea id='emailtoaddresses' name='emailtoaddresses'></textarea></p>
             </div>
