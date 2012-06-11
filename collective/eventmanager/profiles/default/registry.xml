@@ -127,6 +127,38 @@
     </field>
     <value>plone body</value>
   </record>
+  <record field="roster_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_htmlbody">
+    <field type="plone.registry.field.Text">
+      <title>Roster HTML Body</title>
+    </field>
+    <value>
+The following registraitons were made for the event:
+&lt;ul&gt;
+% for reg in registrations:
+    &lt;li&gt;${reg.title} (&lt;a href='mailto:${reg.email}'&gt;${reg.email}&lt;/a&gt;)&lt;/li&gt;
+% endfor
+&lt;/ul&gt;
+    </value>
+  </record>
+  <record field="roster_subject" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_subject">
+    <field type="plone.registry.field.TextLine">
+      <title>Roster you Subject</title>
+    </field>
+    <value>Roster for ${emevent.title}</value>
+  </record>
+  <record field="roster_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_textbody">
+    <field type="plone.registry.field.Text">
+      <title>Roster Plain Text Body</title>
+    </field>
+    <value>
+The following registraitons were made for the event:
+% for reg in registrations:
+    - ${reg.title} (${reg.email})
+% endfor
+    </value>
+  </record>
+
+
 
     <record interface="Products.ResourceRegistries.interfaces.settings.IResourceRegistriesSettings"
             field="resourceBundlesForThemes">
