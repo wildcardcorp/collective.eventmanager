@@ -16,6 +16,7 @@
     <property name="allowed_content_types">
         <element value="Document" />
         <element value="Image" />
+        <element value="File" />
         <element value="Topic" />
         <element value="Folder" />
     </property>
