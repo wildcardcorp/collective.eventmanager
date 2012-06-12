@@ -1,16 +1,49 @@
 <object name="portal_actions"
         meta_type="Plone Actions Tool"
         xmlns:i18n="http://xml.zope.org/namespaces/i18n">
-    <action-provider name="portal_actions"
-                     i18n:domain="plone">
-        <action title="Payment Settings"
-                action_id="buyable"
-                category="object"
-                condition_expr="python:path('object/@@getpaid_control').isPayable()"
-                url_expr="string:${object_url}/@@edit-payable"
-                visible="False"
-                i18n:attributes="title">
-            <permission>Modify portal content</permission>
-        </action>
-    </action-provider>
+    <object name="object" meta_type="CMF Action Category">
+        <object name="buyable" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+    </object>
+    <object name="user" meta_type="CMF Action Category">
+        <object name="getpaid_manage_cart" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+    </object>
+    <object name="object_buttons" meta_type="CMF Action Category">
+        <object name="getpaid_make_buyable" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_make_shippable" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_make_donatable" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_make_variableamountdonatable" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_make_not_buyable" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_make_not_shippable" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_make_not_premium" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_make_not_donatable" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_make_not_variableamountdonatable" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_recurring_payment" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+        <object name="getpaid_make_not_recurring_payment" meta_type="CMF Action">
+            <property name="visible">False</property>
+        </object>
+    </object>
 </object>

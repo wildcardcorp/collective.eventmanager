@@ -18,7 +18,6 @@
   <include package="z3c.jbot" file="meta.zcml" />
   <browser:jbot directory="jbot" />
 
-
   <!-- Roster View //-->
   <browser:page
     name='export-registrations'

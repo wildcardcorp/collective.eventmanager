@@ -12,12 +12,6 @@ from zope.browsermenu.menu import BrowserSubMenuItem
 from collective.eventmanager.event import IEMEvent
 
 
-def _safe_unicode(text):
-    if not isinstance(text, unicode):
-        text = unicode(text, 'utf-8', 'ignore')
-    return text
-
-
 class SubMenuItem(BrowserSubMenuItem):
     implements(IActionsSubMenuItem)
 

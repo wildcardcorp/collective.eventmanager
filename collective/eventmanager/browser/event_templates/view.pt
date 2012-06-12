@@ -5,54 +5,108 @@
       lang="en"
       metal:use-macro="context/main_template/macros/master"
       i18n:domain="collective.eventmanager">
+
+<metal:css fill-slot="style_slot">
+  <link href="++resource++brstatic/bootstrap.css" rel="stylesheet"
+      tal:attributes="href string:${context/portal_url}/++theme++em/bootstrap.css">
+  <link href="++resource++brstatic/bootstrap.css" rel="stylesheet"
+      tal:attributes="href string:${context/portal_url}/++theme++em/bootstrap-custom.css">
+</metal:css>
+
 <body>
+
+<metal:content-title fill-slot="content-title">
+ <metal:title define-macro="content-title">
+    <h1 class="emTitle" tal:content="context/Title"></h1>
+  </metal:title>
+</metal:content-title>
 
 <metal:content-core fill-slot="content-core">
   <metal:content-core define-macro="content-core"
     tal:define="num_reg view/number_registered;
                 num_wait view/number_wait_list;">
-
+    <div class="em">
       <tal:registered tal:condition="view/registered">
-        <tal:waiting tal:condition="view/waiting_list">
-          You are on the wait list for this event.
-        </tal:waiting>
-        <tal:notwaiting tal:condition="not: view/waiting_list">
-          You are registered for this event.
-        </tal:notwaiting>
-        <a tal:attributes="href string:${reg/absolute_url}/view">
-          View registration settings.
-        </a>
+        <div class="alert">
+          <tal:waiting tal:condition="view/waiting_list">
+            You are on the wait list for this event.
+          </tal:waiting>
+          <tal:notwaiting tal:condition="not: view/waiting_list">
+            You are registered for this event.
+          </tal:notwaiting>
+          <a tal:attributes="href string:${reg/absolute_url}/view" class="btn btn-small">
+            View registration settings.
+          </a>
+        </div>
       </tal:registered>
       <tal:notregistered tal:condition="not: view/registered">
-        You are not
-        <a href="#"
-           tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?current-user=true">registered for this event</a>.
+        <div class="alert alert-error">
+          You are not registered for this event.
+          <a href="#" tal:condition="python: view.can_register"
+             tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?current-user=true" class="btn btn-small">Register</a>
+          <p class="discreet" tal:condition="python: not view.can_register">
+            Registration is closed
+          </p>
+        </div>
       </tal:notregistered>
-      <p tal:condition="num_reg">
-        There are <span class="num" tal:content="num_reg" />
-        <span tal:condition='python: context.maxRegistrations != None'>
-          of <span tal:replace='python: context.maxRegistrations' />
-        </span>
-        registered.
-      </p>
-      <p tal:condition="num_wait">
-        There are <span class="num" tal:content="num_wait" /> on the wait list.
-      </p>
-
-
-      <div class='event_datetime'>
-        <div tal:condition="python: context.start == context.end">
-          This is an all day event taking place on <span tal:content="python: context.start.strftime('%x')" />.
-        </div>
-        <div tal:condition="python: context.start != context.end">
-          The event takes place from <span tal:content="python: context.start.strftime('%A, %x at %X')" />
-          to <span tal:content="python: context.end.strftime('%A, %x at %X')" />.
-        </div>
-      </div>
-
-      <div class='event_registration_datetime'>
-        Registration opens <span tal:content="python: context.registrationOpen.strftime('%A, %x at %X')" />.
-        <div tal:condition="python: context.registrationClosed != None" ><span tal:content="python: context.registrationClosed.strftime('%A, %x at %X')" /></div>
+      <div class="row">
+        <div class="span4">
+          <h2>Number Registered</h2>
+          <div class="well">
+            <p tal:condition="num_reg">
+              There are <span class="num" tal:content="num_reg" />
+              <span tal:condition='python: context.maxRegistrations != None'>
+                of <span tal:replace='python: context.maxRegistrations' />
+              </span>
+              registered.
+            </p>
+            <p tal:condition="not: num_reg">
+              No users registered yet.
+            </p>
+            <p tal:condition="num_wait">
+              There are <span class="num" tal:content="num_wait" /> on the wait list.
+            </p>
+          </div>
+        </div><!--/span-->
+        <div class="span4">
+          <h2>Event Dates</h2>
+          <div class="well">
+            <div tal:condition="python: context.start == context.end">
+              This is an all day event taking place on <span tal:content="python: context.start.strftime('%x')" />.
+            </div>
+            <div tal:condition="python: context.start != context.end">
+              The event takes place from <span tal:content="python: context.start.strftime('%A, %x at %X')" />
+              to <span tal:content="python: context.end.strftime('%A, %x at %X')" />.
+            </div>
+          </div>
+        </div><!--/span-->
+        <div class="span4">
+          <h2>Registration Dates</h2>
+          <div class="well">
+            <div class='event_registration_datetime'>
+              Registration opens <span tal:content="python: context.registrationOpen.strftime('%A, %x at %X')" />.
+              <div tal:condition="python: context.registrationClosed != None" ><span tal:content="python: context.registrationClosed.strftime('%A, %x at %X')" /></div>
+            </div>
+          </div>
+        </div><!--/span-->
+        <div class="span4" tal:condition="context/contactName|context/contactDetails">
+          <h2>Contact Information</h2>
+          <div class="well">
+            <div class='event_contact'>
+              <div tal:content='python: context.contactName' />
+              <div tal:content='python: context.contactDetails' />
+            </div>
+          </div>
+        </div><!--/span-->
+        <div class="span4" tal:condition='python: context.flyer != None'>
+          <h2>Flyer</h2>
+          <div class="well">
+            <div class='event_flyer'>
+              <a href="./@@display-file/flyer" class="btn">View Event Flyer</a>
+            </div>
+          </div>
+        </div><!--/span-->
+    </div>
       </div>
 
       <tal:if condition="python: context.location is not None and context.location != ''">
@@ -64,17 +118,6 @@
           <div class='event_location_description' tal:content='python: context.locationDescription'>
           </div>
       </tal:if>
-
-      <div class='event_flyer' tal:condition='python: context.flyer != None'>
-        <a href='./@@display-file/flyer'>Event Flyer</a>
-      </div>
-
-      <div class='event_contact' tal:condition='python: context.contactName != None or context.contactDetails != None'>
-          <h2>Event Contact Information</h2>
-          <div tal:content='python: context.contactName' />
-          <div tal:content='python: context.contactDetails' />
-      </div>
-
     </metal:content-core>
 </metal:content-core>
 
