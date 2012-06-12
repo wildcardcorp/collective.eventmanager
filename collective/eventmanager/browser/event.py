@@ -361,8 +361,10 @@ class EventRosterView(BrowserView):
 
         key = regname + ',' + regdate
         self.initsettings()
+        #import pdb; pdb.set_trace()
         if key in self.settings.eventAttendance:
-            self.settings.eventAttendance[key] = not self.settings[key]
+            self.settings.eventAttendance[key] = \
+                    not self.settings.eventAttendance[key]
         else:
             self.settings.eventAttendance[key] = True
 
@@ -370,7 +372,8 @@ class EventRosterView(BrowserView):
         self.initsettings()
         key = reg + ',' + dt
         #import pdb; pdb.set_trace()
-        if key in self.settings.eventAttendance:
+        if key in self.settings.eventAttendance \
+                and self.settings.eventAttendance[key]:
             return 'checked'
         else:
             return ''
