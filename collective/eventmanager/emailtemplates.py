@@ -39,13 +39,6 @@ class IEMailTemplateSettings(Interface):
     thankyou_htmlbody = schema.Text(title=u"Thank you HTML Body")
     thankyou_textbody = schema.Text(title=u"Thank you Plain Text Body")
 
-    thankyou_with_confirmation_subject = schema.TextLine(
-        title=u"Thank you with confirmation Subject")
-    thankyou_with_confirmation_htmlbody = schema.Text(
-        title=u"Thank you with confirmation HTML Body")
-    thankyou_with_confirmation_textbody = schema.Text(
-        title=u"Thank you with confirmation Plain Text Body")
-
     roster_subject = schema.Text(title=u"Roster Subject")
     roster_htmlbody = schema.Text(title=u"Roster HTML Body")
     roster_textbody = schema.Text(title=u"Roster Plain Text Body")

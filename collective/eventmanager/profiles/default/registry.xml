@@ -109,24 +109,6 @@
     </field>
     <value>${event_content}</value>
   </record>
-  <record field="thankyou_with_confirmation_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_with_confirmation_htmlbody">
-    <field type="plone.registry.field.Text">
-      <title>Thank you with confirmation HTML Body</title>
-    </field>
-    <value>${event_content}</value>
-  </record>
-  <record field="thankyou_with_confirmation_subject" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_with_confirmation_subject">
-    <field type="plone.registry.field.TextLine">
-      <title>Thank you with confirmation Subject</title>
-    </field>
-    <value>Thank you with confirmation Subject</value>
-  </record>
-  <record field="thankyou_with_confirmation_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.thankyou_with_confirmation_textbody">
-    <field type="plone.registry.field.Text">
-      <title>Thank you with confirmation Plain Text Body</title>
-    </field>
-    <value>${event_content}</value>
-  </record>
   <record field="roster_htmlbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_htmlbody">
     <field type="plone.registry.field.Text">
       <title>Roster HTML Body</title>
