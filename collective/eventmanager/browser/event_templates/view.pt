@@ -49,7 +49,7 @@
           </p>
         </div>
       </tal:notregistered>
-      <div class="row">
+      <div class="row" tal:define="featured_material view/featured_material">
         <div class="span4">
           <h2>Number Registered</h2>
           <div class="well">
@@ -106,9 +106,28 @@
             </div>
           </div>
         </div><!--/span-->
-    </div>
+        <div class="span4" tal:condition='featured_material'>
+          <h2>Featured Material</h2>
+          <div class="well">
+            <ul>
+              <li tal:repeat="material featured_material">
+                <a tal:attributes="href material/getURL" tal:content="material/Title" />
+              </li>
+            </ul>
+          </div>
+        </div><!--/span-->
       </div>
-
+      <div class="row" tal:define="material view/all_material">
+        <div class="span6" tal:condition="material">
+          <h2>All Event Material</h2>
+          <div class="well">
+            <ul>
+              <li tal:repeat="material material">
+                <a tal:attributes="href material/getURL" tal:content="material/Title" />
+              </li>
+            </ul>
+          </div>
+      </div>
       <tal:if condition="python: context.location is not None and context.location != ''">
           <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
           <script type='text/javascript' tal:content="python: view.cgmapSettings()">
@@ -118,6 +137,7 @@
           <div class='event_location_description' tal:content='python: context.locationDescription'>
           </div>
       </tal:if>
+    </div>
     </metal:content-core>
 </metal:content-core>
 

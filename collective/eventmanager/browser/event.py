@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import re
 from persistent.dict import PersistentDict
 from mako.template import Template
 from email.mime.text import MIMEText
@@ -24,13 +25,19 @@ class View(grok.View):
 
     The associated template is found in event_templates/view.pt
     """
-
     grok.context(IEMEvent)
     grok.require('zope2.View')
     grok.name('view')
     grok.layer(ILayer)
 
     MAP_CSS_CLASS = 'eventlocation'
+
+    filter_material_paths = (
+        'sessions',
+        'session-calendar',
+        'registrations',
+        'travel-accommodations',
+        'lodging-accommodations')
 
     def __call__(self):
         # setup map widget
@@ -93,6 +100,28 @@ class View(grok.View):
             "collective.eventmanager.Registration_workflow",
             self.reg)
         return status['review_state'] != 'approved'
+
+    @property
+    def featured_material(self):
+        catalog = getToolByName(self.context, 'portal_catalog')
+        return catalog(Subject='featured', path={
+            'query': '/'.join(self.context.getPhysicalPath()),
+            'depth': 5})
+
+    @property
+    def all_material(self):
+        catalog = getToolByName(self.context, 'portal_catalog')
+        base = '/'.join(self.context.getPhysicalPath())
+        filter_material_paths_re = re.compile('^(%s)' % (
+            '|'.join([base + '/' + p for p in self.filter_material_paths])))
+
+        res = []
+        brains = catalog(path={'query': base + '/', 'depth': 5})
+        for brain in brains:
+            path = brain.getPath()
+            if path != base and not filter_material_paths_re.match(path):
+                res.append(brain)
+        return res
 
     def cgmapSettings(self):
         settings = {}
