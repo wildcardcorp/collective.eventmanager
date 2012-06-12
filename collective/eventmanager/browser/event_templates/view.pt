@@ -41,12 +41,12 @@
       </tal:registered>
       <tal:notregistered tal:condition="not: view/registered">
         <div class="alert alert-error">
+          <h4 class="alert-heading" tal:condition="python: not view.can_register">
+            Registration is closed
+          </h4> 
           You are not registered for this event.
           <a href="#" tal:condition="python: view.can_register"
              tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?current-user=true" class="btn btn-small">Register</a>
-          <p class="discreet" tal:condition="python: not view.can_register">
-            Registration is closed
-          </p>
         </div>
       </tal:notregistered>
       <div class="row" tal:define="featured_material view/featured_material">

@@ -17,6 +17,7 @@ class TestViews(BaseTest):
             '/registrations/++add++collective.eventmanager.Registration')
         self.browser.getControl(name="form.widgets.title").value = name
         self.browser.getControl(name="form.widgets.email").value = email
+        self.browser.getControl('Register').click()
 
     def test_searchable_public_training_calendar(self):
         browserLogin(self.portal, self.browser)
@@ -49,7 +50,6 @@ class TestViews(BaseTest):
             name="form.widgets.registrationFields.AA.widgets.fieldtype:list"
             ).value = ['TextLine']
         self.browser.getControl('Save').click()
-        import pdb; pdb.set_trace()
         event = self.portal['test-event']
         self.browser.open(event.absolute_url() + \
             '/registrations/++add++collective.eventmanager.Registration')
@@ -74,7 +74,21 @@ class TestViews(BaseTest):
         pass
 
     def test_registration_is_open_with_waitlist(self):
-        pass
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(
+            name="form.widgets.maxRegistrations").value = "2"
+        self.browser.getControl(
+            name="form.widgets.enableWaitingList:list").checked = True
+        self.browser.getControl('Save').click()
+        event = self.portal['test-event']
+        self.registerNewUser(event, 'test1', 'test1@foobar.com')
+        self.registerNewUser(event, 'test2', 'test2@foobar.com')
+        self.browser.open(event.absolute_url())
+        assert "Registration is closed" not in self.browser.contents
 
     def test_registrants_receive_confirmation_email_on_signup(self):
         pass

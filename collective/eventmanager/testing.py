@@ -1,7 +1,6 @@
 from plone.app.testing import TEST_USER_ID
 from Products.CMFCore.utils import getToolByName
 from plone.app.testing import setRoles
-from plone.app.testing import applyProfile
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
 from plone.app.testing import PLONE_FIXTURE

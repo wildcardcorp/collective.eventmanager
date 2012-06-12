@@ -12,6 +12,7 @@ from plone.registry.interfaces import IRegistry
 from Products.Five import BrowserView
 from collective.geo.mapwidget.browser.widget import MapWidget
 from plone.protect import protect, CheckAuthenticator
+from plone.memoize.view import memoize
 
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
@@ -50,32 +51,30 @@ class View(grok.View):
         return super(View, self).__call__()
 
     @property
+    @memoize
+    def catalog(self):
+        return getToolByName(self.context, 'portal_catalog')
+
+    @property
+    @memoize
     def number_registered(self):
-        # XXX Optimize! catalog
-        registrationfolder = self.context.registrations
-        wftool = getToolByName(self.context, "portal_workflow")
-        count = 0
-        for reg in registrationfolder.objectValues():
-            status = wftool.getStatusOf(
-                "collective.eventmanager.Registration_workflow", reg)
-            if status['review_state'] in ('approved', 'confirmed'):
-                count += 1
-        return count
+        return len(self.catalog(path={
+            'query': '/'.join(self.context.getPhysicalPath()),
+            'depth': 5},
+            portal_type="collective.eventmanager.Registration",
+            review_state=('approved', 'confirmed')))
 
     @property
+    @memoize
     def number_wait_list(self):
-        # XXX Optimize! catalog
-        registrationfolder = self.context.registrations
-        wftool = getToolByName(self.context, "portal_workflow")
-        count = 0
-        for reg in registrationfolder.objectValues():
-            status = wftool.getStatusOf(
-                "collective.eventmanager.Registration_workflow", reg)
-            if status['review_state'] in ('submitted',):
-                count += 1
-        return count
+        return len(self.catalog(path={
+            'query': '/'.join(self.context.getPhysicalPath()),
+            'depth': 5},
+            portal_type="collective.eventmanager.Registration",
+            review_state=('submitted',)))
 
     @property
+    @memoize
     def reg(self):
         return findRegistrationObject(self.context)
 
@@ -83,7 +82,7 @@ class View(grok.View):
     def can_register(self):
         if self.context.enableWaitingList:
             return True
-        return self.number_registered >= self.context.maxRegistrations
+        return self.number_registered < self.context.maxRegistrations
 
     @property
     def registered(self):
@@ -220,7 +219,7 @@ class EMailSenderForm(grok.View):
         for r in regfolder:
             found = False
             for dt in evdates:
-                key = "%s,%s" % (r,dt.strftime('%m/%d/%Y'))
+                key = "%s,%s" % (r, dt.strftime('%m/%d/%Y'))
                 if key in settings.eventAttendance:
                     found = True
                     break
@@ -512,4 +511,3 @@ class ExportRegistrationsView(BrowserView):
             cvsout += "\n"
 
         self.request.response.setBody(cvsout)
-
