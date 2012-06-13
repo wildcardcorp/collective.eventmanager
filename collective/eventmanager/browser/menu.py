@@ -1,4 +1,5 @@
-
+from AccessControl import getSecurityManager
+from Products.CMFCore import permissions
 from plone.memoize.instance import memoize
 from zope.interface import implements
 
@@ -43,6 +44,9 @@ class Menu(BrowserMenu):
 
     def getMenuItems(self, context, request):
         """Return menu item entries in a TAL-friendly form."""
+        if not getSecurityManager().checkPermission(
+                permissions.ModifyPortalContent, context):
+            return []
         base_url = context.absolute_url()
         return [{
             'title': 'Email Sender',

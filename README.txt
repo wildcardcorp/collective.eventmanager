@@ -32,3 +32,7 @@ Getpaid
 
 sudo port install swig
 sudo port install swig-python
+
+- ubuntu
+
+sudo apt-get install swig
