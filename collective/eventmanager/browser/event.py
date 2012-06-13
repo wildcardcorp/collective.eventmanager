@@ -80,7 +80,8 @@ class View(grok.View):
 
     @property
     def can_register(self):
-        if self.context.enableWaitingList:
+        if self.context.enableWaitingList or \
+                self.context.maxRegistrations is None:
             return True
         return self.number_registered < self.context.maxRegistrations
 
