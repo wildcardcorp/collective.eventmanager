@@ -4,6 +4,7 @@ from zope import schema
 from zope.interface import Interface
 from plone.directives import form
 from plone.namedfile.field import NamedBlobFile
+from plone.app.textfield import RichText
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from collective.z3cform.mapwidget.widget import MapFieldWidget
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
@@ -156,6 +157,13 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                           u"registration link"),
             required=True,
             default=False,
+        )
+
+    body = RichText(
+            title=_(u"Body"),
+            description=_(u"This field describes additional content of an "
+                          u"event"),
+            required=False,
         )
 
     # === REGISTRATION FIELDS ===

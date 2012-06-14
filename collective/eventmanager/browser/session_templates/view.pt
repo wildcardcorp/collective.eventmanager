@@ -43,6 +43,11 @@
             <div tal:content='python: context.contactDetails' />
         </div>
 
+        <div tal:condition="python: context.body != None and context.body != ''">
+            <div tal:content="structure context/body/output">
+            </div>
+        </div>
+
     </metal:content-core>
 </metal:content-core>
 

@@ -22,6 +22,11 @@
              tal:content='python: context.locationDescription'>
         </div>
 
+        <div tal:condition="python: context.body != None and context.body != ''">
+            <div tal:content="structure context/body/output">
+            </div>
+        </div>
+
     </metal:content-core>
 </metal:content-core>
 

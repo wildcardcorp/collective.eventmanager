@@ -71,6 +71,14 @@ def addFoldersForEventFormsFolder(emevent, event):
                         title='Lodging Accommodations')
     _canAdd(emevent[id], 'Accommodation')
 
+    # add a folder to hold news items for event announcments
+    id = emevent.invokeFactory(
+                        'Folder',
+                        'announcements',
+                        title='Announcements')
+    emevent[id].setConstrainTypesMode(1)
+    emevent[id].setLocallyAllowedTypes(('News Item',))
+
 
 @grok.subscribe(IEMEvent, IObjectModifiedEvent)
 def checkEventForSessionsState(emevent, event):

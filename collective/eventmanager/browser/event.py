@@ -38,7 +38,8 @@ class View(grok.View):
         'session-calendar',
         'registrations',
         'travel-accommodations',
-        'lodging-accommodations')
+        'lodging-accommodations',
+        'announcements')
 
     def __call__(self):
         # setup map widget

@@ -1,8 +1,10 @@
 from datetime import datetime
 from zope import schema
 from plone.directives import form
+from plone.app.textfield import RichText
 from Solgema.fullcalendar.interfaces import ISolgemaFullcalendarMarker
 from collective.z3cform.mapwidget.widget import MapFieldWidget
+
 from collective.eventmanager import EventManagerMessageFactory as _
 
 
@@ -72,3 +74,11 @@ class ISession(form.Schema, ISolgemaFullcalendarMarker):
                           u"person"),
             required=False,
         )
+
+    body = RichText(
+            title=_(u"Body"),
+            description=_(u"This field describes additional content of a "
+                          u"session"),
+            required=False,
+        )
+

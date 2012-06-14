@@ -43,7 +43,7 @@
         <div class="alert alert-error">
           <h4 class="alert-heading" tal:condition="python: not view.can_register">
             Registration is closed
-          </h4> 
+          </h4>
           You are not registered for this event.
           <a href="#" tal:condition="python: view.can_register"
              tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?current-user=true" class="btn btn-small">Register</a>
@@ -116,6 +116,16 @@
             </ul>
           </div>
         </div><!--/span-->
+        <div class='span4' tal:condition='python: len(context.announcements) > 0'>
+          <h2>Announcements</h2>
+          <div class='well'>
+            <ul>
+              <li tal:repeat='announcement python:[context.announcements[a] for a in context.announcements]'>
+                <a tal:attributes="href python:'announcements/' + announcement.getId()" tal:content="python:announcement.title" />
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
       <div class="row" tal:define="material view/all_material">
         <div class="span6" tal:condition="material">
@@ -137,6 +147,10 @@
           <div class='event_location_description' tal:content='python: context.locationDescription'>
           </div>
       </tal:if>
+      <div tal:condition="python: context.body != None and context.body != ''">
+        <div tal:content="structure context/body/output">
+        </div>
+      </div>
     </div>
     </metal:content-core>
 </metal:content-core>
