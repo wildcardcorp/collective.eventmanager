@@ -11,12 +11,14 @@
 <metal:content-core fill-slot="content-core">
     <metal:content-core define-macro="content-core">
 
-        <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
+        <tal:if tal:condition="python:context.location != None and context.location != ''">
+          <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
 
-        <script type='text/javascript' tal:content="python: view.cgmapSettings()">
-        </script>
+          <script type='text/javascript' tal:content="python: view.cgmapSettings()">
+          </script>
 
-        <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
+          <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
+        </tal:if>
 
         <div class='session_datetime'>
             <div tal:condition="python: context.start == context.end">
@@ -38,7 +40,7 @@
              tal:content='python: context.locationDescription'>
         </div>
 
-        <div class='session_presenter'>
+        <div class='session_presenter' tal:condition="python: context.contactName != None and context.contactName != ''">
             <h2>Presenting <span tal:content='python: context.contactName' /></h2>
             <div tal:content='python: context.contactDetails' />
         </div>
@@ -46,6 +48,17 @@
         <div tal:condition="python: context.body != None and context.body != ''">
             <div tal:content="structure context/body/output">
             </div>
+        </div>
+
+        <div tal:condition='python: len(context.announcements) > 0'>
+          <h2>Announcements</h2>
+          <div class='well'>
+            <ul>
+              <li tal:repeat='announcement python:[context.announcements[a] for a in context.announcements]'>
+                <a tal:attributes="href python:'announcements/' + announcement.getId()" tal:content="python:announcement.title" />
+              </li>
+            </ul>
+          </div>
         </div>
 
     </metal:content-core>

@@ -9,6 +9,7 @@ from Products.PloneGetPaid.interfaces import IBuyableMarker
 
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.registration import IRegistration
+from collective.eventmanager.session import ISession
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.emailtemplates import sendEMail
@@ -140,3 +141,14 @@ def handleNewRegistration(reg, event):
     else:
         workflowTool.doActionFor(reg, 'deny')
         sendEMail(parentevent, 'registration full', [reg.email], reg)
+
+
+@grok.subscribe(ISession, IObjectAddedEvent)
+def handleNewSession(sess, event):
+    # add a folder to hold news items for session announcments
+    id = sess.invokeFactory(
+                        'Folder',
+                        'announcements',
+                        title='Announcements')
+    sess[id].setConstrainTypesMode(1)
+    sess[id].setLocallyAllowedTypes(('News Item',))
