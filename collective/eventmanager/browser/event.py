@@ -75,32 +75,11 @@ class View(grok.View):
             review_state=('submitted',)))
 
     @property
-    @memoize
-    def reg(self):
-        return findRegistrationObject(self.context)
-
-    @property
     def can_register(self):
         if self.context.enableWaitingList or \
                 self.context.maxRegistrations is None:
             return True
         return self.number_registered < self.context.maxRegistrations
-
-    @property
-    def registered(self):
-        if self.reg is None:
-            return False
-        return True
-
-    @property
-    def waiting_list(self):
-        if self.reg is None:
-            return False
-        wftool = getToolByName(self.context, "portal_workflow")
-        status = wftool.getStatusOf(
-            "collective.eventmanager.Registration_workflow",
-            self.reg)
-        return status['review_state'] != 'approved'
 
     @property
     def featured_material(self):
@@ -111,18 +90,25 @@ class View(grok.View):
 
     @property
     def all_material(self):
-        catalog = getToolByName(self.context, 'portal_catalog')
         base = '/'.join(self.context.getPhysicalPath())
         filter_material_paths_re = re.compile('^(%s)' % (
             '|'.join([base + '/' + p for p in self.filter_material_paths])))
 
         res = []
-        brains = catalog(path={'query': base + '/', 'depth': 5})
+        brains = self.catalog(path={'query': base + '/', 'depth': 5})
         for brain in brains:
             path = brain.getPath()
             if path != base and not filter_material_paths_re.match(path):
                 res.append(brain)
         return res
+
+    @property
+    def announcements(self):
+        base = '%s/announcements' % '/'.join(self.context.getPhysicalPath())
+        limit = 20
+        return self.catalog(path={'query': base, 'depth': 5},
+                                  sort_on="effective", sort_limit=limit,
+                                  portal_type="News Item")[:limit]
 
     def cgmapSettings(self):
         settings = {}

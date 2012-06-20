@@ -102,22 +102,7 @@ def checkEventForSessionsState(emevent, event):
 def handleNewRegistration(reg, event):
     parentevent = reg.__parent__.__parent__
     regfolderish = reg.__parent__
-    # first, check if the user needs to be created
-    user = getToolByName(reg, 'acl_users').getUserById(reg.email)
-    if not user:
-        # create member and make him owner of registration object
-        regtool = getToolByName(reg, 'portal_registration')
-        member = regtool.addMember(reg.email, regtool.generatePassword(),
-            properties={
-                'fullname': reg.title, 'email': reg.email,
-                'username': reg.email
-            })
-        # should we do a different email than password reset?
-        # more like, hey, can account was create, set your password!
-        regtool.mailPassword(reg.email, reg.REQUEST)
-        user = member.getUser()
-    reg.manage_setLocalRoles(reg.email, ["Owner"])
-    # Make sure user is owner of this sucker
+    reg.manage_setLocalRoles('admin', ["Owner"])
     reg.reindexObjectSecurity()
 
     hasWaitingList = parentevent.enableWaitingList

@@ -151,8 +151,8 @@ class AddForm(dexterity.AddForm):
         If the current user is registering. Otherwise, it could be
         an admin signing someone else up.
         """
-        return 'current-user' in self.request or \
-            self.widgets['for_current_user'].value == 'yes'
+        return 'new-user' in self.request or \
+            self.widgets['new_user'].value == 'yes'
 
     @property
     def member(self):
@@ -186,7 +186,7 @@ class AddForm(dexterity.AddForm):
         if obj is not None:
             # mark only as finished if we get the new object
             self._finishedAdd = True
-            if data.get('for_current_user', False):
+            if data.get('new_user', False):
                 msg = u'Registration submitted'
             else:
                 msg = u'Registered user'
@@ -196,16 +196,7 @@ class AddForm(dexterity.AddForm):
     def updateWidgets(self):
         super(dexterity.AddForm, self).updateWidgets()
         if self.userRegistering:
-            member = self.member
-            IStatusMessage(self.request).addStatusMessage(
-                u"You are currently logged in and registering as %s." % (
-                    self.member.getUserName()), 'info')
-            # default to current user name and email
-            self.widgets['email'].value = member.getUserName()
-            self.widgets['email'].mode = 'display'
-            self.widgets['title'].value = member.getProperty('fullname')
-            self.widgets['title'].mode = 'display'
-            self.widgets['for_current_user'].value = u'yes'
+            self.widgets['new_user'].value = u'yes'
 
     def updateFields(self):
         super(dexterity.AddForm, self).updateFields()

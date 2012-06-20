@@ -9,12 +9,8 @@ class IRegistration(form.Schema):
     """A registration for an event"""
 
     title = schema.TextLine(title=_(u"Name"))
-    # XXX email WILL be treated as the username
-    # XXX this is what connects the registration object
-    # XXX to the user.
     email = schema.TextLine(title=_(u"EMail Address"))
 
-    form.mode(for_current_user='hidden')
     dexterity.write_permission(
             noshow='collective.eventmanager.ManageRegistrations')
     noshow = schema.Bool(
@@ -29,9 +25,9 @@ class IRegistration(form.Schema):
         title=_(u"Paid"),
         description=_(u"Paid registration fee."))
 
-    form.mode(for_current_user='hidden')
-    for_current_user = schema.TextLine(
-        title=u"For current user", default=u'no')
+    form.mode(new_user='hidden')
+    new_user = schema.TextLine(
+        title=u"new user", default=u'no')
 
 
 @form.validator(field=IRegistration['email'])
