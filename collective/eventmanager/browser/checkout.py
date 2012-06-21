@@ -31,7 +31,8 @@ def getCart(context):
     cart = getUtility(IShoppingCartUtility).get(context, key='oneshot:_')
     factory = getMultiAdapter((cart, context), ILineItemFactory)
     if len(factory.cart) == 0:
-        factory.create(quantity=1)
+        line = factory.create(quantity=1)
+        line.product_code = line.uid
     return cart
 
 
@@ -73,6 +74,7 @@ class PayForEventView(ShoppingCartAddItem):
         if 'price' not in settings or \
                 settings['price'] != self.context.registrationFee:
             settings['price'] = self.context.registrationFee
+
         url = self.context.absolute_url() + '/@@getpaid-checkout-wizard'
         return self.request.response.redirect(url)
 
@@ -149,7 +151,9 @@ class CheckoutReviewAndPay(BaseCheckoutReviewAndPay):
             raise Exception('oops, there was an error.')
         super(CheckoutReviewAndPay, self).makePayment.success_handler(
             self, action, data)
+        reg = reg._unrestrictedGetObject()
         reg.paid_fee = True
+        reg.reindexObject()
 
 
 class EMCheckoutWizard(CheckoutWizard):

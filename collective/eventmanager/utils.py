@@ -7,12 +7,13 @@ def findRegistrationObject(context, email):
     context must be an event
     """
     catalog = getToolByName(context, 'portal_catalog')
-    result = catalog(object_provides=IRegistration.__identifier__,
+    result = catalog.unrestrictedSearchResults(
+        object_provides=IRegistration.__identifier__,
         path={'query': '/'.join(context.getPhysicalPath()),
               'depth': 4},
         email=email)
     if len(result) > 0:
-        return result[0].getObject()
+        return result[0]
     return None
 
 

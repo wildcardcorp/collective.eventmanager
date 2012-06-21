@@ -3,4 +3,6 @@
  <index name="email" meta_type="FieldIndex">
   <indexed_attr value="email"/>
  </index>
+ <column value="paid_fee" />
+ <column value="email" />
 </object>
