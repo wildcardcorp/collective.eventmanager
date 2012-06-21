@@ -32,6 +32,8 @@
         </h4>
         <a href="#" tal:condition="python: view.can_register"
            tal:attributes="href string:${context/absolute_url}/registrations/++add++collective.eventmanager.Registration?new-user=true" class="btn btn-small">Register for this event</a>
+        <a tal:condition="view/can_pay" class="btn btn-small"
+          tal:attributes="href string:${context/absolute_url}/@@pay-for-registration">Pay for event</a>
       </div>
       <div class="row" tal:define="featured_material view/featured_material;
                                    announcements view/announcements;">

@@ -81,6 +81,10 @@ class View(grok.View):
         return self.number_registered < self.context.maxRegistrations
 
     @property
+    def can_pay(self):
+        return self.context.requirePayment or self.context.registrationFee
+
+    @property
     def featured_material(self):
         catalog = getToolByName(self.context, 'portal_catalog')
         return catalog(Subject='featured', path={
