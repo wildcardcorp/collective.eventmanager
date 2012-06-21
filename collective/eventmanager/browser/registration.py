@@ -117,10 +117,6 @@ class EditForm(dexterity.EditForm):
 
     def updateWidgets(self):
         super(dexterity.EditForm, self).updateWidgets()
-        # can't actually edit these as they can be descructive.
-        # should delete and then re-add
-        self.widgets['email'].mode = 'display'
-        self.widgets['title'].mode = 'display'
 
     def updateFields(self):
         super(dexterity.EditForm, self).updateFields()
@@ -197,6 +193,7 @@ class AddForm(dexterity.AddForm):
         super(dexterity.AddForm, self).updateWidgets()
         if self.userRegistering:
             self.widgets['new_user'].value = u'yes'
+        self.widgets['noshow'].mode = 'hidden'
 
     def updateFields(self):
         super(dexterity.AddForm, self).updateFields()

@@ -137,3 +137,8 @@ def handleNewSession(sess, event):
                         title='Announcements')
     sess[id].setConstrainTypesMode(1)
     sess[id].setLocallyAllowedTypes(('News Item',))
+
+
+# XXX Need to subscribe to event publish 
+# and auto publish contents of event
+# OR make sub items use parent workflow

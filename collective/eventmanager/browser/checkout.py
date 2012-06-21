@@ -21,6 +21,9 @@ class PayForEventView(ShoppingCartAddItem):
 
     def __call__(self):
         # first, make sure getpaid configuration for price is set.
+        if not self.context.registrationFee:
+            return self.request.response.redirect(
+                self.context.absolute_url())
         annotations = IAnnotations(self.context)
         if _getpaid_key not in annotations:
             annotations[_getpaid_key] = PersistentMapping()
