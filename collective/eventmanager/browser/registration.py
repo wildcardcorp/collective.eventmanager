@@ -13,6 +13,7 @@ from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
 from collective.eventmanager.registration import IRegistration
 from collective.eventmanager import EventManagerMessageFactory as _
+from collective.eventmanager.utils import findRegistrationObject
 
 
 class View(grok.View):
@@ -158,23 +159,19 @@ class AddForm(dexterity.AddForm):
     @button.buttonAndHandler(_('Register'), name='register')
     def handle_register(self, action):
         data, errors = self.extractData()
-        # XXX before we save, we need to make sure there aren't
-        # XXX already registrations for same user.
-        # XXX Make faster! Index and use catalog
         if not errors:
             email = data['email']
-            for registration in self.context.objectValues():
-                if registration.email == email:
-                    widget = self.widgets['email']
-                    view = getMultiAdapter(
-                        (schema.ValidationError(),
-                         self.request, widget, widget.field,
-                         self, self.context), IErrorViewSnippet)
-                    view.update()
-                    view.message = u"Duplicate Registration"
-                    widget.error = view
-                    errors += (view,)
-                    break
+            reg = findRegistrationObject(self.context, email)
+            if reg is not None:
+                widget = self.widgets['email']
+                view = getMultiAdapter(
+                    (schema.ValidationError(),
+                     self.request, widget, widget.field,
+                     self, self.context), IErrorViewSnippet)
+                view.update()
+                view.message = u"Duplicate Registration"
+                widget.error = view
+                errors += (view,)
         if errors:
             self.status = self.formErrorsMessage
             return
