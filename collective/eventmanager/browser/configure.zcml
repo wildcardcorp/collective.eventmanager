@@ -76,7 +76,18 @@
      permission="zope2.View"
      layer="..interfaces.ILayer"
      />
+  <browser:page
+     for="collective.eventmanager.event.IEMEvent"
+     name="getpaid-checkout-wizard"
+     class=".checkout.EMCheckoutWizard"
+     permission="zope2.View"
+     layer="..interfaces.ILayer"
+     />
 
+  <adapter
+      for="collective.eventmanager.interfaces.IEMWizard"
+      provides="getpaid.wizard.interfaces.IWizardController"
+      factory=".checkout.EMCheckoutController" />
 
   <!-- EMail Templating //-->
   <browser:page

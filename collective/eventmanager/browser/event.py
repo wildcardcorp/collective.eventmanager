@@ -17,7 +17,6 @@ from plone.memoize.view import memoize
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.emailtemplates import sendEMail
-from collective.eventmanager.utils import findRegistrationObject
 from collective.eventmanager.browser.rostersettings import RosterSettings
 
 
