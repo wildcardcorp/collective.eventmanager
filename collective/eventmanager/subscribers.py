@@ -11,6 +11,7 @@ from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.session import ISession
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
+from collective.eventmanager.utils import executeUnderSpecialRole
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.emailtemplates import sendEMail
 
@@ -114,10 +115,20 @@ def handleNewRegistration(reg, event):
 
     # private registration means manual adding of registrations
     if hasPrivateReg:
-        workflowTool.doActionFor(reg, 'approve')
+        #workflowTool.doActionFor(reg, 'approve')
+        executeUnderSpecialRole(parentevent.__parent__,
+                                "Manager",
+                                workflowTool.doActionFor,
+                                reg,
+                                'approve')
     # haven't hit max, 'approve'
     elif maxreg == None or numRegApproved < maxreg:
-        workflowTool.doActionFor(reg, 'approve')
+        #workflowTool.doActionFor(reg, 'approve')
+        executeUnderSpecialRole(parentevent.__parent__,
+                                "Manager",
+                                workflowTool.doActionFor,
+                                reg,
+                                'approve')
         sendEMail(parentevent, 'thank you', [reg.email], reg)
     # waiting list, and hit max == remain 'submitted' (on waiting list)
     elif hasWaitingList:
