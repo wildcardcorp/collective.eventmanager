@@ -22,13 +22,14 @@ from zope import schema
 from zope.component import getUtility
 from zope.component import getMultiAdapter
 
-from collective.eventmanager.event import IEMEvent
-from collective.eventmanager.browser.registration import addDynamicFields
-from collective.eventmanager.registration import IRegistration
-from collective.eventmanager.interfaces import ILayer
-from collective.eventmanager.emailtemplates import sendEMail
-from collective.eventmanager.browser.rostersettings import RosterSettings
 from collective.eventmanager import EventManagerMessageFactory as _
+from collective.eventmanager.browser.registration import addDynamicFields
+from collective.eventmanager.browser.rostersettings import RosterSettings
+from collective.eventmanager.emailtemplates import sendEMail
+from collective.eventmanager.event import IEMEvent
+from collective.eventmanager.interfaces import ILayer
+from collective.eventmanager.registration import IRegistration
+from collective.eventmanager.utils import findRegistrationObject
 
 
 class View(grok.View):
@@ -527,6 +528,8 @@ class PublicRegistrationForm(form.SchemaForm):
     schema = IRegistration
     ignoreContext = True
 
+    MAP_CSS_CLASS = 'eventlocation'
+
     label = 'Register'
 
     @property
@@ -536,23 +539,19 @@ class PublicRegistrationForm(form.SchemaForm):
     @button.buttonAndHandler(_('Register'), name='register')
     def handle_register(self, action):
         data, errors = self.extractData()
-        # XXX before we save, we need to make sure there aren't
-        # XXX already registrations for same user.
-        # XXX Make faster! Index and use catalog
         if not errors:
             email = data['email']
-            for registration in self.context['registrations'].objectValues():
-                if registration.email == email:
-                    widget = self.widgets['email']
-                    view = getMultiAdapter(
-                        (schema.ValidationError(),
-                         self.request, widget, widget.field,
-                         self, self.context), IErrorViewSnippet)
-                    view.update()
-                    view.message = u"Duplicate Registration"
-                    widget.error = view
-                    errors += (view,)
-                    break
+            reg = findRegistrationObject(self.context, email)
+            if reg is not None:
+                widget = self.widgets['email']
+                view = getMultiAdapter(
+                    (schema.ValidationError(),
+                     self.request, widget, widget.field,
+                     self, self.context), IErrorViewSnippet)
+                view.update()
+                view.message = u"Duplicate Registration"
+                widget.error = view
+                errors += (view,)
         if errors:
             self.status = self.formErrorsMessage
             return
@@ -568,8 +567,7 @@ class PublicRegistrationForm(form.SchemaForm):
                 self.context['registrations'],
                 type_name='collective.eventmanager.Registration',
                 id=newid,
-                title=data['title'],
-                email=data['email'])
+                **data)
         if hasattr(type_info, '_finishConstruction'):
             finobj = type_info._finishConstruction(obj)
         else:
@@ -586,3 +584,26 @@ class PublicRegistrationForm(form.SchemaForm):
         super(form.SchemaForm, self).updateFields()
         em = self.context
         addDynamicFields(self, em.registrationFields)
+
+    def showMap(self):
+        return self.context.location is not None \
+                and self.context.location != '' \
+                and self.context.location[:6] == 'POINT('
+
+    def location(self):
+        return self.context.location
+
+    def cgmapSettings(self):
+        settings = {}
+
+        coords = [0, 0]
+        if self.context.location != None \
+                and self.context.location[0:6] == u'POINT(':
+            coords = self.context.location[6:-1].split(' ')
+
+        settings['lon'] = float(coords[0])
+        settings['lat'] = float(coords[1])
+        settings['zoom'] = 16
+
+        return "cgmap.state['" + self.MAP_CSS_CLASS + "'] = " \
+               + str(settings) + ";"

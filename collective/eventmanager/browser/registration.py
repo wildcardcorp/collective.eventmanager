@@ -9,11 +9,11 @@ from z3c.form.interfaces import IErrorViewSnippet
 from z3c.form import button
 from plone.directives import dexterity
 
-from collective.eventmanager.interfaces import ILayer
-from collective.eventmanager.utils import getNumApprovedAndConfirmed
-from collective.eventmanager.registration import IRegistration
 from collective.eventmanager import EventManagerMessageFactory as _
+from collective.eventmanager.interfaces import ILayer
+from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.utils import findRegistrationObject
+from collective.eventmanager.utils import getNumApprovedAndConfirmed
 
 
 class View(grok.View):

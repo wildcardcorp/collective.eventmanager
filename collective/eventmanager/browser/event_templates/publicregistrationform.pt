@@ -1,0 +1,46 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="collective.eventmanager"
+      metal:use-macro="context/main_template/macros/master">
+
+  <metal:block fill-slot="main">
+
+    <h1 class="documentFirstHeading" tal:content="view/label | nothing" />
+
+    <div>
+      <a id='regshowhidemap' href='javascript:void(0)'>Show a Map of the Event</a>
+    </div>
+    <div id='regmap' tal:condition="python: view.showMap()" style='display:none;'>
+      <tal:if condition="python: view.location() is not None and view.location() != ''">
+        <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
+        <script type='text/javascript' tal:content="python: view.cgmapSettings()">
+        </script>
+        <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
+      </tal:if>
+    </div>
+
+    <div id="content-core">
+        <metal:block use-macro="context/@@ploneform-macros/titlelessform" />
+    </div>
+
+    <script type='text/javascript'>
+      (function($){
+        $(document).ready(function(){
+          $('a#regshowhidemap').click(function(){
+            $('div#regmap').toggle();
+            if($('div#regmap').css('display') == 'none') {
+              $(this).html('Show a Map of the Event');
+            }
+            else {
+              $(this).html('Hide Map');
+            }
+          });
+        });
+      })(jQuery);
+    </script>
+
+  </metal:block>
+
+</html>
