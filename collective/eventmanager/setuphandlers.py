@@ -2,6 +2,7 @@ from zope.component import getMultiAdapter
 from plone.portlets.interfaces import IPortletManager
 from zope.component import getUtility
 from plone.portlets.interfaces import IPortletAssignmentMapping
+from Products.PloneGetPaid.interfaces import IGetPaidManagementPaymentOptions
 
 
 def install(context):
@@ -30,3 +31,7 @@ def install(context):
     for name in manager.keys():
         if type(manager[name]) in _getpaid_portlet_types:
             del manager[name]
+
+    # set default getpaid settings
+    settings = IGetPaidManagementPaymentOptions(site)
+    settings.allow_anonymous_checkout = True

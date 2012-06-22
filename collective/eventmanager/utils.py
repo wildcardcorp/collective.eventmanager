@@ -1,20 +1,20 @@
 from Products.CMFCore.utils import getToolByName
+from collective.eventmanager.registration import IRegistration
 
 
-def findRegistrationObject(context):
+def findRegistrationObject(context, email):
     """
     context must be an event
     """
-    mt = getToolByName(context, 'portal_membership')
-    if mt.isAnonymousUser():
-        return False
-    # XXX should be optimized
-    member = mt.getAuthenticatedMember()
-    username = member.getUserName()
-    registrationfolder = context.registrations
-    for reg in registrationfolder.objectValues():
-        if reg.email == username:
-            return reg
+    catalog = getToolByName(context, 'portal_catalog')
+    result = catalog.unrestrictedSearchResults(
+        object_provides=IRegistration.__identifier__,
+        path={'query': '/'.join(context.getPhysicalPath()),
+              'depth': 4},
+        email=email)
+    if len(result) > 0:
+        return result[0]
+    return None
 
 
 def getNumApprovedAndConfirmed(context):

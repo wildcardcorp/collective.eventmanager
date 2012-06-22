@@ -113,7 +113,8 @@ class TestViews(BaseTest):
         self.browser.getControl(
             name="form.widgets.maxRegistrations").value = "2"
         self.browser.getControl(
-            name="form.widgets.enableWaitingList:list").checked = True
+            name="form.widgets.enableWaitingList:list"
+        ).controls[0].selected = True
         self.browser.getControl('Save').click()
         event = self.portal['test-event']
         self.registerNewUser(event, 'test1', 'test1@foobar.com')

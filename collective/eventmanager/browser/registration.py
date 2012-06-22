@@ -13,6 +13,7 @@ from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
 from collective.eventmanager.registration import IRegistration
 from collective.eventmanager import EventManagerMessageFactory as _
+from collective.eventmanager.utils import findRegistrationObject
 
 
 class View(grok.View):
@@ -117,10 +118,6 @@ class EditForm(dexterity.EditForm):
 
     def updateWidgets(self):
         super(dexterity.EditForm, self).updateWidgets()
-        # can't actually edit these as they can be descructive.
-        # should delete and then re-add
-        self.widgets['email'].mode = 'display'
-        self.widgets['title'].mode = 'display'
 
     def updateFields(self):
         super(dexterity.EditForm, self).updateFields()
@@ -151,8 +148,8 @@ class AddForm(dexterity.AddForm):
         If the current user is registering. Otherwise, it could be
         an admin signing someone else up.
         """
-        return 'current-user' in self.request or \
-            self.widgets['for_current_user'].value == 'yes'
+        return 'new-user' in self.request or \
+            self.widgets['new_user'].value == 'yes'
 
     @property
     def member(self):
@@ -162,23 +159,19 @@ class AddForm(dexterity.AddForm):
     @button.buttonAndHandler(_('Register'), name='register')
     def handle_register(self, action):
         data, errors = self.extractData()
-        # XXX before we save, we need to make sure there aren't
-        # XXX already registrations for same user.
-        # XXX Make faster! Index and use catalog
         if not errors:
             email = data['email']
-            for registration in self.context.objectValues():
-                if registration.email == email:
-                    widget = self.widgets['email']
-                    view = getMultiAdapter(
-                        (schema.ValidationError(),
-                         self.request, widget, widget.field,
-                         self, self.context), IErrorViewSnippet)
-                    view.update()
-                    view.message = u"Duplicate Registration"
-                    widget.error = view
-                    errors += (view,)
-                    break
+            reg = findRegistrationObject(self.context, email)
+            if reg is not None:
+                widget = self.widgets['email']
+                view = getMultiAdapter(
+                    (schema.ValidationError(),
+                     self.request, widget, widget.field,
+                     self, self.context), IErrorViewSnippet)
+                view.update()
+                view.message = u"Duplicate Registration"
+                widget.error = view
+                errors += (view,)
         if errors:
             self.status = self.formErrorsMessage
             return
@@ -186,7 +179,7 @@ class AddForm(dexterity.AddForm):
         if obj is not None:
             # mark only as finished if we get the new object
             self._finishedAdd = True
-            if data.get('for_current_user', False):
+            if data.get('new_user', False):
                 msg = u'Registration submitted'
             else:
                 msg = u'Registered user'
@@ -196,16 +189,8 @@ class AddForm(dexterity.AddForm):
     def updateWidgets(self):
         super(dexterity.AddForm, self).updateWidgets()
         if self.userRegistering:
-            member = self.member
-            IStatusMessage(self.request).addStatusMessage(
-                u"You are currently logged in and registering as %s." % (
-                    self.member.getUserName()), 'info')
-            # default to current user name and email
-            self.widgets['email'].value = member.getUserName()
-            self.widgets['email'].mode = 'display'
-            self.widgets['title'].value = member.getProperty('fullname')
-            self.widgets['title'].mode = 'display'
-            self.widgets['for_current_user'].value = u'yes'
+            self.widgets['new_user'].value = u'yes'
+        self.widgets['noshow'].mode = 'hidden'
 
     def updateFields(self):
         super(dexterity.AddForm, self).updateFields()

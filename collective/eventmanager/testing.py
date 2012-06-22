@@ -21,6 +21,11 @@ class EventManager(PloneSandboxLayer):
             context=configurationContext)
         z2.installProduct(app, 'collective.eventmanager')
 
+        import Products.PloneGetPaid
+        xmlconfig.file('configure.zcml', Products.PloneGetPaid,
+            context=configurationContext)
+        z2.installProduct(app, 'Products.PloneGetPaid')
+
     def setUpPloneSite(self, portal):
         # install into the Plone site
         qi = portal.portal_quickinstaller
