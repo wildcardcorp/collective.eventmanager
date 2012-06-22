@@ -35,15 +35,15 @@
                 <em><a href='javascript:void(0)'>EMail Roster</a></em>
             </h2>
             <div class='event_roster_email_form'>
-                <form method='post'>
+                <form method='post' action='@@email-roster'>
                     <p><label>From</label></p>
-                    <p><input class='event_roster_email_from' /></p>
+                    <p><input name='event_roster_email_from' class='event_roster_email_from' /></p>
                     <p><label>To</label></p>
-                    <p><input class='event_roster_email_to' /></p>
+                    <p><input name='event_roster_email_to' class='event_roster_email_to' /></p>
                     <p><label>Additional Text</label></p>
-                    <p><textarea class='event_roster_email_text'></textarea></p>
+                    <p><textarea name='event_roster_email_text' class='event_roster_email_text'></textarea></p>
                     <p class='form_actions'>
-                        <input type='button' class='event_roster_email_submit' value='Submit' />
+                        <input type='submit' name='event_roster_email_submit' class='event_roster_email_submit' value='Submit' />
                         <input type='button' class='event_roster_email_cancel' value='Cancel' />
                     </p>
                 </form>
@@ -120,26 +120,29 @@
                 jQuery(ev.target).parents('.event_roster_day:first').find('.event_roster_email_form').show();
             });
 
+/*
             jQuery('.event_roster_day .event_roster_email_form .event_roster_email_submit').bind('click', function(ev){
                 var posturl = jQuery('base').attr('href') + '@@email-roster';
                 var eventel = ev.target;
                 var data = {
-                    'from': jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form .event_roster_email_from').val(),
-                    'to': jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form .event_roster_email_to').val(),
-                    'text': jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form .event_roster_email_text').val(),
+                    'event_roster_email_from': jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form .event_roster_email_from').val(),
+                    'event_roster_email_to': jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form .event_roster_email_to').val(),
+                    'event_roster_email_text': jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form .event_roster_email_text').val(),
                 };
 
                 jQuery('#kss-spinner').show();
                 jQuery.post(posturl, data, function(retdata){
-                jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form').show();
+                    jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form').show();
                     jQuery('#kss-spinner').hide();
                     jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form').hide();
                     jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form .event_roster_email_from').val('')
                     jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form .event_roster_email_to').val('');
                     jQuery(eventel).parents('.event_roster_day:first').find('.event_roster_email_form .event_roster_email_text').val('');
                 });
-            });
 
+                return false;
+            });
+*/
             jQuery('.event_roster_day .event_roster_email_form .event_roster_email_cancel').bind('click', function(ev){
                 jQuery(ev.target).parents('.event_roster_day:first').find('.event_roster_email_form').hide();
             });

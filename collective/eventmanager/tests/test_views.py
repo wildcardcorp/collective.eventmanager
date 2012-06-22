@@ -1,7 +1,13 @@
 import unittest2 as unittest
+import transaction
 from collective.eventmanager.tests import BaseTest
 from collective.eventmanager.testing import browserLogin
 from plone.testing.z2 import Browser
+from Acquisition import aq_base
+from Products.CMFPlone.tests.utils import MockMailHost
+from Products.MailHost.interfaces import IMailHost
+from zope.component import getSiteManager
+from email import message_from_string
 
 
 class TestViews(BaseTest):
@@ -11,6 +17,29 @@ class TestViews(BaseTest):
         self.browser = Browser(self.layer['app'])
         self.browser.handleErrors = False
         self.portal_url = self.portal.absolute_url()
+
+        self.setUpMailHost()
+
+    def tearDown(self):
+        super(TestViews, self).tearDown()
+
+        self.tearDownMailHost()
+
+    def setUpMailHost(self):
+        # setup mock mailhost
+        self.portal._original_MailHost = self.portal.MailHost
+        self.portal.MailHost = mailhost = MockMailHost('MailHost')
+        sm = getSiteManager(context=self.portal)
+        sm.unregisterUtility(provided=IMailHost)
+        sm.registerUtility(mailhost, provided=IMailHost)
+        transaction.commit()
+
+    def tearDownMailHost(self):
+        self.portal.MailHost = self.portal._original_MailHost
+        sm = getSiteManager(context=self.portal)
+        sm.unregisterUtility(provided=IMailHost)
+        sm.registerUtility(aq_base(self.portal._original_MailHost),
+                           provided=IMailHost)
 
     def registerNewUser(self, event, name, email):
         self.browser.open(event.absolute_url() + \
@@ -43,6 +72,8 @@ class TestViews(BaseTest):
         self.browser.getControl('Event Name').value = 'Test Event'
         self.browser.getControl('Description/Notes').value = 'Event desc'
         # XXX not working without js?
+        # XXX    -> seems to still function correctly when javascript is
+        #           disabled - is it not pulling data from a correct layer?
         self.browser.getControl(
             name='form.widgets.registrationFields.AA.widgets.name'
             ).value = 'Custom Field'
@@ -91,7 +122,38 @@ class TestViews(BaseTest):
         assert "Registration is closed" not in self.browser.contents
 
     def test_registrants_receive_confirmation_email_on_signup(self):
-        pass
+        # create em event
+        # enable 'Include Confirmation Link and Message' in the Thank You EMail
+        #   settings section
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(
+            name="form.widgets.maxRegistrations").value = "2"
+        self.browser.getControl(
+            name="form.widgets.thankYouIncludeConfirmation:list").checked = True
+        self.browser.getControl('Save').click()
+        event = self.portal['test-event']
+
+        # add registration
+        self.registerNewUser(event, "Test Registration 1", "test1@foobar.com")
+
+        # check captured messages in the mailhost to verify an email with
+        mailhost = self.portal.MailHost
+        self.assertEqual(len(mailhost.messages), 1)
+        msg = message_from_string(mailhost.message[0])
+
+        self.assertEqual(msg['To'], 'test1@foobar.com')
+        self.assertEqual(
+            msg['Subject'],
+            self.portal['test-event'].thankYouEMailSubject)
+        #self.assertIn(confirmationURL,
+        #              self.portal_url + '/test-event/')
+
+        # XXX a confirmation message and link are present
+        # TODO: add confirmation message and link to registration email
 
     def test_registrants_can_cancel(self):
         pass
@@ -115,7 +177,14 @@ class TestViews(BaseTest):
         pass
 
     def test_create_event(self):
-        pass
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl('Save').click()
+        self.assertEqual('test-event' in self.portal, True)
+        self.assertEqual(self.portal['test-event'] != None, True)
 
     def test_clone_event(self):
         pass
@@ -148,7 +217,43 @@ class TestViews(BaseTest):
         pass
 
     def test_email_roster_to_3rd_party(self):
-        pass
+        browserLogin(self.portal, self.browser)
+
+        # create em event
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl('Save').click()
+        event = self.portal['test-event']
+
+        # add a couple of registrations
+        self.registerNewUser(event, "Reg1", "reg1@foobar.com")
+        self.registerNewUser(event, "Reg2", "reg1@foobar.com")
+
+        # send roster email
+        self.browser.open(self.portal_url + \
+            '/test-event/@@eventroster')
+
+        # wrapped in try/except to make sure tear down happens on
+        # the mailhost
+        self.browser.getControl(
+            name='event_roster_email_from').value = 'testfrom@foobar.com'
+        self.browser.getControl(
+            name='event_roster_email_to').value = 'testto@foobar.com'
+        self.browser.getControl(
+            name='event_roster_email_text').value = 'test additional text'
+        self.browser.getControl(name='event_roster_email_submit').click()
+
+        # check captured messages in the mailhost to verify an email was
+        # sent to the to email address
+        mailhost = self.portal.MailHost
+        self.assertEqual(len(mailhost.messages) > 0, True)
+        msg = message_from_string(
+                mailhost.messages[len(mailhost.messages) - 1])
+
+        self.assertEqual(msg['From'], 'testfrom@foobar.com')
+        self.assertEqual(msg['To'], 'testto@foobar.com')
 
     def test_send_certificate_on_completion(self):
         pass

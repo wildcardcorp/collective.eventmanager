@@ -5,20 +5,31 @@ from mako.template import Template
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-from five import grok
-from Products.CMFCore.utils import getToolByName
-from zope.component import getUtility
-from plone.registry.interfaces import IRegistry
-from Products.Five import BrowserView
 from collective.geo.mapwidget.browser.widget import MapWidget
-from plone.protect import protect, CheckAuthenticator
+from five import grok
+from plone.directives import form
+from plone.i18n.normalizer.interfaces import IIDNormalizer
 from plone.memoize.view import memoize
+from plone.protect import protect
+from plone.protect import CheckAuthenticator
+from plone.registry.interfaces import IRegistry
+from Products.CMFCore.utils import getToolByName
+from Products.Five import BrowserView
+from Products.statusmessages.interfaces import IStatusMessage
+from z3c.form import button
+from z3c.form.interfaces import IErrorViewSnippet
+from zope import schema
+from zope.component import getUtility
+from zope.component import getMultiAdapter
 
 from collective.eventmanager.event import IEMEvent
+from collective.eventmanager.browser.registration import addDynamicFields
+from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.utils import findRegistrationObject
 from collective.eventmanager.browser.rostersettings import RosterSettings
+from collective.eventmanager import EventManagerMessageFactory as _
 
 
 class View(grok.View):
@@ -376,6 +387,8 @@ class EventRosterView(BrowserView):
 
     def eventDates(self):
         datediff = (self.context.end - self.context.start).days
+        if datediff == 0:
+            return [self.context.start]
         return [(self.context.start + timedelta(days=a))
                     for a in range(datediff)]
 
@@ -416,16 +429,19 @@ class EventRosterView(BrowserView):
 
     def emailRoster(self):
         postitems = self.makeDictFromPost()
+        tokey = 'event_roster_email_to'
+        fromkey = 'event_roster_email_from'
+        textkey = 'event_roster_email_text'
 
-        if 'to' not in postitems or postitems['to'] == None \
-                or postitems['to'] == '':
+        if tokey not in postitems or postitems[tokey] == None \
+                or postitems[tokey] == '':
             return "no to address"
-        if 'from' not in postitems or postitems['from'] == None \
-                or postitems['from'] == '':
+        if fromkey not in postitems or postitems[fromkey] == None \
+                or postitems[fromkey] == '':
             return "no to address"
-        elif 'text' not in postitems or postitems['text'] == None \
-                or postitems['text'] == '':
-            postitems['text'] = ''
+        elif textkey not in postitems or postitems[textkey] == None \
+                or postitems[textkey] == '':
+            postitems[textkey] = ''
 
         registry = getUtility(IRegistry)
         subject = registry.records['collective.eventmanager.emailtemplates.IEMailTemplateSettings.roster_subject'].value
@@ -438,8 +454,8 @@ class EventRosterView(BrowserView):
         if plainmessage == None:
             plainmessage = ''
 
-        htmlmessage += '<div>' + postitems['text'] + '</div>'
-        plainmessage += '\n\n' + postitems['text']
+        htmlmessage += '<div>' + postitems[textkey] + '</div>'
+        plainmessage += '\n\n' + postitems[textkey]
 
         regs = [self.context.registrations[a]
                     for a in self.context.registrations]
@@ -461,8 +477,8 @@ class EventRosterView(BrowserView):
         msg.attach(msgpart1)
         msg.attach(msgpart2)
         msg['Subject'] = renderedsubject
-        msg['From'] = postitems['from']
-        msg['To'] = postitems['to']
+        msg['From'] = postitems[fromkey]
+        msg['To'] = postitems[tokey]
         try:
             mh.send(msg)
         except Exception:
@@ -513,3 +529,73 @@ class ExportRegistrationsView(BrowserView):
             cvsout += "\n"
 
         self.request.response.setBody(cvsout)
+
+
+class PublicRegistrationForm(form.SchemaForm):
+    grok.context(IEMEvent)
+    grok.require('zope2.View')
+    grok.name('registration-form')
+    grok.layer(ILayer)
+
+    schema = IRegistration
+    ignoreContext = True
+
+    label = 'Register'
+
+    @property
+    def description(self):
+        return 'Fill out this form to register for \'' + self.title + '\''
+
+    @button.buttonAndHandler(_('Register'), name='register')
+    def handle_register(self, action):
+        data, errors = self.extractData()
+        # XXX before we save, we need to make sure there aren't
+        # XXX already registrations for same user.
+        # XXX Make faster! Index and use catalog
+        if not errors:
+            email = data['email']
+            for registration in self.context['registrations'].objectValues():
+                if registration.email == email:
+                    widget = self.widgets['email']
+                    view = getMultiAdapter(
+                        (schema.ValidationError(),
+                         self.request, widget, widget.field,
+                         self, self.context), IErrorViewSnippet)
+                    view.update()
+                    view.message = u"Duplicate Registration"
+                    widget.error = view
+                    errors += (view,)
+                    break
+        if errors:
+            self.status = self.formErrorsMessage
+            return
+
+        # avoid security checks and add a registration to the
+        # registraitons folder of the event
+        pt = getToolByName(self, 'portal_types')
+        type_info = pt.getTypeInfo('collective.eventmanager.Registration')
+        normalizer = getUtility(IIDNormalizer)
+        newid = normalizer.normalize(data['title'])
+        #import pdb; pdb.set_trace()
+        obj = type_info._constructInstance(
+                self.context['registrations'],
+                type_name='collective.eventmanager.Registration',
+                id=newid,
+                title=data['title'],
+                email=data['email'])
+        if hasattr(type_info, '_finishConstruction'):
+            finobj = type_info._finishConstruction(obj)
+        else:
+            finobj = obj
+
+        if finobj is not None:
+            # mark only as finished if we get the new object
+            self._finishedAdd = True
+            msg = "Registration Complete"
+            IStatusMessage(self.request).addStatusMessage(
+                msg, "info")
+
+    def updateFields(self):
+        super(form.SchemaForm, self).updateFields()
+        em = self.context
+        addDynamicFields(self, em.registrationFields)

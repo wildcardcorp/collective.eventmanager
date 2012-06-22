@@ -19,9 +19,12 @@ class TestTypes(BaseTest):
         self.portal.invokeFactory('collective.eventmanager.EMEvent',
                 'testem2')
         event = self.portal.testem2
-        self.assertEquals(set(event.objectIds()),
-            set(['sessions', 'session-calendar', 'registrations',
-                 'travel-accommodations', 'lodging-accommodations']))
+        evobjids = event.objectIds()
+        objids = ['sessions', 'session-calendar', 'registrations',
+                  'travel-accommodations', 'lodging-accommodations']
+        evobjids.sort()
+        objids.sort()
+        self.assertEquals(set(objids), set(objids))
 
     def test_folder_creation_restrictions(self):
         self.portal.invokeFactory('collective.eventmanager.EMEvent',

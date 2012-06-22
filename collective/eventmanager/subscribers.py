@@ -132,6 +132,7 @@ def handleNewRegistration(reg, event):
         workflowTool.doActionFor(reg, 'approve')
     # haven't hit max, 'approve'
     elif maxreg == None or numRegApproved < maxreg:
+        import pdb; pdb.set_trace()
         workflowTool.doActionFor(reg, 'approve')
         sendEMail(parentevent, 'thank you', [reg.email], reg)
     # waiting list, and hit max == remain 'submitted' (on waiting list)
