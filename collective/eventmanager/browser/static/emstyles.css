@@ -37,3 +37,8 @@
 .event_roster_day .event_roster_email_form .form_actions {
     text-align: right;
 }
+
+
+form#certificatepdf div.certinfo input {
+    width: 100%;
+}

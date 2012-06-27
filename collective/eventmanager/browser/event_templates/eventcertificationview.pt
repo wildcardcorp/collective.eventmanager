@@ -1,0 +1,92 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="collective.eventmanager">
+
+<body>
+
+<div metal:fill-slot="main">
+    <tal:main-macro metal:define-macro="main"
+           tal:define="size python:here.getObjSize(here);
+                       content_type here/get_content_type|here/Format;
+                       kssClassesView context/@@kss_field_decorator_view;
+                       getKssClasses nocall:kssClassesView/getKssClassesInlineEditable">
+
+        <div tal:replace="structure provider:plone.abovecontenttitle" />
+
+        <h1 class="documentFirstHeading">
+            Create Certificates for Registrations
+        </h1>
+
+        <div tal:replace="structure provider:plone.abovecontentbody" />
+
+        <form id='certificatepdf' method='post' name='registration_certs' action='@@certificates'>
+            <div class='certinfo'>
+                <label for='certtitle'>Title</label>
+                <p><input type='text' id='certtitle' name='certtitle' value='Certificate of Completion' /></p>
+            </div>
+            <div class='certinfo'>
+                <label for='certsubtitle'>Subtitle</label>
+                <p><input type='text' id='certsubtitle' name='certsubtitle' value='' /></p>
+            </div>
+            <div class='certinfo'>
+                <label for='certprenamedesc'>Pre-Name Description</label>
+                <p><input type='text' id='certprenamedesc' name='certprenamedesc' /></p>
+            </div>
+            <div class='certinfo'>
+                <label for='certpostnamedesc'>Post-Name Description</label>
+                <p><input type='text' id='certpostnamedesc' name='certpostnamedesc' /></p>
+            </div>
+            <div class='certinfo'>
+                <label for='certawardtitle'>Award/Certification Title</label>
+                <p><input type='text' id='certawardtitle' name='certawardtitle' /></p>
+            </div>
+            <div class='certinfo'>
+                <label for='certdate'>Date of Award</label>
+                <p><input type='text' id='certdate' name='certdate' /></p>
+            </div>
+            <div class='certinfo'>
+                <label for='certsigdesc'>Signature Description</label>
+                <p><input type='text' id='certsigdesc' name='certsigdesc' /></p>
+            </div>
+
+            <label for='registration_list'>Registrations</label>
+            <div class='reg_select_actions'>
+                <a href='javascript:void(0);' id='select_all_reg'>Select All</a>
+                - <a href='javascript:void(0);' id='select_none_reg'>Deselect All</a>
+            </div>
+            <ul id='registration_list'>
+                <li tal:repeat="item python:context.registrations">
+                    <input type='checkbox' class='reg_active' checked='checked'
+                           tal:attributes="name python:item" />
+                    <a tal:attributes="href python:'registrations/' + item"><span tal:replace="python:context.registrations[item].title" /></a> (<a tal:attributes="href python:'mailto:' + context.registrations[item].email"><span tal:replace="python:context.registrations[item].email" /></a>)
+                </li>
+            </ul>
+
+            <p><input type='submit' name='submit' value='Generate Certificates' /></p>
+        </form>
+
+        <div tal:replace="structure provider:plone.belowcontentbody" />
+
+        <script type='text/javascript'>
+            (function($){
+                $(document).ready(function(){
+                    $('.reg_select_actions a#select_all_reg').click(function(){
+                        $('#registration_list input[type=checkbox]').attr('checked', 'checked');
+                    });
+                    $('.reg_select_actions a#select_none_reg').click(function(){
+                        $('#registration_list input[type=checkbox]').removeAttr('checked');
+                    });
+                });
+            })(jQuery);
+        </script>
+
+    </tal:main-macro>
+</div>
+
+</body>
+
+</html>

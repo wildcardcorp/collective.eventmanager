@@ -42,7 +42,8 @@ setup(name='collective.eventmanager',
           'plone.protect',
           'mako',
           'Products.PloneGetPaid',
-          'getpaid.wizard'
+          'getpaid.wizard',
+          'xhtml2pdf'
       ],
       extras_require={
             'test': ['plone.app.testing', ]

@@ -88,4 +88,12 @@ class Menu(BrowserMenu):
             'icon': '',
             'extra': {'id': 'roster', 'separator': None, 'class': ''},
             'submenu': None
+        }, {
+            'title': 'Certificates',
+            'action': "%s/@@certificates" % base_url,
+            'description': '',
+            'selected': False,
+            'icon': '',
+            'extra': {'id': 'certificates', 'separator': None, 'class': ''},
+            'submenu': None
         }]

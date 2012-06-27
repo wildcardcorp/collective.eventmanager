@@ -140,8 +140,6 @@ The following registraitons were made for the event:
     </value>
   </record>
 
-
-
     <record interface="Products.ResourceRegistries.interfaces.settings.IResourceRegistriesSettings"
             field="resourceBundlesForThemes">
         <value purge="false">
@@ -160,6 +158,76 @@ The following registraitons were made for the event:
                 <element>jquery</element>
                 <element>default</element>
             </element>
+        </value>
+    </record>
+
+    <record field="certificate_pdf_template"
+            interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
+            name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_pdf_template">
+        <field type="plone.registry.field.Text">
+            <title>Certificate PDF Template</title>
+        </field>
+        <value>
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Event Certificates&lt;/title&gt;
+    &lt;style type='text/css'&gt;
+        @page {
+            size: a5 landscape;
+            margin: 1cm;
+
+            @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 2cm;
+                left: 3cm;
+                height: 4cm;
+                width: 4cm;
+            }
+        }
+
+        .certificate {
+            page-break-after: always;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1cm;
+        }
+
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+% for reg in registrations:
+    &lt;div class='certificate'&gt;
+        % if certtitle != '':
+            &lt;h1&gt;${certtitle}&lt;/h1&gt;
+        % endif
+        % if certsubtitle != '':
+            &lt;h2&gt;${certsubtitle}&lt;/h2&gt;
+        % endif
+        % if certprenamedesc != '':
+            &lt;p&gt;${certprenamedesc}&lt;/p&gt;
+        % endif
+        &lt;div&gt;${reg.title}&lt;/div&gt;
+        % if certpostnamedesc != '':
+            &lt;p&gt;${certpostnamedesc}&lt;/p&gt;
+        % endif
+        % if certdate != '':
+            &lt;p&gt;Awarded On ${certdate}&lt;/p&gt;
+        % endif
+        % if certsigdesc != '':
+            &lt;p&gt;${certsigdesc}&lt;/p&gt;
+        % endif
+    &lt;/div&gt;
+% endfor
+
+    &lt;div id="footerContent"&gt;
+        &lt;img height='150px' width='150px' src='${portal_url}/++resource++goldenseal.png' /&gt;
+    &lt;/div&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
         </value>
     </record>
 

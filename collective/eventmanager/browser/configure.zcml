@@ -18,7 +18,16 @@
   <include package="z3c.jbot" file="meta.zcml" />
   <browser:jbot directory="jbot" />
 
-  <!-- Roster View //-->
+  <!-- Certification View //-->
+  <browser:page
+    name='certificates'
+    for='collective.eventmanager.event.IEMEvent'
+    permission="cmf.ModifyPortalContent"
+    class="collective.eventmanager.browser.event.EventCertificationView"
+    template="event_templates/eventcertificationview.pt"
+    />
+
+  <!-- Registration View //-->
   <browser:page
     name='export-registrations'
     for='collective.eventmanager.event.IEMEvent'
@@ -96,5 +105,19 @@
     class=".controlpanel.EmailTemplateConfiglet"
     layer="..interfaces.ILayer"
     permission="cmf.ManagePortal" />
+
+  <!-- Certificate PDF Templating //-->
+  <browser:page
+    name="certificate-pdf-templates"
+    for="Products.CMFCore.interfaces._content.ISiteRoot"
+    class=".controlpanel.CertificatePDFTemplateConfiglet"
+    layer="..interfaces.ILayer"
+    permission="cmf.ManagePortal" />
+
+  <browser:resource
+    name="goldenseal.png"
+    image="static/goldenseal.png"
+    layer="..interfaces.ILayer"
+    />
 
 </configure>

@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta
+from DateTime import DateTime
 import re
 from persistent.dict import PersistentDict
 from mako.template import Template
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import xhtml2pdf.pisa as pisa
+import StringIO
 
 from collective.geo.mapwidget.browser.widget import MapWidget
 from five import grok
@@ -15,6 +18,7 @@ from plone.protect import CheckAuthenticator
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.statusmessages.interfaces import IStatusMessage
 from z3c.form import button
 from z3c.form.interfaces import IErrorViewSnippet
@@ -607,3 +611,77 @@ class PublicRegistrationForm(form.SchemaForm):
 
         return "cgmap.state['" + self.MAP_CSS_CLASS + "'] = " \
                + str(settings) + ";"
+
+
+class EventCertificationView(BrowserView):
+    def __call__(self):
+        if self.request.form is not None \
+                and len(self.request.form) > 0 \
+                and 'submit' in self.request.form:
+
+            self._handlePost(self.request)
+
+        return super(EventCertificationView, self).__call__()
+
+    def _handlePost(self, REQUEST=None):
+        regs = [self.context.registrations[a]
+                    for a in REQUEST.form
+                     if a != 'submit' \
+                        and a[:4] != 'cert' \
+                        and REQUEST.form[a] == 'on']
+
+        registry = getUtility(IRegistry)
+        certificatepdftemplatetext = registry.records[
+                'collective.eventmanager.certificatepdftemplates'
+                '.ICertificatePDFTemplateSettings.certificate_pdf_template'
+            ].value
+        certificatepdftemplate = Template(certificatepdftemplatetext)
+
+        certinfo = {}
+
+        def setCertValue(key):
+            if key not in REQUEST.form or REQUEST.form[key] == None:
+                certinfo[key] = ''
+            else:
+                certinfo[key] = REQUEST.form[key]
+
+        setCertValue('certtitle')
+        setCertValue('certsubtitle')
+        setCertValue('certprenamedesc')
+        setCertValue('certpostnamedesc')
+        setCertValue('certawardtitle')
+        setCertValue('certdate')
+        setCertValue('certsigdesc')
+
+        urltool = getToolByName(self.context, 'portal_url')
+        portal = urltool.getPortalObject()
+        portal_url = portal.absolute_url()
+
+        renderedcertificatepdfs = certificatepdftemplate.render(
+                registrations=regs,
+                portal_url=portal_url,
+                **certinfo
+            )
+
+        pdf = StringIO.StringIO()
+
+        html = StringIO.StringIO(renderedcertificatepdfs)
+        pisa.pisaDocument(html, pdf, raise_exception=True)
+        assert pdf.len != 0, 'PDF generation utility returned empty PDF!'
+        html.close()
+
+        pdfcontent = pdf.getvalue()
+        pdf.close()
+
+        now = DateTime()
+        filename = '%s-%s.pdf' % ('certificates', now.strftime('%Y%m%d'))
+
+        REQUEST.response.setHeader('Content-Disposition',
+                                   'attachment; filename=%s' % filename)
+        REQUEST.response.setHeader('Content-Type', 'application/pdf')
+        REQUEST.response.setHeader('Content-Length', len(pdfcontent))
+        REQUEST.response.setHeader('Last-Modified',
+                                   DateTime.rfc822(DateTime()))
+        REQUEST.response.setHeader('Cache-Control', 'no-store')
+        REQUEST.response.setHeader('Pragma', 'no-cache')
+        REQUEST.response.write(pdfcontent)
