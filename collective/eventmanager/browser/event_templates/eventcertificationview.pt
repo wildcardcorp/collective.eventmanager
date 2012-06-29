@@ -34,23 +34,23 @@
             </div>
             <div class='certinfo'>
                 <label for='certprenamedesc'>Pre-Name Description</label>
-                <p><input type='text' id='certprenamedesc' name='certprenamedesc' /></p>
+                <p><input type='text' id='certprenamedesc' name='certprenamedesc' value='In honor of your outstanding performance and dedication we gladly present this award to' /></p>
             </div>
             <div class='certinfo'>
                 <label for='certpostnamedesc'>Post-Name Description</label>
-                <p><input type='text' id='certpostnamedesc' name='certpostnamedesc' /></p>
+                <p><input type='text' id='certpostnamedesc' name='certpostnamedesc' value='for completion of the requirements for' /></p>
             </div>
             <div class='certinfo'>
                 <label for='certawardtitle'>Award/Certification Title</label>
-                <p><input type='text' id='certawardtitle' name='certawardtitle' /></p>
+                <p><input type='text' id='certawardtitle' name='certawardtitle' value='' /></p>
             </div>
             <div class='certinfo'>
                 <label for='certdate'>Date of Award</label>
-                <p><input type='text' id='certdate' name='certdate' /></p>
+                <p><input type='text' id='certdate' name='certdate' value='' /></p>
             </div>
             <div class='certinfo'>
                 <label for='certsigdesc'>Signature Description</label>
-                <p><input type='text' id='certsigdesc' name='certsigdesc' /></p>
+                <p><textarea id='certsigdesc' name='certsigdesc'></textarea></p>
             </div>
 
             <label for='registration_list'>Registrations</label>

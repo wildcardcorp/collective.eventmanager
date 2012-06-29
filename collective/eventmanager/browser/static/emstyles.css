@@ -39,6 +39,15 @@
 }
 
 
-form#certificatepdf div.certinfo input {
+form#certificatepdf #certtitle,
+form#certificatepdf #certsubtitle,
+form#certificatepdf #certprenamedesc,
+form#certificatepdf #certpostnamedesc,
+form#certificatepdf #certawardtitle
+{
     width: 100%;
+}
+
+form#certificatepdf #certsigdesc {
+    width: 250px;
 }

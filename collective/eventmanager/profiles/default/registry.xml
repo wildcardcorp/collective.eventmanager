@@ -168,63 +168,138 @@ The following registraitons were made for the event:
             <title>Certificate PDF Template</title>
         </field>
         <value>
+&lt;%def name="makecssfor(regid)"&gt;
+            size: a5 landscape;
+            @frame {
+                top: 4cm;
+            }
+            @frame header {
+                -pdf-frame-content: ${regid}header;
+                margin-top: 1.5cm;
+            }
+            @frame bottom {
+                -pdf-frame-content: ${regid}bottom;
+                margin-top: 12cm;
+                margin-right: 3cm;
+                margin-left: 11cm;
+                padding-top: .1cm;
+            }
+            @frame footer {
+                -pdf-frame-content: ${regid}footer;
+                margin-top: 10cm;
+                margin-left: 2cm;
+            }
+&lt;/%def&gt;
+&lt;%def name="makehtmlfor(reg, regid)"&gt;
+    &lt;div class='pagewrapper'&gt;
+        &lt;div id="${regid}header" class='header'&gt;
+        % if certtitle != '':
+            &lt;h1 class='certtitle'&gt;${certtitle}&lt;/h1&gt;
+        % endif
+        &lt;/div&gt;
+
+        &lt;div id="${regid}content" class='content'&gt;
+        % if certsubtitle != '':
+            &lt;h2 class='certsubtitle'&gt;${certsubtitle}&lt;/h2&gt;
+        % endif
+        % if certprenamedesc != '':
+            &lt;p class='certprenamedesc'&gt;${certprenamedesc}&lt;/p&gt;
+        % endif
+
+            &lt;div class='regname'&gt;${reg.title}&lt;/div&gt;
+
+        % if certpostnamedesc != '':
+            &lt;p class='certpostnamedesc'&gt;${certpostnamedesc}&lt;/p&gt;
+        % endif
+        % if certawardtitle != '':
+            &lt;p class='certawardtitle'&gt;${certawardtitle}&lt;/p&gt;
+        % endif
+        % if certdate != '':
+            &lt;p class='certdate'&gt;Awarded On &lt;span class='certdatevalue'&gt;${certdate}&lt;/span&gt;&lt;/p&gt;
+        % endif
+        &lt;/div&gt;
+
+        &lt;div id="${regid}bottom"&gt;
+            &lt;div class='signatureContent'&gt;
+                &nbsp;
+            % if certsigdesc != '':
+                &lt;p class='certsigdesc'&gt;${certsigdesc.replace("\n", "&lt;br /&gt;")}&lt;/p&gt;
+            % endif
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div id="${regid}footer" class='footer'&gt;
+            &lt;img height='150px' width='150px' src='${portal_url}/++resource++goldenseal.png' /&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/%def&gt;
+
 &lt;html&gt;
 &lt;head&gt;
     &lt;title&gt;Event Certificates&lt;/title&gt;
     &lt;style type='text/css'&gt;
+        % if len(registrations) &gt; 0:
         @page {
-            size: a5 landscape;
-            margin: 1cm;
+            ${makecssfor(registrations[0].getId().replace('-',''))}
+        }
+        % endif
+        % for reg in registrations[1:]:
+        @page ${reg.getId().replace('-','')}page {
+            ${makecssfor(reg.getId().replace('-',''))}
+        }
+        % endfor
 
-            @frame footer {
-                -pdf-frame-content: footerContent;
-                bottom: 2cm;
-                left: 3cm;
-                height: 4cm;
-                width: 4cm;
-            }
+        .header {
+            text-align: center;
+            font-size: 1cm;
+            font-style: italic;
+            font-family: Georgia;
         }
 
-        .certificate {
-            page-break-after: always;
+        .content,
+        .bottom {
+            font-family: "Times New Roman";
+            font-size: .35cm;
+        }
+
+        .content {
             text-align: center;
         }
 
-        h1 {
-            font-size: 1cm;
+        .certsubtitle {
+            font-size: .6cm;
         }
 
+        .regname,
+        .certawardtitle {
+            font-size: .45cm;
+            font-weight: bold;
+        }
+
+        .certdatevalue {
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .signatureContent {
+            border-top: .025cm solid black;
+            text-align: right;
+            padding-top: .1cm;
+        }
     &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
 
-% for reg in registrations:
-    &lt;div class='certificate'&gt;
-        % if certtitle != '':
-            &lt;h1&gt;${certtitle}&lt;/h1&gt;
-        % endif
-        % if certsubtitle != '':
-            &lt;h2&gt;${certsubtitle}&lt;/h2&gt;
-        % endif
-        % if certprenamedesc != '':
-            &lt;p&gt;${certprenamedesc}&lt;/p&gt;
-        % endif
-        &lt;div&gt;${reg.title}&lt;/div&gt;
-        % if certpostnamedesc != '':
-            &lt;p&gt;${certpostnamedesc}&lt;/p&gt;
-        % endif
-        % if certdate != '':
-            &lt;p&gt;Awarded On ${certdate}&lt;/p&gt;
-        % endif
-        % if certsigdesc != '':
-            &lt;p&gt;${certsigdesc}&lt;/p&gt;
-        % endif
-    &lt;/div&gt;
-% endfor
+% if len(registrations) &gt; 0:
+    ${makehtmlfor(registrations[0], registrations[0].getId().replace('-',''))}
+% endif
 
-    &lt;div id="footerContent"&gt;
-        &lt;img height='150px' width='150px' src='${portal_url}/++resource++goldenseal.png' /&gt;
-    &lt;/div&gt;
+% for reg in registrations[1:]:
+    &lt;pdf:nextpage/&gt;
+    &lt;pdf:nexttemplate name="${reg.getId().replace('-','')}page"/&gt;
+
+    ${makehtmlfor(reg, reg.getId().replace('-',''))}
+% endfor
 
 &lt;/body&gt;
 &lt;/html&gt;
