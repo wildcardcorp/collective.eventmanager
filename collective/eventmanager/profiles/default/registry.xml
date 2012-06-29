@@ -221,7 +221,7 @@ The following registraitons were made for the event:
 
         &lt;div id="${regid}bottom"&gt;
             &lt;div class='signatureContent'&gt;
-                &nbsp;
+                &amp;nbsp;
             % if certsigdesc != '':
                 &lt;p class='certsigdesc'&gt;${certsigdesc.replace("\n", "&lt;br /&gt;")}&lt;/p&gt;
             % endif
