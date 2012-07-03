@@ -179,18 +179,18 @@ The following registraitons were made for the event:
             }
             @frame back {
                 -pdf-frame-content: ${regid}back;
-                top: 1cm;
+                top: 1.75cm;
                 left: 1cm;
                 margin-right: 1cm;
                 margin-bottom: 1cm;
             }
             @frame header {
                 -pdf-frame-content: ${regid}header;
-                margin-top: 2.5cm;
+                margin-top: 3.25cm;
             }
             @frame bottom {
                 -pdf-frame-content: ${regid}bottom;
-                margin-top: 17cm;
+                margin-top: 16cm;
                 margin-right: 3cm;
                 margin-left: 11cm;
                 padding-top: .1cm;
@@ -257,7 +257,7 @@ The following registraitons were made for the event:
         &lt;/div&gt;
 
         &lt;div id='${regid}back'&gt;
-            &lt;img height='100%' src='${portal_url}/++resource++certificate-border-1.png' /&gt;
+            &lt;img height='100%' src='${portal_url}/++resource++certificate-border-${certborder}.png' /&gt;
         &lt;/div&gt;
     &lt;/div&gt;
 &lt;/%def&gt;

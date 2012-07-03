@@ -652,6 +652,7 @@ class EventCertificationView(BrowserView):
         setCertValue('certawardtitle')
         setCertValue('certdate')
         setCertValue('certsigdesc')
+        setCertValue('certborder')
 
         urltool = getToolByName(self.context, 'portal_url')
         portal = urltool.getPortalObject()
@@ -662,7 +663,6 @@ class EventCertificationView(BrowserView):
                 portal_url=portal_url,
                 **certinfo
             )
-        #import pdb; pdb.set_trace()
 
         pdf = StringIO.StringIO()
 

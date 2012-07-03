@@ -52,6 +52,15 @@
                 <label for='certsigdesc'>Signature Description</label>
                 <p><textarea id='certsigdesc' name='certsigdesc'></textarea></p>
             </div>
+            <div class='certinfo'>
+                <label for='certificate_borders'>Certificate Borders</label>
+                <ul id='certificate_borders'>
+                    <li><input type='radio' name='certborder' value='1' checked='checked' /><img alt='Certificate Border 1' src='++resource++certificate-border-1-thumb.png' /></li>
+                    <li><input type='radio' name='certborder' value='2' /><img alt='Certificate Border 2' src='++resource++certificate-border-2-thumb.png' /></li>
+                    <li><input type='radio' name='certborder' value='3' /><img alt='Certificate Border 3' src='++resource++certificate-border-3-thumb.png' /></li>
+                </ul>
+                <p class='clear_thumbnails'></p>
+            </div>
 
             <label for='registration_list'>Registrations</label>
             <div class='reg_select_actions'>

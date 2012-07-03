@@ -125,5 +125,32 @@
     file="static/certificate-border-1.png"
     layer="..interfaces.ILayer"
     />
+  <browser:resource
+    name="certificate-border-1-thumb.png"
+    file="static/certificate-border-1-thumb.png"
+    layer="..interfaces.ILayer"
+    />
+
+  <browser:resource
+    name="certificate-border-2.png"
+    file="static/certificate-border-2.png"
+    layer="..interfaces.ILayer"
+    />
+  <browser:resource
+    name="certificate-border-2-thumb.png"
+    file="static/certificate-border-2-thumb.png"
+    layer="..interfaces.ILayer"
+    />
+
+  <browser:resource
+    name="certificate-border-3.png"
+    file="static/certificate-border-3.png"
+    layer="..interfaces.ILayer"
+    />
+  <browser:resource
+    name="certificate-border-3-thumb.png"
+    file="static/certificate-border-3-thumb.png"
+    layer="..interfaces.ILayer"
+    />
 
 </configure>

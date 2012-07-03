@@ -51,3 +51,29 @@ form#certificatepdf #certawardtitle
 form#certificatepdf #certsigdesc {
     width: 250px;
 }
+
+form#certificatepdf #certificate_borders,
+form#certificatepdf #certificate_borders li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+form#certificatepdf #certificate_borders li {
+    float: left;
+    margin-right: 20px;
+}
+
+form#certificatepdf #certificate_borders img {
+    height: 100px;
+    width: 100px;
+    vertical-align: middle;
+}
+
+form#certificatepdf .clear_thumbnails {
+    clear: both;
+}
+
+form#certificatepdf #certificate_borders input {
+    margin-right: 5px;
+}
