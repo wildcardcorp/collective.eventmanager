@@ -120,4 +120,10 @@
     layer="..interfaces.ILayer"
     />
 
+  <browser:resource
+    name="certificate-border-1.png"
+    file="static/certificate-border-1.png"
+    layer="..interfaces.ILayer"
+    />
+
 </configure>

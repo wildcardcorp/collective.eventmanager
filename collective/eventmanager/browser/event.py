@@ -662,6 +662,7 @@ class EventCertificationView(BrowserView):
                 portal_url=portal_url,
                 **certinfo
             )
+        #import pdb; pdb.set_trace()
 
         pdf = StringIO.StringIO()
 

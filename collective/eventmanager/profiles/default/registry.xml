@@ -169,25 +169,36 @@ The following registraitons were made for the event:
         </field>
         <value>
 &lt;%def name="makecssfor(regid)"&gt;
-            size: a5 landscape;
+            size: letter landscape;
             @frame {
-                top: 4cm;
+                top: 0cm;
+                left: 0cm;
+                height: 21cm;
+                width: 27.94cm;
+                margin-top: 6cm;
+            }
+            @frame back {
+                -pdf-frame-content: ${regid}back;
+                top: 1cm;
+                left: 1cm;
+                margin-right: 1cm;
+                margin-bottom: 1cm;
             }
             @frame header {
                 -pdf-frame-content: ${regid}header;
-                margin-top: 1.5cm;
+                margin-top: 2.5cm;
             }
             @frame bottom {
                 -pdf-frame-content: ${regid}bottom;
-                margin-top: 12cm;
+                margin-top: 17cm;
                 margin-right: 3cm;
                 margin-left: 11cm;
                 padding-top: .1cm;
             }
             @frame footer {
                 -pdf-frame-content: ${regid}footer;
-                margin-top: 10cm;
-                margin-left: 2cm;
+                margin-top: 13.5cm;
+                margin-left: 3cm;
             }
 &lt;/%def&gt;
 &lt;%def name="makehtmlfor(reg, regid)"&gt;
@@ -201,27 +212,40 @@ The following registraitons were made for the event:
         &lt;div id="${regid}content" class='content'&gt;
         % if certsubtitle != '':
             &lt;h2 class='certsubtitle'&gt;${certsubtitle}&lt;/h2&gt;
+        % else:
+            &lt;div class='certsubtitle'&gt;___________________________________________________&lt;/div&gt;
         % endif
         % if certprenamedesc != '':
             &lt;p class='certprenamedesc'&gt;${certprenamedesc}&lt;/p&gt;
+        % else:
+            &lt;div class='certprenamedesc'&gt;_______________________________________&lt;/div&gt;
         % endif
 
             &lt;div class='regname'&gt;${reg.title}&lt;/div&gt;
 
         % if certpostnamedesc != '':
             &lt;p class='certpostnamedesc'&gt;${certpostnamedesc}&lt;/p&gt;
+        % else:
+            &lt;div class='certpostnamedesc'&gt;_______________________________________&lt;/div&gt;
         % endif
         % if certawardtitle != '':
             &lt;p class='certawardtitle'&gt;${certawardtitle}&lt;/p&gt;
+        % else:
+            &lt;div class='certawardtitle'&gt;_______________________________________________&lt;/div&gt;
         % endif
+
+        &lt;p class='certdate'&gt;Awarded On 
         % if certdate != '':
-            &lt;p class='certdate'&gt;Awarded On &lt;span class='certdatevalue'&gt;${certdate}&lt;/span&gt;&lt;/p&gt;
+            &lt;span class='certdatevalue'&gt;${certdate}&lt;/span&gt;
+        % else:
+            &lt;span class='certdatevalue_empty'&gt;________ / ________ / ________&lt;/span&gt;
         % endif
-        &lt;/div&gt;
+        &lt;/p&gt;
 
         &lt;div id="${regid}bottom"&gt;
             &lt;div class='signatureContent'&gt;
-                &amp;nbsp;
+                ________________________________________
+                &lt;br /&gt;
             % if certsigdesc != '':
                 &lt;p class='certsigdesc'&gt;${certsigdesc.replace("\n", "&lt;br /&gt;")}&lt;/p&gt;
             % endif
@@ -229,7 +253,11 @@ The following registraitons were made for the event:
         &lt;/div&gt;
 
         &lt;div id="${regid}footer" class='footer'&gt;
-            &lt;img height='150px' width='150px' src='${portal_url}/++resource++goldenseal.png' /&gt;
+            &lt;img height='6cm' width='6cm' src='${portal_url}/++resource++goldenseal.png' /&gt;
+        &lt;/div&gt;
+
+        &lt;div id='${regid}back'&gt;
+            &lt;img height='100%' src='${portal_url}/++resource++certificate-border-1.png' /&gt;
         &lt;/div&gt;
     &lt;/div&gt;
 &lt;/%def&gt;
@@ -251,7 +279,7 @@ The following registraitons were made for the event:
 
         .header {
             text-align: center;
-            font-size: 1cm;
+            font-size: 1.2cm;
             font-style: italic;
             font-family: Georgia;
         }
@@ -259,7 +287,7 @@ The following registraitons were made for the event:
         .content,
         .bottom {
             font-family: "Times New Roman";
-            font-size: .35cm;
+            font-size: .45cm;
         }
 
         .content {
@@ -267,12 +295,16 @@ The following registraitons were made for the event:
         }
 
         .certsubtitle {
-            font-size: .6cm;
+            font-size: .8cm;
+        }
+
+        .certsubtitle_empty {
+            font-size: .8cm;
         }
 
         .regname,
         .certawardtitle {
-            font-size: .45cm;
+            font-size: .65cm;
             font-weight: bold;
         }
 
@@ -280,11 +312,17 @@ The following registraitons were made for the event:
             text-decoration: underline;
             font-weight: bold;
         }
+        .certdatevalue_empty {
+            font-weight: bold;
+        }
 
         .signatureContent {
-            border-top: .025cm solid black;
             text-align: right;
             padding-top: .1cm;
+        }
+
+        .footer {
+            text-align: left;
         }
     &lt;/style&gt;
 &lt;/head&gt;
