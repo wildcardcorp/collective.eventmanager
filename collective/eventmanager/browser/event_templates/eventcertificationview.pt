@@ -26,38 +26,50 @@
         <form id='certificatepdf' method='post' name='registration_certs' action='@@certificates'>
             <div class='certinfo'>
                 <label for='certtitle'>Title</label>
-                <p><input type='text' id='certtitle' name='certtitle' value='Certificate of Completion' /></p>
+                <p><input type='text' id='certtitle' name='certtitle'
+                          tal:attributes="value python:view.getDefaultValue('title')" /></p>
             </div>
             <div class='certinfo'>
                 <label for='certsubtitle'>Subtitle</label>
-                <p><input type='text' id='certsubtitle' name='certsubtitle' value='' /></p>
+                <p><input type='text' id='certsubtitle' name='certsubtitle'
+                          tal:attributes="value python:view.getDefaultValue('subtitle')" /></p>
             </div>
             <div class='certinfo'>
                 <label for='certprenamedesc'>Pre-Name Description</label>
-                <p><input type='text' id='certprenamedesc' name='certprenamedesc' value='In honor of your outstanding performance and dedication we gladly present this award to' /></p>
+                <p><input type='text' id='certprenamedesc' name='certprenamedesc'
+                          tal:attributes="value python:view.getDefaultValue('prenamedesc')" /></p>
             </div>
             <div class='certinfo'>
                 <label for='certpostnamedesc'>Post-Name Description</label>
-                <p><input type='text' id='certpostnamedesc' name='certpostnamedesc' value='for completion of the requirements for' /></p>
+                <p><input type='text' id='certpostnamedesc' name='certpostnamedesc'
+                          tal:attributes="value python:view.getDefaultValue('postnamedesc')" /></p>
             </div>
             <div class='certinfo'>
                 <label for='certawardtitle'>Award/Certification Title</label>
-                <p><input type='text' id='certawardtitle' name='certawardtitle' value='' /></p>
+                <p><input type='text' id='certawardtitle' name='certawardtitle'
+                          tal:attributes="value python:view.getDefaultValue('awardtitle')" /></p>
             </div>
             <div class='certinfo'>
                 <label for='certdate'>Date of Award</label>
-                <p><input type='text' id='certdate' name='certdate' value='' /></p>
+                <p><input type='text' id='certdate' name='certdate'
+                          tal:attributes="value python:view.getDefaultValue('date')" /></p>
             </div>
             <div class='certinfo'>
                 <label for='certsigdesc'>Signature Description</label>
-                <p><textarea id='certsigdesc' name='certsigdesc'></textarea></p>
+                <p><textarea id='certsigdesc' name='certsigdesc' tal:content="python:view.getDefaultValue('sigdesc')"></textarea></p>
             </div>
             <div class='certinfo'>
                 <label for='certificate_borders'>Certificate Borders</label>
                 <ul id='certificate_borders'>
-                    <li><input type='radio' name='certborder' value='1' checked='checked' /><img alt='Certificate Border 1' src='++resource++certificate-border-1-thumb.png' /></li>
-                    <li><input type='radio' name='certborder' value='2' /><img alt='Certificate Border 2' src='++resource++certificate-border-2-thumb.png' /></li>
-                    <li><input type='radio' name='certborder' value='3' /><img alt='Certificate Border 3' src='++resource++certificate-border-3-thumb.png' /></li>
+                    <li><input type='radio' name='certborder' value='1'
+                               tal:attributes="checked python:'checked' if view.getDefaultValue('border') == 'Blue' else ''"
+                               /><img alt='Certificate Border 1' src='++resource++certificate-border-1-thumb.png' /></li>
+                    <li><input type='radio' name='certborder' value='2'
+                               tal:attributes="checked python:'checked' if view.getDefaultValue('border') == 'Green' else ''"
+                               /><img alt='Certificate Border 2' src='++resource++certificate-border-2-thumb.png' /></li>
+                    <li><input type='radio' name='certborder' value='3'
+                               tal:attributes="checked python:'checked' if view.getDefaultValue('border') == 'Gold' else ''"
+                               /><img alt='Certificate Border 3' src='++resource++certificate-border-3-thumb.png' /></li>
                 </ul>
                 <p class='clear_thumbnails'></p>
             </div>

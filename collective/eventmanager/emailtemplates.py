@@ -87,16 +87,18 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
     if mfrom == None or mfrom == '':
         return False
 
+    # get the keys for each of the registry entries that define the
+    # email templates
+    registrykey = "collective.eventmanager.emailtemplates" \
+                  ".IEMailTemplateSettings.%s_%s"
+    tsubkey = registrykey % (mtemplate, '_subject')
+    thtmlkey = registrykey % (mtemplate, '_htmlbody')
+    tplainkey = registrykey % (mtemplate, '_textbody')
+
     # get the site wide templates
-    tsub = registry.records['collective.eventmanager.emailtemplates'
-                            '.IEMailTemplateSettings.' + mtemplate + '_subject'
-                            ].value
-    thtml = registry.records['collective.eventmanager.emailtemplates'
-                            '.IEMailTemplateSettings.' + mtemplate + '_htmlbody'
-                            ].value
-    tplain = registry.records['collective.eventmanager.emailtemplates'
-                            '.IEMailTemplateSettings.' + mtemplate + '_textbody'
-                            ].value
+    tsub = registry.records[tsubkey].value
+    thtml = registry.records[thtmlkey].value
+    tplain = registry.records[tplainkey].value
 
     subtemplate = Template(tsub)
     htmltemplate = Template(thtml)
@@ -106,8 +108,12 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
 
     # apply results of event template render to site wide templates
     messageresult = messagetemplate.render(emevent=emevent)
-    messagehtml = htmltemplate.render(emevent=emevent, event_content=messageresult)
-    messageplain = plaintemplate.render(emevent=emevent, event_content=messageresult)
+    messagehtml = htmltemplate.render(
+                    emevent=emevent,
+                    event_content=messageresult)
+    messageplain = plaintemplate.render(
+                    emevent=emevent,
+                    event_content=messageresult)
 
     subject = subtemplate.render(emevent=emevent, event_content=msubject)
 

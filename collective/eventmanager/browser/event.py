@@ -5,8 +5,6 @@ from persistent.dict import PersistentDict
 from mako.template import Template
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import xhtml2pdf.pisa as pisa
-import StringIO
 
 from collective.geo.mapwidget.browser.widget import MapWidget
 from five import grok
@@ -18,17 +16,20 @@ from plone.protect import CheckAuthenticator
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.statusmessages.interfaces import IStatusMessage
 from z3c.form import button
 from z3c.form.interfaces import IErrorViewSnippet
 from zope import schema
-from zope.component import getUtility
 from zope.component import getMultiAdapter
+from zope.component import getUtility
 
 from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.browser.registration import addDynamicFields
 from collective.eventmanager.browser.rostersettings import RosterSettings
+from collective.eventmanager.certificatepdftemplates \
+    import generateCertificate
+from collective.eventmanager.certificatepdftemplates \
+    import ICertificatePDFTemplateSettings
 from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
@@ -168,6 +169,8 @@ class EMailSenderForm(grok.View):
         emailtype = REQUEST.form['emailtype']
         tolist = REQUEST.form['emailtoaddresses'].splitlines()
         attachments = []
+
+        # get attachments
         if REQUEST.form['attachment1'].filename != '':
             attachments.append({
                 'name': REQUEST.form['attachment1'].filename,
@@ -184,6 +187,28 @@ class EMailSenderForm(grok.View):
             attachments.append({
                 'name': REQUEST.form['attachment4'].filename,
                 'data': REQUEST.form['attachment4'].read()})
+
+        # if a certificate is requested, then generate the certificate, and add
+        # it to the attachment list
+        if 'certreq' in REQUEST.form and REQUEST.form['certreq'] == 'on':
+            # get registrations
+            regs = []
+            for r in self.context.registrations:
+                reg = self.context.registrations[r]
+                for toemail in tolist:
+                    if reg.email in toemail:
+                        regs.append(reg)
+                        break
+
+            # get portal url
+            urltool = getToolByName(self.context, 'portal_url')
+            portal = urltool.getPortalObject()
+            portal_url = portal.absolute_url()
+
+            # get cert info
+
+            #pdf = generateCertificate(registrations=reg, portal_url=portal_url, False)
+
         mfrom = REQUEST.form['emailfromaddress']
         msubject = REQUEST.form['emailsubject']
         mbody = REQUEST.form['emailbody']
@@ -630,59 +655,48 @@ class EventCertificationView(BrowserView):
                         and a[:4] != 'cert' \
                         and REQUEST.form[a] == 'on']
 
-        registry = getUtility(IRegistry)
-        certificatepdftemplatetext = registry.records[
-                'collective.eventmanager.certificatepdftemplates'
-                '.ICertificatePDFTemplateSettings.certificate_pdf_template'
-            ].value
-        certificatepdftemplate = Template(certificatepdftemplatetext)
-
         certinfo = {}
-
-        def setCertValue(key):
+        for key in ['certtitle', 'certsubtitle', 'certprenamedesc',
+                    'certpostnamedesc', 'certawardtitle', 'certdate',
+                    'certsigdesc', 'certborder']:
             if key not in REQUEST.form or REQUEST.form[key] == None:
                 certinfo[key] = ''
             else:
                 certinfo[key] = REQUEST.form[key]
 
-        setCertValue('certtitle')
-        setCertValue('certsubtitle')
-        setCertValue('certprenamedesc')
-        setCertValue('certpostnamedesc')
-        setCertValue('certawardtitle')
-        setCertValue('certdate')
-        setCertValue('certsigdesc')
-        setCertValue('certborder')
-
         urltool = getToolByName(self.context, 'portal_url')
         portal = urltool.getPortalObject()
         portal_url = portal.absolute_url()
 
-        renderedcertificatepdfs = certificatepdftemplate.render(
-                registrations=regs,
-                portal_url=portal_url,
-                **certinfo
-            )
-
-        pdf = StringIO.StringIO()
-
-        html = StringIO.StringIO(renderedcertificatepdfs)
-        pisa.pisaDocument(html, pdf, raise_exception=True)
-        assert pdf.len != 0, 'PDF generation utility returned empty PDF!'
-        html.close()
-
-        pdfcontent = pdf.getvalue()
-        pdf.close()
-
-        now = DateTime()
-        filename = '%s-%s.pdf' % ('certificates', now.strftime('%Y%m%d'))
+        pdf = generateCertificate(regs, portal_url, True, **certinfo)
 
         REQUEST.response.setHeader('Content-Disposition',
-                                   'attachment; filename=%s' % filename)
+                                   'attachment; filename=%s' % pdf['filename'])
         REQUEST.response.setHeader('Content-Type', 'application/pdf')
-        REQUEST.response.setHeader('Content-Length', len(pdfcontent))
+        REQUEST.response.setHeader('Content-Length', len(pdf['file']))
         REQUEST.response.setHeader('Last-Modified',
                                    DateTime.rfc822(DateTime()))
         REQUEST.response.setHeader('Cache-Control', 'no-store')
         REQUEST.response.setHeader('Pragma', 'no-cache')
-        REQUEST.response.write(pdfcontent)
+        REQUEST.response.write(pdf['file'])
+
+    def getDefaultValue(self, field):
+        registry = getUtility(IRegistry)
+        value = registry.records[
+            'collective.eventmanager.certificatepdftemplates'
+            '.ICertificatePDFTemplateSettings.certificate_%s'
+            % (field,)
+        ].value
+
+        # if the value is none now, that means the registry hasn't been saved
+        # yet, so we need to get the default value, if any, from the
+        # interface
+        if value == None:
+            value = ICertificatePDFTemplateSettings.get(
+                        'certificate_%s' % (field,)).default
+
+        # if the value is still none, then there is no default value set
+        if value == None:
+            return ''
+
+        return value

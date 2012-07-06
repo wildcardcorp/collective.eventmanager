@@ -161,6 +161,68 @@ The following registraitons were made for the event:
         </value>
     </record>
 
+    <record field="certificate_title"
+            interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
+            name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_title">
+      <field type='plone.registry.field.TextLine'>
+        <title>Default Title</title>
+      </field>
+    </record>
+    <record field="certificate_subtitle"
+            interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
+            name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_subtitle">
+      <field type='plone.registry.field.TextLine'>
+        <title>Default Subtitle</title>
+      </field>
+    </record>
+    <record field="certificate_prenamedesc"
+            interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
+            name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_prenamedesc">
+      <field type='plone.registry.field.TextLine'>
+        <title>Default Pre-Name Description</title>
+      </field>
+    </record>
+    <record field="certificate_postnamedesc"
+            interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
+            name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_postnamedesc">
+      <field type='plone.registry.field.TextLine'>
+        <title>Default Post-Name Description</title>
+      </field>
+    </record>
+    <record field="certificate_awardtitle"
+            interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
+            name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_awardtitle">
+      <field type='plone.registry.field.TextLine'>
+        <title>Default Award Title</title>
+      </field>
+    </record>
+    <record field="certificate_date"
+            interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
+            name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_date">
+      <field type='plone.registry.field.TextLine'>
+        <title>Default Date</title>
+      </field>
+    </record>
+    <record field="certificate_sigdesc"
+            interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
+            name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_sigdesc">
+      <field type='plone.registry.field.Text'>
+        <title>Default Signature Description</title>
+      </field>
+    </record>
+    <record field="certificate_border"
+            interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
+            name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_border">
+      <field type='plone.registry.field.Choice'>
+        <title>Default Border</title>
+        <values>
+          <element>Blue</element>
+          <element>Green</element>
+          <element>Gold</element>
+        </values>
+      </field>
+    </record>
+
     <record field="certificate_pdf_template"
             interface="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings"
             name="collective.eventmanager.certificatepdftemplates.ICertificatePDFTemplateSettings.certificate_pdf_template">
@@ -213,12 +275,20 @@ The following registraitons were made for the event:
         % if certsubtitle != '':
             &lt;h2 class='certsubtitle'&gt;${certsubtitle}&lt;/h2&gt;
         % else:
-            &lt;div class='certsubtitle'&gt;___________________________________________________&lt;/div&gt;
+            % if underlines_for_empty_values:
+            &lt;div class='certsubtitle'&gt;${'_'*51&lt;/div&gt;
+            % else:
+            &lt;div class='certsubtitle'&gt;${' '*51}&lt;/div&gt;
+            % endif
         % endif
         % if certprenamedesc != '':
             &lt;p class='certprenamedesc'&gt;${certprenamedesc}&lt;/p&gt;
         % else:
-            &lt;div class='certprenamedesc'&gt;_______________________________________&lt;/div&gt;
+            % if underlines_for_empty_values:
+            &lt;div class='certprenamedesc'&gt;${'_'*39}&lt;/div&gt;
+            % else:
+            &lt;div class='certprenamedesc'&gt;${' '*39}&lt;/div&gt;
+            % endif
         % endif
 
             &lt;div class='regname'&gt;${reg.title}&lt;/div&gt;
@@ -226,25 +296,41 @@ The following registraitons were made for the event:
         % if certpostnamedesc != '':
             &lt;p class='certpostnamedesc'&gt;${certpostnamedesc}&lt;/p&gt;
         % else:
-            &lt;div class='certpostnamedesc'&gt;_______________________________________&lt;/div&gt;
+            % if underlines_for_empty_values:
+            &lt;div class='certpostnamedesc'&gt;${'_'*39}&lt;/div&gt;
+            % else:
+            &lt;div class='certpostnamedesc'&gt;${' '*39}&lt;/div&gt;
+            % endif
         % endif
         % if certawardtitle != '':
             &lt;p class='certawardtitle'&gt;${certawardtitle}&lt;/p&gt;
         % else:
-            &lt;div class='certawardtitle'&gt;_______________________________________________&lt;/div&gt;
+            % if underlines_for_empty_values:
+            &lt;div class='certawardtitle'&gt;${'_'*47}&lt;/div&gt;
+            % else:
+            &lt;div class='certawardtitle'&gt;${' '*47}&lt;/div&gt;
+            % endif
         % endif
 
-        &lt;p class='certdate'&gt;Awarded On 
-        % if certdate != '':
-            &lt;span class='certdatevalue'&gt;${certdate}&lt;/span&gt;
+        % if certdate == '' and not underlines_for_empty_values:
+            &lt;p class='certdate'&gt; &lt;span class='certdatevalue'&gt;&lt;/span&gt;&lt;/p&gt;
         % else:
-            &lt;span class='certdatevalue_empty'&gt;________ / ________ / ________&lt;/span&gt;
+            &lt;p class='certdate'&gt;Awarded On 
+            % if certdate != '':
+                &lt;span class='certdatevalue'&gt;${certdate}&lt;/span&gt;
+            % else:
+                &lt;span class='certdatevalue_empty'&gt;________ / ________ / ________&lt;/span&gt;
+            % endif
+            &lt;/p&gt;
         % endif
-        &lt;/p&gt;
 
         &lt;div id="${regid}bottom"&gt;
             &lt;div class='signatureContent'&gt;
-                ________________________________________
+                % if underlines_for_empty_values:
+                ${'_'*40}
+                % else:
+                ${' '*40}
+                % endif
                 &lt;br /&gt;
             % if certsigdesc != '':
                 &lt;p class='certsigdesc'&gt;${certsigdesc.replace("\n", "&lt;br /&gt;")}&lt;/p&gt;

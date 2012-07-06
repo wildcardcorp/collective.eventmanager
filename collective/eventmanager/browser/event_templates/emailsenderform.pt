@@ -42,16 +42,36 @@
             function addNoShowRegistrations() {
                 jQuery('#emailtoaddresses').html(registrationEMailListNoShows);
             }
+
+            jQuery(document).ready(function(){
+                jQuery('form input#announcementradio').click(function(){
+                    jQuery('form input#certreq').removeAttr('checked');
+                });
+                jQuery('form input#confirmationradio').click(function(){
+                    jQuery('form input#certreq').attr('checked', 'checked');
+                });
+                jQuery('form input#otherradio').click(function(){
+                    jQuery('form input#certreq').removeAttr('checked');
+                });
+            });
         </script>
         <form action='emailsenderform' method='POST' enctype='multipart/form-data'>
             <div>
                 <p>
-                    <input type='radio' name='emailtype' value='announcement' />
+                    <input type='radio' name='emailtype' id='announcementradio' value='announcement' />
                     <label for='emailtype'>Announcement</label>
-                    <input type='radio' name='emailtype' value='confirmation' checked='checked' />
+                    <input type='radio' name='emailtype' id='confirmationradio' value='confirmation' checked='checked' />
                     <label for='emailtype'>Confirmation</label>
-                    <input type='radio' name='emailtype' value='other' />
+                    <input type='radio' name='emailtype' id='otherradio' value='other' />
                     <label for='emailtype'>Other</label>
+                </p>
+            </div>
+            <div>
+                <p>
+                    <input type='checkbox' name='certreq' id='certreq' checked='checked' />
+                    <label for='certreq'>Add Certificate?</label>
+                    <br/>
+                    Note: a certificate will only be added to emails that are associated with a registration.
                 </p>
             </div>
             <div>
