@@ -12,25 +12,31 @@ class ICertificatePDFTemplateSettings(Interface):
     certificate_title = schema.TextLine(
                             title=u"Title",
                             default=u"Certificate of Completion")
-    certificate_subtitle = schema.TextLine(title=u"Subtitle")
+    certificate_subtitle = schema.TextLine(title=u"Subtitle", required=False)
     certificate_prenamedesc = schema.TextLine(
                                 title=u"Pre-Name Description",
                                 default=u"In honor of your outstanding "
                                         u"performance and dedication we "
-                                        u"gladly present this award to")
+                                        u"gladly present this award to",
+                                required=False)
     certificate_postnamedesc = schema.TextLine(
                                 title=u"Post-Name Description",
                                 default=u"for completion of the "
-                                        u"requirements for")
-    certificate_awardtitle = schema.TextLine(title=u"Award Title")
+                                        u"requirements for",
+                                required=False)
+    certificate_awardtitle = schema.TextLine(title=u"Award Title",
+                                             required=False)
     certificate_date = schema.TextLine(
                                     title=u"Date",
-                                    default=unicode(DateTime().strftime("%x")))
-    certificate_sigdesc = schema.Text(title=u"Signature Description")
+                                    default=unicode(DateTime().strftime("%x")),
+                                    required=False)
+    certificate_sigdesc = schema.Text(title=u"Signature Description",
+                                      required=False)
     certificate_border = schema.Choice(
                                     title=u"Border",
                                     values=[u'Blue', u'Green', u'Gold'],
-                                    default=u'Gold'
+                                    default=u'Gold',
+                                    required=False
                                 )
 
     certificate_pdf_template = schema.Text(title=u"Certificate PDF Template")

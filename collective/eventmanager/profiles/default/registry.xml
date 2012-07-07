@@ -276,7 +276,7 @@ The following registraitons were made for the event:
             &lt;h2 class='certsubtitle'&gt;${certsubtitle}&lt;/h2&gt;
         % else:
             % if underlines_for_empty_values:
-            &lt;div class='certsubtitle'&gt;${'_'*51&lt;/div&gt;
+            &lt;div class='certsubtitle'&gt;${'_'*51}&lt;/div&gt;
             % else:
             &lt;div class='certsubtitle'&gt;${' '*51}&lt;/div&gt;
             % endif
