@@ -30,6 +30,8 @@ from collective.eventmanager.certificatepdftemplates \
     import generateCertificate
 from collective.eventmanager.certificatepdftemplates \
     import ICertificatePDFTemplateSettings
+from collective.eventmanager.certificatepdftemplates \
+    import getDefaultValueForCertField
 from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
@@ -206,8 +208,22 @@ class EMailSenderForm(grok.View):
             portal_url = portal.absolute_url()
 
             # get cert info
+            certinfo = {}
+            for key in ["title", "subtitle", "prenamedesc", "postnamedesc",
+                        "awardtitle", "date", "sigdesc", "border"]:
+                certinfo['cert%s' % (key,)] = getDefaultValueForCertField(key)
 
-            #pdf = generateCertificate(registrations=reg, portal_url=portal_url, False)
+            # get pdf content
+            pdf = generateCertificate(registrations=regs,
+                                      portal_url=portal_url,
+                                      underlines_for_empty_values=False,
+                                      **certinfo)
+
+            # add to attachments
+            attachments.append({
+                    'name': 'certificate.pdf',
+                    'data': pdf['file']
+                })
 
         mfrom = REQUEST.form['emailfromaddress']
         msubject = REQUEST.form['emailsubject']
@@ -681,22 +697,4 @@ class EventCertificationView(BrowserView):
         REQUEST.response.write(pdf['file'])
 
     def getDefaultValue(self, field):
-        registry = getUtility(IRegistry)
-        value = registry.records[
-            'collective.eventmanager.certificatepdftemplates'
-            '.ICertificatePDFTemplateSettings.certificate_%s'
-            % (field,)
-        ].value
-
-        # if the value is none now, that means the registry hasn't been saved
-        # yet, so we need to get the default value, if any, from the
-        # interface
-        if value == None:
-            value = ICertificatePDFTemplateSettings.get(
-                        'certificate_%s' % (field,)).default
-
-        # if the value is still none, then there is no default value set
-        if value == None:
-            return ''
-
-        return value
+        return getDefaultValueForCertField(field)

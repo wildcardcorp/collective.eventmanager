@@ -42,18 +42,6 @@
             function addNoShowRegistrations() {
                 jQuery('#emailtoaddresses').html(registrationEMailListNoShows);
             }
-
-            jQuery(document).ready(function(){
-                jQuery('form input#announcementradio').click(function(){
-                    jQuery('form input#certreq').removeAttr('checked');
-                });
-                jQuery('form input#confirmationradio').click(function(){
-                    jQuery('form input#certreq').attr('checked', 'checked');
-                });
-                jQuery('form input#otherradio').click(function(){
-                    jQuery('form input#certreq').removeAttr('checked');
-                });
-            });
         </script>
         <form action='emailsenderform' method='POST' enctype='multipart/form-data'>
             <div>
@@ -68,10 +56,12 @@
             </div>
             <div>
                 <p>
-                    <input type='checkbox' name='certreq' id='certreq' checked='checked' />
+                    <input type='checkbox' name='certreq' id='certreq' />
                     <label for='certreq'>Add Certificate?</label>
                     <br/>
                     Note: a certificate will only be added to emails that are associated with a registration.
+                    <br />
+                    <span style='color:red;font-weight:bold;'>WARNING</span> please verify that all fields in the <em>Site Setup</em> -> <em>Certificate PDF Templates</em> control panel have been configured before sending an email with a certificate.
                 </p>
             </div>
             <div>

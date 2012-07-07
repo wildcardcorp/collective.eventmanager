@@ -81,3 +81,25 @@ def generateCertificate(registrations, portal_url, underlines_for_empty_values,
     filename = '%s-%s.pdf' % ('certificates', now.strftime('%Y%m%d'))
 
     return {'filename': filename, 'file': pdfcontent}
+
+
+def getDefaultValueForCertField(field):
+    registry = getUtility(IRegistry)
+    value = registry.records[
+        'collective.eventmanager.certificatepdftemplates'
+        '.ICertificatePDFTemplateSettings.certificate_%s'
+        % (field,)
+    ].value
+
+    # if the value is none now, that means the registry hasn't been saved
+    # yet, so we need to get the default value, if any, from the
+    # interface
+    if value == None:
+        value = ICertificatePDFTemplateSettings.get(
+                    'certificate_%s' % (field,)).default
+
+    # if the value is still none, then there is no default value set
+    if value == None:
+        return ''
+
+    return value

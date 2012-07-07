@@ -91,9 +91,9 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
     # email templates
     registrykey = "collective.eventmanager.emailtemplates" \
                   ".IEMailTemplateSettings.%s_%s"
-    tsubkey = registrykey % (mtemplate, '_subject')
-    thtmlkey = registrykey % (mtemplate, '_htmlbody')
-    tplainkey = registrykey % (mtemplate, '_textbody')
+    tsubkey = registrykey % (mtemplate, 'subject')
+    thtmlkey = registrykey % (mtemplate, 'htmlbody')
+    tplainkey = registrykey % (mtemplate, 'textbody')
 
     # get the site wide templates
     tsub = registry.records[tsubkey].value
