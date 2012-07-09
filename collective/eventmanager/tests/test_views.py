@@ -251,13 +251,49 @@ class TestViews(BaseTest):
         mailhost = self.portal.MailHost
         self.assertEqual(len(mailhost.messages) > 0, True)
         msg = message_from_string(
-                mailhost.messages[len(mailhost.messages) - 1])
+                mailhost.messages[-1])
 
         self.assertEqual(msg['From'], 'testfrom@foobar.com')
         self.assertEqual(msg['To'], 'testto@foobar.com')
 
     def test_send_certificate_on_completion(self):
-        pass
+        browserLogin(self.portal, self.browser)
+
+        # create em event
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl('Save').click()
+        event = self.portal['test-event']
+
+        # add a registration
+        self.registerNewUser(event, "Reg1", "reg1@foobar.com")
+
+        # go to email sender and setup the form and submit it
+        self.browser.open(self.portal_url + "/test-event/emailsenderform")
+        self.browser.getControl(name='emailtype').value = ['confirmation']
+        self.browser.getControl(name='certreq').value = 'on'
+        self.browser.getControl(
+                name='emailfromaddress').value = 'no-reply@foo.bar'
+        self.browser.getControl(
+                name='emailtoaddresses').value = '"Reg1" <reg1@foobar.com>'
+        self.browser.getControl(name='submit').click()
+
+        # check to see if all is well with the sent emails
+        mailhost = self.portal.MailHost
+        self.assertEqual(len(mailhost.messages) > 0, True)
+        msg = message_from_string(mailhost.messages[-1])
+
+        self.assertEqual(msg['from'], 'no-reply@foo.bar')
+        self.assertEqual(msg['to'], '"Reg1" <reg1@foobar.com>')
+        foundcert = False
+        for payload in msg.get_payload():
+            if 'attachment; filename="certificate.pdf"' in payload.values():
+                foundcert = True
+                break
+
+        self.assertEqual(foundcert, True)
 
     def test_create_lodging_report(self):
         pass
