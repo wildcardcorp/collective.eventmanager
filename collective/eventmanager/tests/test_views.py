@@ -94,11 +94,13 @@ class TestViews(BaseTest):
         self.browser.getControl('Description/Notes').value = 'Event desc'
         self.browser.getControl(
             name="form.widgets.maxRegistrations").value = "2"
+        #import pdb; pdb.set_trace()
         self.browser.getControl('Save').click()
-        event = self.portal['test-event']
+        event = [self.portal[a] for a in self.portal if 'test-event' in a][-1]
         self.registerNewUser(event, 'test1', 'test1@foobar.com')
         self.registerNewUser(event, 'test2', 'test2@foobar.com')
         self.browser.open(event.absolute_url())
+        #import pdb; pdb.set_trace()
         assert "Registration is closed" in self.browser.contents
 
     def test_registration_is_closed_on_dates_closed(self):
@@ -134,7 +136,8 @@ class TestViews(BaseTest):
         self.browser.getControl(
             name="form.widgets.maxRegistrations").value = "2"
         self.browser.getControl(
-            name="form.widgets.thankYouIncludeConfirmation:list").checked = True
+                name="form.widgets.thankYouIncludeConfirmation:list"
+            ).value = 'on'
         self.browser.getControl('Save').click()
         event = self.portal['test-event']
 
