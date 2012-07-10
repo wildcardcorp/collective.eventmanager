@@ -85,6 +85,9 @@
             <div>
                 <label for='emailbody'>EMail Message</label>
                 <p><textarea type='text' name='emailbody' tal:content="python:view.confirmationBody()"></textarea></p>
+                <p tal:condition='python:view.confirmationLinkIncluded()'>
+                    Note: a confirmation link will be included in the email. This can be configured in the Thank You/Confirmation EMail Settings of this event.
+                </p>
             </div>
             <div>
                 <label for='attachment1'>Attachment 1</label>

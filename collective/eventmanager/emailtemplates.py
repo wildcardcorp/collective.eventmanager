@@ -9,6 +9,8 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+from collective.eventmanager.registration import generateConfirmationHash
+
 
 class IEMailTemplateSettings(Interface):
     announcement_subject = schema.Text(title=u"Announcement Subject")
@@ -51,6 +53,8 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
     mfrom = deffrom
     msubject = defsubject
     mbody = defmsg
+    additional_html_body = None
+    additional_plain_body = None
     mattachments = defattachments
 
     mh = getToolByName(emevent, 'MailHost')
@@ -77,6 +81,18 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
 
     elif emailtype == 'confirmation':
         mtemplate = 'confirmation'
+        if emevent.thankYouIncludeConfirmation and reg is not None:
+            reghash = generateConfirmationHash('confirmation', reg)
+            additional_plain_body = """
+=======================
+Please visit the following URL in order to confirm your registration:
+
+%s/confirm-registration?h=%s""" % (emevent.absolute_url(), reghash)
+            additional_html_body = \
+                '<div>=======================<br />Please ' \
+                '<a href="%s/confirm-registration?h=%s">confirm your ' \
+                'registration</a>.</div>' \
+                % (emevent.absolute_url(), reghash)
 
     elif emailtype == 'announcement':
         mtemplate = 'announcement'
@@ -115,6 +131,11 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
                     emevent=emevent,
                     event_content=messageresult)
 
+    if additional_html_body is not None:
+        messagehtml += additional_html_body
+    if additional_plain_body is not None:
+        messageplain += additional_plain_body
+
     subject = subtemplate.render(emevent=emevent, event_content=msubject)
 
     # create a multipart message to hold both a text and html version
@@ -145,4 +166,3 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
     #mh.send('message', 'to@example.com', 'from@example.com', 'subject')
 
     return True
-

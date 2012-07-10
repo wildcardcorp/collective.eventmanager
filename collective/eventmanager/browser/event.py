@@ -29,13 +29,12 @@ from collective.eventmanager.browser.rostersettings import RosterSettings
 from collective.eventmanager.certificatepdftemplates \
     import generateCertificate
 from collective.eventmanager.certificatepdftemplates \
-    import ICertificatePDFTemplateSettings
-from collective.eventmanager.certificatepdftemplates \
     import getDefaultValueForCertField
 from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.registration import IRegistration
+from collective.eventmanager.registration import generateConfirmationHash
 from collective.eventmanager.utils import findRegistrationObject
 
 
@@ -228,8 +227,21 @@ class EMailSenderForm(grok.View):
         mfrom = REQUEST.form['emailfromaddress']
         msubject = REQUEST.form['emailsubject']
         mbody = REQUEST.form['emailbody']
-        sendEMail(self.__parent__, emailtype, tolist, None, attachments,
-                  mfrom, msubject, mbody)
+        for toaddress in tolist:
+            # should return a list of one since emails are unique in this
+            # system
+            reg = [self.__parent__.registrations[a]
+                    for a in self.__parent__.registrations
+                     if self.__parent__.registrations[a].email in toaddress]
+            # if there is no reg, then just send an email with no registration
+            # confirmation link, otherwise include the confirmation link (if
+            # the event is configured to include one)
+            if len(reg) <= 0:
+                sendEMail(self.__parent__, emailtype, [toaddress], None,
+                          attachments, mfrom, msubject, mbody)
+            else:
+                sendEMail(self.__parent__, emailtype, [toaddress], reg[0],
+                          attachments, mfrom, msubject, mbody)
 
         self.emailSent = True
 
@@ -292,6 +304,44 @@ class EMailSenderForm(grok.View):
 
     def confirmationBody(self):
         return self.__parent__.thankYouEMailBody
+
+    def confirmationLinkIncluded(self):
+        return self.__parent__.thankYouIncludeConfirmation
+
+
+class ConfirmRegistrationView(grok.View):
+
+    grok.context(IEMEvent)
+    grok.require('zope2.View')
+    grok.name('confirm-registration')
+    grok.layer(ILayer)
+
+    confirmed = False
+
+    def __call__(self):
+        # TODO: make sure this works...
+
+        regconfirmhash = self.request.get('h')
+        # if a match is found, then move it to the confirm state and
+        # set a flag for the template to show a 'confirmed' message
+        for reg in self.context.registrations:
+            reghash = generateConfirmationHash(
+                        'confirmation',
+                        self.context.registrations[reg])
+            if reghash == regconfirmhash:
+                self.confirmed = True
+                wf = getToolByName(self.context, 'portal_workflow')
+                curstatus = wf.getStatusOf(
+                                'plone_workflow',
+                                self.context.registrations[reg])
+                # only confirm a registration if it has been approved
+                if curstatus is not None \
+                        and curstatus['review_state'] == 'approved':
+                    wf.doActionFor(self.context.registrations[reg], 'confirm')
+
+                break
+
+        return super(ConfirmRegistrationView, self).__call__()
 
 
 class RegistrationStatusForm(grok.View):

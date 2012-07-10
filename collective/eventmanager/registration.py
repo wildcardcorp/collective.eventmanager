@@ -1,7 +1,9 @@
+import hashlib
+from plone.directives import form, dexterity
+from Products.CMFCore.utils import getToolByName
 from zope import schema
 from zope.component.hooks import getSite
-from Products.CMFCore.utils import getToolByName
-from plone.directives import form, dexterity
+
 from collective.eventmanager import EventManagerMessageFactory as _
 
 
@@ -35,3 +37,8 @@ def validateEmail(value):
     registration = getToolByName(getSite(), 'portal_registration')
     if not registration.isValidEmail(value):
         raise schema.ValidationError("Invalid email address")
+
+
+def generateConfirmationHash(salt, registration):
+    msg = "%s%s%s" % (salt, registration.email, registration.getId())
+    return hashlib.sha256(msg).hexdigest()

@@ -217,7 +217,7 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
     # === THANK YOU EMAIL ===
     form.fieldset(
             "thankyouemailsettings",
-            label=_(u"Thank You EMail Settings"),
+            label=_(u"Thank You/Confirmation EMail Settings"),
             fields=[
                 'thankYouIncludeConfirmation',
                 'thankYouEMailFrom',
