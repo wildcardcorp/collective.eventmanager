@@ -1,13 +1,16 @@
-import unittest2 as unittest
-import transaction
-from collective.eventmanager.tests import BaseTest
-from collective.eventmanager.testing import browserLogin
-from plone.testing.z2 import Browser
 from Acquisition import aq_base
+from datetime import datetime
+from email import message_from_string
+from plone.testing.z2 import Browser
 from Products.CMFPlone.tests.utils import MockMailHost
 from Products.MailHost.interfaces import IMailHost
+from StringIO import StringIO
+import transaction
+import unittest2 as unittest
 from zope.component import getSiteManager
-from email import message_from_string
+
+from collective.eventmanager.testing import browserLogin
+from collective.eventmanager.tests import BaseTest
 
 
 class TestViews(BaseTest):
@@ -48,6 +51,10 @@ class TestViews(BaseTest):
         self.browser.getControl(name="form.widgets.email").value = email
         self.browser.getControl('Register').click()
 
+    def getLastEvent(self, evid):
+        return self.portal[[a for a in self.portal
+                               if a[:10] == evid][-1]]
+
     def test_searchable_public_training_calendar(self):
         browserLogin(self.portal, self.browser)
         self.browser.open(self.portal_url + \
@@ -63,7 +70,57 @@ class TestViews(BaseTest):
             self.browser.contents
 
     def test_calendar_includes_name_location_link_etc(self):
-        pass
+        # the values that should be on an item linked to by a calendar
+        # (assuming the appropriate options are enabled):
+        #   - name
+        #   - location
+        #   - registration link
+        #   - seats remaining
+        #   - registration start date
+        #   - flyer link
+        #   - notes
+
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+
+        # set name, location, max registrations, flyer, and body/notes element
+        # -- the registration link should be auto generated, and the
+        #    registration start date should be defaulted to the current day
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl(
+            'Description/Notes').value = 'Event Description'
+        self.browser.getControl(
+            name='form.widgets.location').value = 'POINT(-100.0,100.0)'
+        self.browser.getControl(
+            name='form.widgets.maxRegistrations').value = '2'
+        self.browser.getControl(name='form.widgets.flyer') \
+            .add_file(StringIO('test file'),
+                      'text/plain',
+                      'test.txt')
+        self.browser.getControl(
+            name='form.widgets.body').value = 'Body Content'
+
+        self.browser.getControl('Save').click()
+        newevt = self.getLastEvent('test-event')
+
+        # add a registration
+        self.registerNewUser(newevt, "Test Registration", "test@foo.bar")
+
+        # inspect the event page
+        self.browser.open(newevt.absolute_url())
+
+        assert '>Test Event</h1>' in self.browser.contents
+        # TODO: location
+        assert '>Register for this event</a>'
+
+        assert 'class="num">1</span>' in self.browser.contents \
+                and 'of 2' in self.browser.contents
+        assert 'Registration opens <span>%s' \
+                    % (datetime.now().strftime('%A, %x at ')) \
+                in self.browser.contents
+        assert 'href="./@@display-file/flyer"' in self.browser.contents
+        assert 'Body Content' in self.browser.contents
 
     def test_customizable_registration_form(self):
         browserLogin(self.portal, self.browser)
@@ -81,7 +138,7 @@ class TestViews(BaseTest):
             name="form.widgets.registrationFields.AA.widgets.fieldtype:list"
             ).value = ['TextLine']
         self.browser.getControl('Save').click()
-        event = self.portal['test-event']
+        event = self.getLastEvent('test-event')
         self.browser.open(event.absolute_url() + \
             '/registrations/++add++collective.eventmanager.Registration')
         assert "Custom Field" in self.browser.contents
@@ -96,7 +153,7 @@ class TestViews(BaseTest):
             name="form.widgets.maxRegistrations").value = "2"
         #import pdb; pdb.set_trace()
         self.browser.getControl('Save').click()
-        event = [self.portal[a] for a in self.portal if 'test-event' in a][-1]
+        event = self.getLastEvent('test-event')
         self.registerNewUser(event, 'test1', 'test1@foobar.com')
         self.registerNewUser(event, 'test2', 'test2@foobar.com')
         self.browser.open(event.absolute_url())
@@ -104,7 +161,47 @@ class TestViews(BaseTest):
         assert "Registration is closed" in self.browser.contents
 
     def test_registration_is_closed_on_dates_closed(self):
-        pass
+        browserLogin(self.portal, self.browser)
+
+        def setEventDates(widgetbase, dayadj, houradj):
+            self.browser.getControl(name='%s-day' % (widgetbase,)) \
+                .value = str(datetime.now().day + dayadj)
+            self.browser.getControl(name='%s-month' % (widgetbase,)) \
+                .value = [str(datetime.now().month)]
+            self.browser.getControl(name='%s-year' % (widgetbase,)) \
+                .value = str(datetime.now().year)
+            self.browser.getControl(name='%s-hour' % (widgetbase,)) \
+                .value = str(datetime.now().hour + houradj)
+            self.browser.getControl(name='%s-min' % (widgetbase,)) \
+                .value = str(datetime.now().minute)
+
+        def createEvent(houropenadj, hourcloseadj):
+            self.browser.open(self.portal_url + \
+                '/++add++collective.eventmanager.EMEvent')
+            self.browser.getControl('Event Name').value = 'Test Event'
+            self.browser.getControl('Description/Notes').value = 'Event desc'
+
+            # set the open date to yesterday and the close date to
+            # today -- but one hour in the future
+            setEventDates('form.widgets.registrationOpen', -1, houropenadj)
+            setEventDates('form.widgets.registrationClosed', 0, hourcloseadj)
+
+            self.browser.getControl('Save').click()
+            event = self.getLastEvent('test-event')
+
+            return event
+
+        # get event with a closed time in the future and test to make
+        # sure registration is open
+        event = createEvent(0, 1)
+        self.browser.open(event.absolute_url())
+        assert "Registration is closed" not in self.browser.contents
+
+        # get event with a closed time in the past and test to make
+        # sure registration is closed
+        event = createEvent(0, -1)
+        self.browser.open(event.absolute_url())
+        assert "Registration is closed" in self.browser.contents
 
     def test_registration_is_open_with_waitlist(self):
         browserLogin(self.portal, self.browser)
@@ -118,7 +215,7 @@ class TestViews(BaseTest):
             name="form.widgets.enableWaitingList:list"
         ).controls[0].selected = True
         self.browser.getControl('Save').click()
-        event = self.portal['test-event']
+        event = self.getLastEvent('test-event')
         self.registerNewUser(event, 'test1', 'test1@foobar.com')
         self.registerNewUser(event, 'test2', 'test2@foobar.com')
         self.browser.open(event.absolute_url())
@@ -139,7 +236,7 @@ class TestViews(BaseTest):
                 name="form.widgets.thankYouIncludeConfirmation:list"
             ).value = 'on'
         self.browser.getControl('Save').click()
-        event = self.portal['test-event']
+        event = self.getLastEvent('test-event')
 
         # add registration
         self.registerNewUser(event, "Test Registration 1", "test1@foobar.com")
@@ -229,7 +326,7 @@ class TestViews(BaseTest):
         self.browser.getControl('Event Name').value = 'Test Event'
         self.browser.getControl('Description/Notes').value = 'Event desc'
         self.browser.getControl('Save').click()
-        event = self.portal['test-event']
+        event = self.getLastEvent('test-event')
 
         # add a couple of registrations
         self.registerNewUser(event, "Reg1", "reg1@foobar.com")
@@ -268,7 +365,7 @@ class TestViews(BaseTest):
         self.browser.getControl('Event Name').value = 'Test Event'
         self.browser.getControl('Description/Notes').value = 'Event desc'
         self.browser.getControl('Save').click()
-        event = self.portal['test-event']
+        event = self.getLastEvent('test-event')
 
         # add a registration
         self.registerNewUser(event, "Reg1", "reg1@foobar.com")

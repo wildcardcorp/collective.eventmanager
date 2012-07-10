@@ -93,10 +93,23 @@ class View(grok.View):
 
     @property
     def can_register(self):
+        # check to make sure registration is still open
+        if self.context.registrationOpen > datetime.now() \
+                or (self.context.registrationClosed is not None
+                    and self.context.registrationClosed <= datetime.now()):
+            return False
+
+        # check to see if there are no registration caps
         if self.context.enableWaitingList or \
                 self.context.maxRegistrations is None:
             return True
+
+        # check to see if there are still open spots available
         return self.number_registered < self.context.maxRegistrations
+
+    @property
+    def can_req_reg_reminder(self):
+        return self.context.registrationOpen > datetime.now()
 
     @property
     def can_pay(self):
@@ -139,9 +152,14 @@ class View(grok.View):
                 and self.context.location[0:6] == u'POINT(':
             coords = self.context.location[6:-1].split(' ')
 
-        settings['lon'] = float(coords[0])
-        settings['lat'] = float(coords[1])
-        settings['zoom'] = 16
+        try:
+            settings['lon'] = float(coords[0])
+            settings['lat'] = float(coords[1])
+            settings['zoom'] = 16
+        except ValueError:
+            settings['lon'] = 0.0
+            settings['lat'] = 0.0
+            settings['zoom'] = 1
 
         return "cgmap.state['" + self.MAP_CSS_CLASS + "'] = " \
                + str(settings) + ";"
