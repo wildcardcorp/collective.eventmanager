@@ -12,7 +12,7 @@
     <div>
       <a id='regshowhidemap' href='javascript:void(0)'>Show a Map of the Event</a>
     </div>
-    <div id='regmap' tal:condition="python: view.showMap()" style='display:none;'>
+    <div id='regmap' tal:condition="python: view.showMap()">
       <tal:if condition="python: view.location() is not None and view.location() != ''">
         <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
         <script type='text/javascript' tal:content="python: view.cgmapSettings()">
@@ -38,6 +38,10 @@
             }
           });
         });
+
+        setTimeout(function(){
+          $('#regmap').hide();
+        }, 1000);
       })(jQuery);
     </script>
 

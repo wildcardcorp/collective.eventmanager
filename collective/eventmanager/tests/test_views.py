@@ -2,6 +2,7 @@ from Acquisition import aq_base
 from datetime import datetime
 from email import message_from_string
 from plone.testing.z2 import Browser
+from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.tests.utils import MockMailHost
 from Products.MailHost.interfaces import IMailHost
 from StringIO import StringIO
@@ -9,8 +10,9 @@ import transaction
 import unittest2 as unittest
 from zope.component import getSiteManager
 
-from collective.eventmanager.testing import browserLogin
+from collective.eventmanager.registration import generateRegistrationHash
 from collective.eventmanager.tests import BaseTest
+from collective.eventmanager.testing import browserLogin
 
 
 class TestViews(BaseTest):
@@ -111,8 +113,8 @@ class TestViews(BaseTest):
         self.browser.open(newevt.absolute_url())
 
         assert '>Test Event</h1>' in self.browser.contents
-        # TODO: location
-        assert '>Register for this event</a>'
+        assert 'id="map"' in self.browser.contents
+        assert '>Register for this event</a>' in self.browser.contents
 
         assert 'class="num">1</span>' in self.browser.contents \
                 and 'of 2' in self.browser.contents
@@ -257,25 +259,226 @@ class TestViews(BaseTest):
         # TODO: add confirmation message and link to registration email
 
     def test_registrants_can_cancel(self):
-        pass
+        # setup event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(
+                name='form.widgets.thankYouIncludeConfirmation:list'
+            ).value = 'on'
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # add registration
+        self.registerNewUser(
+                event,
+                "Test Registration Cancel",
+                "testcancel@foobar.com")
+
+        # send confirmation email
+        self.browser.open("%s/%s/@@emailsenderform"
+                                % (self.portal_url, event.getId()))
+        self.browser.getControl(name='emailfromaddress').value = 'tes@tes.com'
+        self.browser.getControl(name='emailtoaddresses') \
+                    .value = "testcancel@foobar.com"
+        self.browser.getControl(name='submit').click()
+
+        # get cancellation link from email
+        mailhost = self.portal.MailHost
+        assert len(mailhost.messages) == 1
+        msg = message_from_string(mailhost.messages[0])
+        assert 'testcancel@foobar.com' in msg['To']
+        cancelurl = "%s/%s/cancel-registration?h=%s" \
+                        % (self.portal_url,
+                           event.getId(),
+                           generateRegistrationHash(
+                                "cancel",
+                                event.registrations['test-registration-cancel']
+                                ))
+        assert cancelurl in mailhost.messages[0]
+
+        # go to cancellation link
+        self.browser.open(cancelurl)
+        assert "Registration Cancelled" in self.browser.contents
+
+        # assert state of registration is cancelled
+        wf = getToolByName(self.portal, "portal_workflow")
+        regstatus = wf.getStatusOf(
+            'collective.eventmanager.Registration_workflow',
+            event.registrations['test-registration-cancel'])
+        assert regstatus['review_state'] == 'cancelled'
 
     def test_waiting_list(self):
-        pass
+        # create event, setting size to 0, forcing all registrations to
+        #   waiting list
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(
+            name="form.widgets.maxRegistrations").value = "0"
+        self.browser.getControl(
+            name="form.widgets.enableWaitingList:list").value = "on"
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # add registration
+        self.registerNewUser(
+                event,
+                "Test Registration Waiting List",
+                "test@foobar.com")
+
+        # assert registration is 'submitted'
+        wf = getToolByName(self.portal, "portal_workflow")
+        status = wf.getStatusOf(
+            'collective.eventmanager.Registration_workflow',
+            event.registrations['test-registration-waiting-list'])
+        assert status['review_state'] == 'submitted'
+
+        # go to registration status page
+        self.browser.open("%s/%s/@@registrationstatusform"
+                            % (self.portal_url,
+                               event.getId()))
+
+        # assert registration is listed under 'On Waiting List'
+        assert 'Test Registration Waiting List' in self.browser.contents
+        assert 'There are no registrations on the waiting list.' \
+                    not in self.browser.contents
+
+        # move registration from waiting list to approved
+        self.browser.getControl(
+                name='submitted'
+            ).value = "on"
+        self.browser.getControl('Approve').click()
+
+        # assert registration is 'approved'
+        status = wf.getStatusOf(
+            'collective.eventmanager.Registration_workflow',
+            event.registrations['test-registration-waiting-list'])
+        assert status['review_state'] == 'approved'
 
     def test_require_payment(self):
         pass
 
-    def test_past_events_automatically_removed_from_calendar(self):
-        pass
-
     def test_registration_info_can_be_managed_by_admins(self):
-        pass
+        # add event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(
+            name="form.widgets.maxRegistrations").value = "0"
+        self.browser.getControl(
+            name="form.widgets.enableWaitingList:list").value = "on"
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # add registration (admin adds registration)
+        self.registerNewUser(
+                event,
+                "Test Registration",
+                "test@foobar.com")
+
+        # assert registration exists
+        assert 'test-registration' in event.registrations
+
+        # alter registration name and email (admin doing this)
+        self.browser.open("%s/%s/registrations/test-registration/edit"
+                            % (self.portal_url,
+                               event.getId()))
+        self.browser.getControl(name="form.widgets.title") \
+                    .value = "New Title Value"
+        self.browser.getControl(name="form.widgets.email") \
+                    .value = "new@email.com"
+        self.browser.getControl(name="form.widgets.noshow:list") \
+                    .value = "on"
+        self.browser.getControl(name="form.widgets.paid_fee:list") \
+                    .value = "on"
+        self.browser.getControl("Save").click()
+
+        # assert registration information has changed
+        assert 'New Title Value' in self.browser.contents
+        assert 'new@email.com' in self.browser.contents
+        assert event.registrations['test-registration'].noshow
+        assert event.registrations['test-registration'].paid_fee
 
     def test_post_training_data(self):
-        pass
+        oldbody = "some test body text"
+        newbody = "a different value"
+
+        # create event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(name='form.widgets.body').value = oldbody
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # modify body -- adding files and such is a function of
+        #   plone itself, so there's no need to test this, as it
+        #   should already be covered in tests.
+        self.browser.open(self.portal_url + '/' + event.getId() + '/@@edit')
+        self.browser.getControl(name='form.widgets.body').value = newbody
+        self.browser.getControl("Save").click()
+
+        # assert that body structure has changed.
+        assert oldbody not in self.browser.contents
+        assert newbody in self.browser.contents
 
     def test_send_training_emails(self):
-        pass
+        # create event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(
+            name="form.widgets.maxRegistrations").value = "0"
+        self.browser.getControl(
+            name="form.widgets.enableWaitingList:list").value = "on"
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # create registrant
+        self.registerNewUser(
+                event,
+                "Test Registration",
+                "test@foobar.com")
+
+        # use email sender form to send 'other' email with attachment
+        self.browser.open("%s/%s/@@emailsenderform"
+                            % (self.portal_url,
+                               event.getId()))
+        self.browser.getControl(name='emailtype').value = ['other']
+        self.browser.getControl(name='emailfromaddress').value = 'test@tes.com'
+        self.browser.getControl(name='emailtoaddresses') \
+                    .value = 'test@foobar.com'
+        self.browser.getControl(name='emailsubject') \
+                    .value = 'Training EMail'
+        self.browser.getControl(name='emailbody') \
+                    .value = 'This is some training material'
+        self.browser.getControl(name='attachment1') \
+                    .add_file(StringIO('test file'),
+                              'text/plain',
+                              'test.txt')
+        self.browser.getControl(name='submit').click()
+
+        # assert an email was sent with an attachment
+        mailhost = self.portal.MailHost
+        assert len(mailhost.messages) == 1
+        msg = message_from_string(mailhost.messages[0])
+
+        assert msg['To'] == 'test@foobar.com'
+        assert msg['Subject'] == "Training EMail"
+        assert 'This is some training material' in mailhost.messages[0]
+        assert 'Content-Disposition: attachment; filename="test.txt"' \
+                    in mailhost.messages[0]
 
     def test_create_event(self):
         browserLogin(self.portal, self.browser)

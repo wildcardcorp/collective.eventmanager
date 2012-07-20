@@ -34,7 +34,7 @@ from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.registration import IRegistration
-from collective.eventmanager.registration import generateConfirmationHash
+from collective.eventmanager.registration import generateRegistrationHash
 from collective.eventmanager.utils import findRegistrationObject
 
 
@@ -143,6 +143,11 @@ class View(grok.View):
         return self.catalog(path={'query': base, 'depth': 5},
                                   sort_on="effective", sort_limit=limit,
                                   portal_type="News Item")[:limit]
+
+    def showMap(self):
+        return self.context.location is not None \
+                and self.context.location != '' \
+                and self.context.location[:6] == 'POINT('
 
     def cgmapSettings(self):
         settings = {}
@@ -343,15 +348,15 @@ class ConfirmRegistrationView(grok.View):
         # if a match is found, then move it to the confirm state and
         # set a flag for the template to show a 'confirmed' message
         for reg in self.context.registrations:
-            reghash = generateConfirmationHash(
+            reghash = generateRegistrationHash(
                         'confirmation',
                         self.context.registrations[reg])
             if reghash == regconfirmhash:
                 self.confirmed = True
                 wf = getToolByName(self.context, 'portal_workflow')
                 curstatus = wf.getStatusOf(
-                                'plone_workflow',
-                                self.context.registrations[reg])
+                              'collective.eventmanager.Registration_workflow',
+                              self.context.registrations[reg])
                 # only confirm a registration if it has been approved
                 if curstatus is not None \
                         and curstatus['review_state'] == 'approved':
@@ -360,6 +365,42 @@ class ConfirmRegistrationView(grok.View):
                 break
 
         return super(ConfirmRegistrationView, self).__call__()
+
+
+class CancelRegistrationView(grok.View):
+
+    grok.context(IEMEvent)
+    grok.require('zope2.View')
+    grok.name('cancel-registration')
+    grok.layer(ILayer)
+
+    canceled = False
+
+    def __call__(self):
+        # TODO: make sure this works...
+
+        regcancelhash = self.request.get('h')
+        # if a match is found, then move it to the confirm state and
+        # set a flag for the template to show a 'confirmed' message
+        for reg in self.context.registrations:
+            reghash = generateRegistrationHash(
+                        'cancel',
+                        self.context.registrations[reg])
+            if reghash == regcancelhash:
+                self.confirmed = True
+                wf = getToolByName(self.context, 'portal_workflow')
+                curstatus = wf.getStatusOf(
+                              'collective.eventmanager.Registration_workflow',
+                              self.context.registrations[reg])
+                # only confirm a registration if it has been approved
+                if curstatus is not None \
+                        and curstatus['review_state'] != 'cancelled' \
+                        and curstatus['review_state'] != 'denied':
+                    wf.doActionFor(self.context.registrations[reg], 'cancel')
+
+                break
+
+        return super(CancelRegistrationView, self).__call__()
 
 
 class RegistrationStatusForm(grok.View):

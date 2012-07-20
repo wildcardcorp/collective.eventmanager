@@ -44,6 +44,7 @@
           </button>
         </div>
       </div>
+
       <div class="row" tal:define="featured_material view/featured_material;
                                    announcements view/announcements;">
         <div class="span4">
@@ -81,7 +82,7 @@
           <div class="well">
             <div class='event_registration_datetime'>
               Registration opens <span tal:content="python: context.registrationOpen.strftime('%A, %x at %X')" />.
-              <div tal:condition="python: context.registrationClosed != None" ><span tal:content="python: context.registrationClosed.strftime('%A, %x at %X')" /></div>
+              <div tal:condition="python: context.registrationClosed != None" >Registration closes <span tal:content="python: context.registrationClosed.strftime('%A, %x at %X')" /></div>
             </div>
           </div>
         </div><!--/span-->
@@ -134,17 +135,20 @@
             </ul>
           </div>
       </div>
-      <tal:if condition="python: context.location is not None and context.location != ''">
-          <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
-          <script type='text/javascript' tal:content="python: view.cgmapSettings()">
-          </script>
-          <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
-
+      <div class='row'>
+        <div class='span8'>
+          <div id='map' tal:condition="python: view.showMap()">
+            <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
+            <script type='text/javascript' tal:content="python: view.cgmapSettings()">
+            </script>
+            <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
+          </div>
           <div class='event_location_description' tal:content='python: context.locationDescription'>
           </div>
-      </tal:if>
-      <div tal:condition="python: context.body != None and context.body != ''">
-        <div tal:content="structure context/body/output">
+          <div tal:condition="python: context.body != None and context.body != ''">
+            <div tal:content="structure context/body/output">
+            </div>
+          </div>
         </div>
       </div>
     </div>

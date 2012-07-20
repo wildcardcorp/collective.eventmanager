@@ -65,7 +65,7 @@
     <field type="plone.registry.field.TextLine">
       <title>Other Subject</title>
     </field>
-    <value>Other Subject</value>
+    <value>${event_content}</value>
   </record>
   <record field="other_textbody" interface="collective.eventmanager.emailtemplates.IEMailTemplateSettings" name="collective.eventmanager.emailtemplates.IEMailTemplateSettings.other_textbody">
     <field type="plone.registry.field.Text">

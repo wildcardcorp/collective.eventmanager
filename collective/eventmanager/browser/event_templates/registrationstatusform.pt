@@ -93,14 +93,6 @@
             </ul>
           </div>
 
-          <div>
-            <input type='button' value='Wait List' />
-            <input type='button' value='Approve' />
-            <input type='button' value='Confirm' />
-            <input type='button' value='Cancel' />
-            <input type='button' value='Deny' />
-          </div>
-
           <span tal:replace="structure context/@@authenticator/authenticator" />
         </form>
 

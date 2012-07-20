@@ -1,15 +1,16 @@
-from zope.interface import Interface
-from zope import schema
-from zope.component import getUtility
-from mako.template import Template
-from Products.CMFCore.utils import getToolByName
-from plone.registry.interfaces import IRegistry
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from mako.template import Template
+from plone.registry.interfaces import IRegistry
+from Products.CMFCore.utils import getToolByName
+from zope import schema
+from zope.app.component.hooks import getSite
+from zope.component import getUtility
+from zope.interface import Interface
 
-from collective.eventmanager.registration import generateConfirmationHash
+from collective.eventmanager.registration import generateRegistrationHash
 
 
 class IEMailTemplateSettings(Interface):
@@ -82,17 +83,44 @@ def sendEMail(emevent, emailtype, mto=[], reg=None, defattachments=[],
     elif emailtype == 'confirmation':
         mtemplate = 'confirmation'
         if emevent.thankYouIncludeConfirmation and reg is not None:
-            reghash = generateConfirmationHash('confirmation', reg)
-            additional_plain_body = """
-=======================
+            # only include a confirmation link where a registration has
+            #   been approved.
+            confirmtext = ''
+            confirmhtml = ''
+            portal = getSite()
+            wf = getToolByName(portal, 'portal_workflow')
+            regstatus = wf.getStatusOf(
+                'collective.eventmanager.Registration_workflow',
+                reg)
+            if regstatus is not None \
+                    and regstatus['review_state'] == 'approved':
+                confirmreghash = generateRegistrationHash('confirmation', reg)
+                confirmtext = """
 Please visit the following URL in order to confirm your registration:
 
-%s/confirm-registration?h=%s""" % (emevent.absolute_url(), reghash)
-            additional_html_body = \
-                '<div>=======================<br />Please ' \
+%s/confirm-registration?h=%s
+
+
+""" % (emevent.absolute_url(), confirmreghash)
+                confirmhtml = '<br />Please ' \
                 '<a href="%s/confirm-registration?h=%s">confirm your ' \
-                'registration</a>.</div>' \
-                % (emevent.absolute_url(), reghash)
+                'registration</a>.</div><br /><br />' \
+                % (emevent.absolute_url(), confirmreghash)
+
+            # put together the final messages
+            cancelreghash = generateRegistrationHash('cancel', reg)
+            additional_plain_body = """
+=======================%s
+If you'd like to cancel your registration, please visit the following URL:
+
+%s/cancel-registration?h=%s""" % (confirmtext,
+                                  emevent.absolute_url(), cancelreghash)
+            additional_html_body = \
+                '<div>=======================%s<div>' \
+                'You may <a href="%s/cancel-registration?h=%s">cancel your ' \
+                'registration</a> at any time.</div>' \
+                % (confirmhtml,
+                   emevent.absolute_url(), cancelreghash)
 
     elif emailtype == 'announcement':
         mtemplate = 'announcement'

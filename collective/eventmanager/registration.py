@@ -39,6 +39,6 @@ def validateEmail(value):
         raise schema.ValidationError("Invalid email address")
 
 
-def generateConfirmationHash(salt, registration):
+def generateRegistrationHash(salt, registration):
     msg = "%s%s%s" % (salt, registration.email, registration.getId())
     return hashlib.sha256(msg).hexdigest()
