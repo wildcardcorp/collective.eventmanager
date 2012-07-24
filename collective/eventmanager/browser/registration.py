@@ -1,5 +1,7 @@
 from zope.component import getMultiAdapter
 from zope import schema
+from zope.schema.vocabulary import SimpleVocabulary
+from zope.schema.vocabulary import SimpleTerm
 from five import grok
 
 from Products.statusmessages.interfaces import IStatusMessage
@@ -14,6 +16,8 @@ from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.utils import findRegistrationObject
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
+from z3c.form.interfaces import INPUT_MODE
+from z3c.form.browser.checkbox import CheckBoxFieldWidget
 
 
 class View(grok.View):
@@ -105,12 +109,20 @@ class View(grok.View):
 
 def addDynamicFields(form, reg_fields):
     for fielddata in reg_fields:
-        field = getattr(schema, fielddata['fieldtype'])(
-                    title=unicode(fielddata['name']),
+        kwargs = dict(title=unicode(fielddata['name']),
                     required=fielddata['required'])
+        if fielddata['fieldtype'] == 'List':
+            vocab = []
+            for value in fielddata.get('configuration').splitlines():
+                vocab.append(SimpleTerm(value=value, title=value))
+            kwargs['value_type'] = schema.Choice(
+                vocabulary=SimpleVocabulary(vocab))
+        field = getattr(schema, fielddata['fieldtype'])(**kwargs)
         field.__name__ = str(fielddata['name'])
         field.interface = IRegistration
         utils.add(form, field)
+        if fielddata['fieldtype'] == 'List':
+            field.widgetFactory = CheckBoxFieldWidget
 
 
 class EditForm(dexterity.EditForm):
