@@ -18,6 +18,8 @@ from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.utils import findRegistrationObject
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
+from z3c.form.interfaces import INPUT_MODE
+from z3c.form.browser.checkbox import CheckBoxFieldWidget
 
 
 class View(grok.View):

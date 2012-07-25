@@ -35,6 +35,10 @@ class IRegistrationFieldRow(Interface):
             required=False,
         )
 
+    configuration = schema.Text(
+        title=u"Configuration(like vocabulary for check list)",
+        required=False)
+
 
 class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
     """An event"""
