@@ -65,7 +65,7 @@ class View(grok.View):
                 v = getattr(self.context, fielddata['name'])
             except AttributeError:
                 v = ''
-            c = fielddata['fieldconfig']
+            c = fielddata['configuration']
 
             fields.append({
                 'name': n,
@@ -104,9 +104,8 @@ class View(grok.View):
             # an integer value
             if item['value'] % int(item['value']) == 0:
                 return int(item['value'])
-        elif item['fieldtype'] == 'Choice':
-            # TODO
-            import pdb; pdb.set_trace()
+        elif item['fieldtype'] == 'List':
+            return '<ul><li>%s</li></ul>' % ("</li><li>".join(item['value']),)
 
         return item['value']
 
@@ -133,6 +132,13 @@ class EditForm(dexterity.EditForm):
     grok.context(IRegistration)
 
     def updateWidgets(self):
+        em = self.context.__parent__
+        for fielddata in em.registrationFields:
+            if fielddata['fieldtype'] == 'List':
+                self.fields[fielddata['name']].widgetFactory = \
+                                                    CheckBoxFieldWidget
+                self.fields[fielddata['name']].field.context = self.context
+
         super(dexterity.EditForm, self).updateWidgets()
 
     def updateFields(self):
