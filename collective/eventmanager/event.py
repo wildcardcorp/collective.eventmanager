@@ -30,6 +30,10 @@ class IRegistrationFieldRow(Interface):
             required=True,
             default=True,
         )
+    configuration = schema.Text(
+            title=u"Field Configuration",
+            required=False,
+        )
 
 
 class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):

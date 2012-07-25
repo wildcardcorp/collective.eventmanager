@@ -246,7 +246,7 @@ class TestViews(BaseTest):
         # check captured messages in the mailhost to verify an email with
         mailhost = self.portal.MailHost
         self.assertEqual(len(mailhost.messages), 1)
-        msg = message_from_string(mailhost.message[0])
+        msg = message_from_string(mailhost.messages[0])
 
         self.assertEqual(msg['To'], 'test1@foobar.com')
         self.assertEqual(
@@ -491,19 +491,224 @@ class TestViews(BaseTest):
         self.assertEqual(self.portal['test-event'] != None, True)
 
     def test_clone_event(self):
-        pass
+        # create an event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event for copy'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # copy the event
+        #eventurl = "%s/%s/object_copy" % (self.portal_url, event.getId())
+        #import pdb; pdb.set_trace()
+        #self.browser.open(eventurl)
+        self.browser.open(self.portal_url + '/folder_contents')
+        self.browser.getControl('Test Event for copy').selected = True
+        self.browser.getControl('Copy').click()
+        self.browser.getControl('Paste').click()
+
+        # assert both the old and new event's exist and have the same title
+        copyid = 'copy_of_%s' % (event.getId(),)
+        assert copyid in self.portal
+        eventcopy = self.portal[copyid]
+        assert event.title == eventcopy.title
 
     def test_set_event_dates(self):
-        pass
+        # create an event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event for copy'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(name='form.widgets.start-day').value = '26'
+        self.browser.getControl(name='form.widgets.start-month').value = ['1']
+        self.browser.getControl(name='form.widgets.start-year').value = '2002'
+        self.browser.getControl(name='form.widgets.start-hour').value = '6'
+        self.browser.getControl(name='form.widgets.start-min').value = '34'
+        self.browser.getControl(name='form.widgets.end-day').value = '27'
+        self.browser.getControl(name='form.widgets.end-month').value = ['1']
+        self.browser.getControl(name='form.widgets.end-year').value = '2002'
+        self.browser.getControl(name='form.widgets.end-hour').value = '7'
+        self.browser.getControl(name='form.widgets.end-min').value = '35'
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # go to event page and assert that dates are set
+        eventurl = "%s/%s" % (self.portal_url, event.getId())
+        self.browser.open(eventurl)
+        assert '01/26/02 at 06:34' in self.browser.contents
+        assert '01/27/02 at 07:35' in self.browser.contents
+
+        # change the dates to make an all day event
+        self.browser.open(eventurl + '/edit')
+        self.browser.getControl(name='form.widgets.start-day').value = '26'
+        self.browser.getControl(name='form.widgets.start-month').value = ['1']
+        self.browser.getControl(name='form.widgets.start-year').value = '2002'
+        self.browser.getControl(name='form.widgets.start-hour').value = '6'
+        self.browser.getControl(name='form.widgets.start-min').value = '34'
+        self.browser.getControl(name='form.widgets.end-day').value = '26'
+        self.browser.getControl(name='form.widgets.end-month').value = ['1']
+        self.browser.getControl(name='form.widgets.end-year').value = '2002'
+        self.browser.getControl(name='form.widgets.end-hour').value = '6'
+        self.browser.getControl(name='form.widgets.end-min').value = '34'
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # check the event page for all day event
+        self.browser.open(eventurl)
+        assert 'This is an all day event taking place on' \
+                    in self.browser.contents
+        assert '01/26/02' in self.browser.contents
 
     def test_modify_email_templates(self):
-        pass
+        # create an event and registration
+        # enable 'Include Confirmation Link and Message' in the Thank You EMail
+        #   settings section
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(
+            name="form.widgets.maxRegistrations").value = "1"
+        self.browser.getControl(
+                name="form.widgets.thankYouIncludeConfirmation:list"
+            ).value = 'on'
+        self.browser.getControl(name='form.widgets.enableWaitingList:list') \
+                    .value = "on"
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # add registration
+        self.registerNewUser(event, "Test Registration 1", "test1@foobar.com")
+
+        # go to site setup and modify every template
+        self.browser.open(self.portal_url + '/@@em-email-templates')
+
+        def setControls(name):
+            subjectname = 'form.widgets.%s_subject' % (name,)
+            htmlname = 'form.widgets.%s_htmlbody' % (name,)
+            textname = 'form.widgets.%s_textbody' % (name,)
+            self.browser.getControl(name=subjectname).value = "Test Subject"
+            self.browser.getControl(name=htmlname).value = "Test HTML Body"
+            self.browser.getControl(name=textname).value = "Test Text Body"
+
+        setControls('announcement')
+        setControls('confirmation')
+        setControls('onwaitinglist')
+        setControls('other')
+        setControls('registrationfull')
+        setControls('thankyou')
+        self.browser.getControl('Save').click()
+
+        emailsenderurl = "%s/%s/@@emailsenderform" \
+                            % (self.portal_url, event.getId())
+
+        def checkMailHost():
+            mailhost = self.portal.MailHost
+            assert len(mailhost.messages) > 0
+            msg = message_from_string(mailhost.messages[-1])
+
+            assert msg['Subject'] == 'Test Subject'
+            assert 'Test Subject' in mailhost.messages[-1]
+            assert 'Test HTML Body' in mailhost.messages[-1]
+            assert 'Test Text Body' in mailhost.messages[-1]
+
+        def emailSenderTest(url, emailtype):
+            # send the email, since we hard-coded the templates, setting
+            # subject and message shouldn't matter here
+            self.browser.open(url)
+            self.browser.getControl(name='emailtype').value = [emailtype]
+            self.browser.getControl(name='emailfromaddress') \
+                        .value = 'test@tes.com'
+            self.browser.getControl(name='emailtoaddresses') \
+                        .value = 'test1@foobar.com'
+            self.browser.getControl(name='submit').click()
+
+            # check to see if the content of the email is correct
+            checkMailHost()
+
+        # test announcement
+        emailSenderTest(emailsenderurl, 'announcement')
+
+        # test confirmation
+        emailSenderTest(emailsenderurl, 'confirmation')
+
+        # test on waiting list
+        self.registerNewUser(event, "Test Registration 2", "test2@foobar.com")
+        checkMailHost()
+
+        # test other
+        emailSenderTest(emailsenderurl, 'other')
+
+        # test registration full
+        evediturl = "%s/%s/edit" % (self.portal_url, event.getId())
+        self.browser.open(evediturl)
+        self.browser.getControl(name='form.widgets.enableWaitingList:list') \
+                    .value = ""
+        self.browser.getControl('Save').click()
+        self.registerNewUser(event, "Test Registration 3", "test3@foobar.com")
+        checkMailHost()
+
+        # test thank you
+        evediturl = "%s/%s/edit" % (self.portal_url, event.getId())
+        self.browser.open(evediturl)
+        self.browser.getControl(name="form.widgets.maxRegistrations") \
+                    .value = "20"
+        self.browser.getControl('Save').click()
+        self.registerNewUser(event, "Test Registration 4", "test4@foobar.com")
+        checkMailHost()
 
     def test_add_registrations_manually(self):
-        pass
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        self.registerNewUser(
+                event,
+                "Test Registration",
+                "test@foobar.com")
+
+        assert 'test-registration' in event.registrations
 
     def test_private_event_and_send_invitations_via_email(self):
-        pass
+        # create private event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(name='form.widgets.privateEvent:list') \
+                    .value = "on"
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # send announcement email through email sender with link
+        #   to registration page
+        senderurl = "%s/%s/@@emailsenderform" \
+                        % (self.portal_url, event.getId())
+        self.browser.open(senderurl)
+        self.browser.getControl(name='emailtype').value = ['announcement']
+        self.browser.getControl(name='emailfromaddress').value = "test@tes.tes"
+        self.browser.getControl(name='emailtoaddresses') \
+                    .value = "foo@bar.com"
+        self.browser.getControl(name='emailbody').value = """This is an example.
+The registration link would be:
+
+http://<your domain>/path/to/your/event/registration-form
+        """
+        self.browser.getControl(name='submit').click()
+
+        # assert an email with a register link has been sent
+        mailhost = self.portal.MailHost
+        assert len(mailhost.messages) > 0
+        assert '/registration-form' in mailhost.messages[-1]
 
     def test_ability_to_search_events(self):
         pass

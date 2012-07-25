@@ -1,13 +1,17 @@
-from zope.component import getMultiAdapter
-from zope import schema
 from five import grok
-
+from plone.z3cform.fieldsets import utils
+from plone.directives import dexterity
 from Products.statusmessages.interfaces import IStatusMessage
 from Products.CMFCore.utils import getToolByName
-from plone.z3cform.fieldsets import utils
-from z3c.form.interfaces import IErrorViewSnippet
 from z3c.form import button
-from plone.directives import dexterity
+#from z3c.form.interfaces import IFieldWidget
+from z3c.form.interfaces import IErrorViewSnippet
+from zope import schema
+from zope.app.form.browser import MultiCheckBoxWidget
+from zope.component import getMultiAdapter
+#from zope.interface import implementer
+from zope.schema.vocabulary import SimpleVocabulary
+from zope.schema.vocabulary import SimpleTerm
 
 from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.interfaces import ILayer
@@ -62,11 +66,13 @@ class View(grok.View):
                 v = getattr(self.context, fielddata['name'])
             except AttributeError:
                 v = ''
+            c = fielddata['fieldconfig']
 
             fields.append({
                 'name': n,
                 'fieldtype': t,
-                'value': v})
+                'value': v,
+                'config': c})
 
         return fields
 
@@ -99,18 +105,29 @@ class View(grok.View):
             # an integer value
             if item['value'] % int(item['value']) == 0:
                 return int(item['value'])
+        elif item['fieldtype'] == 'Choice':
+            # TODO
+            import pdb; pdb.set_trace()
 
         return item['value']
 
 
 def addDynamicFields(form, reg_fields):
     for fielddata in reg_fields:
-        field = getattr(schema, fielddata['fieldtype'])(
-                    title=unicode(fielddata['name']),
-                    required=fielddata['required'])
+        kwargs = dict(title=unicode(fielddata['name']),
+                      required=fielddata['required'])
+        if fielddata['fieldtype'] == 'List':
+            vocab = []
+            for value in fielddata.get('configuration').splitlines():
+                vocab.append(SimpleTerm(value=value, title=value))
+            kwargs['value_type'] == schema.Choice(
+                                        vocabulary=SimpleVocabulary(vocab))
+        field = getattr(schema, fielddata['fieldtype'])(**kwargs)
         field.__name__ = str(fielddata['name'])
         field.interface = IRegistration
         utils.add(form, field)
+        if fielddata['fieldtype'] == 'List':
+            field.widgetFactory = MultiCheckBoxWidget
 
 
 class EditForm(dexterity.EditForm):
@@ -123,6 +140,12 @@ class EditForm(dexterity.EditForm):
         super(dexterity.EditForm, self).updateFields()
         em = self.context.__parent__.__parent__
         addDynamicFields(self, em.registrationFields)
+
+
+#@implementer(IFieldWidget)
+#def MultiChoiceFieldWidget(field, request):
+#    import pdb; pdb.set_trace()
+#    return MultiCheckBoxWidget(field, field.vocabulary, request)
 
 
 class AddForm(dexterity.AddForm):
@@ -187,10 +210,37 @@ class AddForm(dexterity.AddForm):
                 msg, "info")
 
     def updateWidgets(self):
+#        em = self.context.__parent__
+#        import pdb; pdb.set_trace()
+#        for fielddata in em.registrationFields:
+#            if fielddata['fieldtype'] == 'MultiChoice':
+#                self.fields[fielddata['name']].widgetFactory = \
+#                                                    MultiChoiceFieldWidget
+
         super(dexterity.AddForm, self).updateWidgets()
         if self.userRegistering:
             self.widgets['new_user'].value = u'yes'
         self.widgets['noshow'].mode = 'hidden'
+
+        #em = self.context.__parent__
+        #for fielddata in em.registrationFields:
+        #    if fielddata['fieldtype'] == 'Choice':
+        #        if fielddata['fieldconfig'] is None \
+        #                or fielddata['fieldconfig'] == '':
+        #            vocabulary = None
+        #        else:
+        #            fieldconfigdata = fielddata['fieldconfig'].splitlines()
+        #            vocabulary = SimpleVocabulary([
+        #                            SimpleTerm(value=a.replace('"', '&quot;'),
+        #                                       title=a.replace('"', '&quot;'))
+        #                                for a in fieldconfigdata])
+        #
+        #        curwidget = self.widgets[fielddata['name']]
+        #        import pdb; pdb.set_trace()
+        #        self.widgets[fielddata['name']] = \
+        #            MultiCheckBoxWidget(curwidget.field,
+        #                                vocabulary,
+        #                                curwidget.request)
 
     def updateFields(self):
         super(dexterity.AddForm, self).updateFields()
