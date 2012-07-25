@@ -711,7 +711,21 @@ http://<your domain>/path/to/your/event/registration-form
         assert '/registration-form' in mailhost.messages[-1]
 
     def test_ability_to_search_events(self):
-        pass
+        # create event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # go to search url
+        searchurl = self.portal_url + "/@@search?SearchablText=Test+Event"
+        self.browser.open(searchurl)
+
+        # assert event in list
+        assert 'Test Event' in self.browser.contents
 
     def test_checkin_roster(self):
         pass
