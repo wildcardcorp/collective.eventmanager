@@ -36,7 +36,7 @@ class IRegistrationFieldRow(Interface):
         )
 
     configuration = schema.Text(
-        title=u"Configuration(like vocabulary for check list)",
+        title=u"Configuration",
         required=False)
 
 
