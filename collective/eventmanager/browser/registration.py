@@ -7,7 +7,6 @@ from z3c.form import button
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.interfaces import IErrorViewSnippet
 from zope import schema
-from zope.app.form.browser import MultiCheckBoxWidget
 from zope.component import getMultiAdapter
 from zope.schema.vocabulary import SimpleVocabulary
 from zope.schema.vocabulary import SimpleTerm
@@ -124,8 +123,6 @@ def addDynamicFields(form, reg_fields):
         field.__name__ = str(fielddata['name'])
         field.interface = IRegistration
         utils.add(form, field)
-        if fielddata['fieldtype'] == 'List':
-            field.widgetFactory = MultiCheckBoxWidget
 
 
 class EditForm(dexterity.EditForm):
