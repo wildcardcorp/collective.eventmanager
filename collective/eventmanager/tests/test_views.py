@@ -752,16 +752,6 @@ http://<your domain>/path/to/your/event/registration-form
             "Checkin Registration",
             "test@address.com",
             False)
-        #self.browser.open(event.absolute_url() + \
-        #    '/registrations/++add++collective.eventmanager.Registration')
-        #self.browser.getControl(name="form.widgets.title").value = \
-        #                                                'Checkin Registration'
-        #self.browser.getControl(name="form.widgets.email").value = \
-        #                                                'test@address.com'
-        #self.browser.getControl(name="form.widgets.noshow:list").value = ""
-        #self.browser.getControl(name="form.buttons.register").click()
-
-        #import pdb; pdb.set_trace()
 
         # goto /@@eventroster and assert that there is at least one
         #   checkbox for the registration (indicating they are not no-shows)
