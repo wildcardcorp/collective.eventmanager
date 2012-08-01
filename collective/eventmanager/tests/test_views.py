@@ -46,12 +46,20 @@ class TestViews(BaseTest):
         sm.registerUtility(aq_base(self.portal._original_MailHost),
                            provided=IMailHost)
 
-    def registerNewUser(self, event, name, email):
+    def registerNewUser(self, event, name, email, noshow=True):
         self.browser.open(event.absolute_url() + \
             '/registrations/++add++collective.eventmanager.Registration')
         self.browser.getControl(name="form.widgets.title").value = name
         self.browser.getControl(name="form.widgets.email").value = email
         self.browser.getControl('Register').click()
+
+        # this is a hack -- the 'noshow' widget is a hidden field by default
+        # and only accepts 'selected' as value, so if noshow==False, then
+        # we can just set the value in the newly create registration
+        for r in [event.registrations[a] for a in event.registrations]:
+            if r.title == name:
+                r.noshow = noshow
+                break
 
     def getLastEvent(self, evid):
         return self.portal[[a for a in self.portal
@@ -728,7 +736,39 @@ http://<your domain>/path/to/your/event/registration-form
         assert 'Test Event' in self.browser.contents
 
     def test_checkin_roster(self):
-        pass
+        # create event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # add registration, make sure it's confirmed and not marked
+        #   as a no-show
+        self.registerNewUser(
+            event,
+            "Checkin Registration",
+            "test@address.com",
+            False)
+        #self.browser.open(event.absolute_url() + \
+        #    '/registrations/++add++collective.eventmanager.Registration')
+        #self.browser.getControl(name="form.widgets.title").value = \
+        #                                                'Checkin Registration'
+        #self.browser.getControl(name="form.widgets.email").value = \
+        #                                                'test@address.com'
+        #self.browser.getControl(name="form.widgets.noshow:list").value = ""
+        #self.browser.getControl(name="form.buttons.register").click()
+
+        #import pdb; pdb.set_trace()
+
+        # goto /@@eventroster and assert that there is at least one
+        #   checkbox for the registration (indicating they are not no-shows)
+        rosterurl = "%s/%s/@@eventroster" % (self.portal_url,
+                                             event.getId())
+        self.browser.open(rosterurl)
+        assert 'registration="checkin-registration"' in self.browser.contents
 
     def test_export_registration(self):
         pass
