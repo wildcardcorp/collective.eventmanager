@@ -761,7 +761,26 @@ http://<your domain>/path/to/your/event/registration-form
         assert 'registration="checkin-registration"' in self.browser.contents
 
     def test_export_registration(self):
-        pass
+        # create event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # add registration
+        self.registerNewUser(
+            event,
+            "Checkin Registration",
+            "test@address.com")
+
+        # export registrations
+        self.browser.open(event.absolute_url() + '/@@export-registrations')
+
+        # assert registrations in downloaded file
+        assert "\n\"Checkin Registration\",\"test@address.com\",\"Yes\"\n" in self.browser.contents
 
     def test_view_waiting_list(self):
         pass
