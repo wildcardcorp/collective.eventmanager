@@ -666,7 +666,10 @@ class ExportRegistrationsView(BrowserView):
                     val = getattr(reg, field)
                 except AttributeError:
                     val = ''
-                cvsout += ',"%s"' % (val.replace('"', '""'))
+                if isinstance(val, list):
+                    cvsout += ',"%s"' % (", ".join(val).replace('"', '""'),)
+                else:
+                    cvsout += ',"%s"' % (val.replace('"', '""'))
 
             cvsout += "\n"
 
