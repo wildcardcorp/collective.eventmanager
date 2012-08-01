@@ -104,7 +104,11 @@ class View(grok.View):
             if item['value'] % int(item['value']) == 0:
                 return int(item['value'])
         elif item['fieldtype'] == 'List':
-            return '<ul><li>%s</li></ul>' % ("</li><li>".join(item['value']),)
+            if len(item['value']) > 0:
+                return '<ul><li>%s</li></ul>' \
+                            % ("</li><li>".join(item['value']),)
+            else:
+                return ''
 
         return item['value']
 
