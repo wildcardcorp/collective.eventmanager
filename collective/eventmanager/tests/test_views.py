@@ -369,7 +369,26 @@ class TestViews(BaseTest):
         assert status['review_state'] == 'approved'
 
     def test_require_payment(self):
-        pass
+        # create event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(name='form.widgets.requirePayment:list') \
+                    .value = "on"
+        self.browser.getControl(name='form.widgets.registrationFee') \
+                    .value = "10.0"
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # add registration
+        self.registerNewUser(
+            event,
+            "Waiting List Registration",
+            "test@address.com")
+
+        # XXX Finish test
 
     def test_registration_info_can_be_managed_by_admins(self):
         # add event
@@ -820,9 +839,6 @@ http://<your domain>/path/to/your/event/registration-form
         testregindex = self.browser.contents.find('Waiting List Registration')
         assert testregindex > waitlistheadindex
         assert testregindex < approvedheadingindex
-
-    def test_reorder_waiting_list(self):
-        pass
 
     def test_email_roster_to_3rd_party(self):
         browserLogin(self.portal, self.browser)
