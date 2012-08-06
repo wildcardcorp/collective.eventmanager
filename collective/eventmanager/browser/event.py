@@ -738,6 +738,9 @@ class PublicRegistrationForm(form.SchemaForm):
             IStatusMessage(self.request).addStatusMessage(
                 msg, "info")
 
+            self.request.response.redirect(self.context.absolute_url()
+                                            + '/@@pay-for-registration')
+
     def updateWidgets(self):
         em = self.context
         for fielddata in em.registrationFields:

@@ -383,12 +383,57 @@ class TestViews(BaseTest):
         event = self.getLastEvent('test-event')
 
         # add registration
-        self.registerNewUser(
-            event,
-            "Waiting List Registration",
-            "test@address.com")
+        self.browser.open(event.absolute_url() + "/registration-form")
+        self.browser.getControl(name="form.widgets.title") \
+                    .value = "Test Payer Reg"
+        self.browser.getControl(name="form.widgets.email") \
+                    .value = "testpayerreg@address.com"
+        self.browser.getControl(name="form.buttons.register") \
+                    .click()
 
-        # XXX Finish test
+        # assert the browser location, after creating a registration,
+        # is the checkout location
+        assert '/test-event/@@getpaid-checkout-wizard' in self.browser.url
+
+        # fill out info
+        self.browser.getControl(name="form.name").value = "Test Payer Reg"
+        self.browser.getControl(name="form.phone_number").value = "1112223333"
+        self.browser.getControl(name="form.email") \
+                    .value = "testpayerreg@address.com"
+        self.browser.getControl(name="form.bill_name").value = "Test Payer Reg"
+        self.browser.getControl(name="form.bill_first_line") \
+                    .value = "555 N. NoWhere St"
+        self.browser.getControl(name="form.bill_city") \
+                    .value = "NoWhere"
+        self.browser.getControl(name="form.bill_country").value = ["US"]
+        self.browser.getControl(name="form.bill_state").value = ["US-WI"]
+        self.browser.getControl(name="form.bill_postal_code").value = "54952"
+        self.browser.getControl(name="form.ship_same_billing").value = "on"
+        self.browser.getControl(name="form.actions.continue").click()
+
+        # confirm we're on the right page
+        assert "Checkout" in self.browser.content
+
+        # fill in card details
+        self.browser.getControl(name="form.name_on_card") \
+                    .value = "Test Registration"
+        self.browser.getControl(name="form.bill_phone_number") \
+                    .value = "1112223333"
+        self.browser.getControl(name="form.credit_card_type") \
+                    .value = ["Visa"]
+        self.browser.getControl(name="form.credit_card") \
+                    .value = "4024007102901401"
+        self.browser.getControl(name="form.cc_expiration_month") \
+                    .value = ["01"]
+        self.browser.getControl(name="form.cc_expiration_year") \
+                    .value = ["2040"]
+        self.browser.getControl(name="form.cc_cvc") \
+                    .value = "123"
+        self.browser.getControl(name="form.actions.make-payment").click()
+
+        # check to see if the payment information was submitted successfully
+        assert "Thank you for your order" in self.browser.content
+        assert "Your order id is" in self.browser.content
 
     def test_registration_info_can_be_managed_by_admins(self):
         # add event
