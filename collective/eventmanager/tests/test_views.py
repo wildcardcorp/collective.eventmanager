@@ -780,10 +780,46 @@ http://<your domain>/path/to/your/event/registration-form
         self.browser.open(event.absolute_url() + '/@@export-registrations')
 
         # assert registrations in downloaded file
-        assert "\n\"Checkin Registration\",\"test@address.com\",\"Yes\"\n" in self.browser.contents
+        assert "\n\"Checkin Registration\",\"test@address.com\",\"Yes\"\n" \
+                    in self.browser.contents
 
     def test_view_waiting_list(self):
-        pass
+        # create event
+        browserLogin(self.portal, self.browser)
+        self.browser.open(self.portal_url + \
+            '/++add++collective.eventmanager.EMEvent')
+        self.browser.getControl('Event Name').value = 'Test Event'
+        self.browser.getControl('Description/Notes').value = 'Event desc'
+        self.browser.getControl(name='form.widgets.maxRegistrations') \
+                    .value = '0'
+        self.browser.getControl(name='form.widgets.enableWaitingList:list') \
+                    .value = "on"
+        self.browser.getControl('Save').click()
+        event = self.getLastEvent('test-event')
+
+        # add registration
+        self.registerNewUser(
+            event,
+            "Waiting List Registration",
+            "test@address.com")
+
+        # assert registration is wait-listed
+        wf = getToolByName(event, "portal_workflow")
+        status = wf.getStatusOf(
+                        "collective.eventmanager.Registration_workflow",
+                        event.registrations['waiting-list-registration'])
+        self.assertEqual(status['review_state'], 'submitted')
+
+        # assert registration status page is showing the registration on the
+        # waiting list
+        self.browser.open(event.absolute_url() + '/@@registrationstatusform')
+        assert 'Waiting List Registration' in self.browser.contents
+        waitlistheadindex = self.browser.contents \
+                                        .find('<h2>On Waiting List</h2>')
+        approvedheadingindex = self.browser.contents.find('<h2>Approved</h2>')
+        testregindex = self.browser.contents.find('Waiting List Registration')
+        assert testregindex > waitlistheadindex
+        assert testregindex < approvedheadingindex
 
     def test_reorder_waiting_list(self):
         pass
