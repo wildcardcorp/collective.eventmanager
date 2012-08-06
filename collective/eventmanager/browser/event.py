@@ -18,6 +18,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
 from Products.statusmessages.interfaces import IStatusMessage
 from z3c.form import button
+from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.interfaces import IErrorViewSnippet
 from zope import schema
 from zope.component import getMultiAdapter
@@ -736,6 +737,16 @@ class PublicRegistrationForm(form.SchemaForm):
             msg = "Registration Complete"
             IStatusMessage(self.request).addStatusMessage(
                 msg, "info")
+
+    def updateWidgets(self):
+        em = self.context
+        for fielddata in em.registrationFields:
+            if fielddata['fieldtype'] == 'List':
+                self.fields[fielddata['name']].widgetFactory = \
+                                                    CheckBoxFieldWidget
+                self.fields[fielddata['name']].field.context = self.context
+
+        super(form.SchemaForm, self).updateWidgets()
 
     def updateFields(self):
         super(form.SchemaForm, self).updateFields()
