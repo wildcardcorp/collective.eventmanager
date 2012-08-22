@@ -198,6 +198,10 @@ class AddForm(dexterity.AddForm):
         if errors:
             self.status = self.formErrorsMessage
             return
+        # when creating a new registration, the no-show value should always
+        # be False, but hiding the widget makes it come out True. This just
+        # make sure it's set correctly
+        data['noshow'] = False
         obj = self.createAndAdd(data)
         if obj is not None:
             # mark only as finished if we get the new object

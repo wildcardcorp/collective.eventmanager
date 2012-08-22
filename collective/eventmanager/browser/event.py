@@ -279,22 +279,23 @@ class EMailSenderForm(grok.View):
     def registrationEMailList(self, filtered=False):
         regfolder = self.__parent__.registrations
 
+        def addresses(regs):
+            return '"' + ''.join(['\\"%s\\" <%s>\\n'
+                       % (regfolder[reg].title, regfolder[reg].email)
+                   for reg in regs]) + '";'
+
         # return all email addresses formatted for a text field
         if not filtered:
-            return '"' + ''.join(['\\"%s\\" <%s>\\n'
-                           % (regfolder[reg].title, regfolder[reg].email)
-                       for reg in regfolder]) + '";'
+            return addresses(regfolder)
 
         # if there are no attendance settings for the context, then
         # return all email addresses formatted for a text field
         settings = RosterSettings(self.context, IEMEvent)
         if settings.eventAttendance is None:
-            return '"' + ''.join(['\\"%s\\" <%s>\\n'
-                           % (regfolder[reg].title, regfolder[reg].email)
-                       for reg in regfolder]) + '";'
+            return addresses(regfolder)
 
         # get all the days an event is lasting
-        datediff = (self.context.end - self.context.start).days
+        datediff = (self.context.end - self.context.start).days + 1
         evdates = [(self.context.start + timedelta(days=a))
                     for a in range(datediff)]
         # for each registration, see if there are any days that have an
@@ -310,9 +311,7 @@ class EMailSenderForm(grok.View):
             if not found:
                 noattendance.append(r)
         # return list of emails addresses formated for a text field
-        return '"' + ''.join(['\\"%s\\" <%s>\\n'
-                        % (regfolder[reg].title, regfolder[reg].email)
-                    for reg in noattendance]) + '";'
+        return addresses(noattendance)
 
     def showMessageEMailSent(self):
         if getattr(self, 'emailSent', None) != None:
@@ -720,7 +719,6 @@ class PublicRegistrationForm(form.SchemaForm):
         type_info = pt.getTypeInfo('collective.eventmanager.Registration')
         normalizer = getUtility(IIDNormalizer)
         newid = normalizer.normalize(data['title'])
-        #import pdb; pdb.set_trace()
         obj = type_info._constructInstance(
                 self.context['registrations'],
                 type_name='collective.eventmanager.Registration',
