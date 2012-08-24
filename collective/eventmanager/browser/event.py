@@ -77,11 +77,13 @@ class View(grok.View):
     @property
     @memoize
     def number_registered(self):
-        return len(self.catalog(path={
-            'query': '/'.join(self.context.getPhysicalPath()),
-            'depth': 5},
-            portal_type="collective.eventmanager.Registration",
-            review_state=('approved', 'confirmed')))
+        return len(
+            self.catalog.search({
+                    'path': {
+                        'query': '/'.join(self.context.getPhysicalPath()),
+                        'depth': 5},
+                    'portal_type': "collective.eventmanager.Registration",
+                    'review_state': ('approved', 'confirmed')}))
 
     @property
     @memoize
