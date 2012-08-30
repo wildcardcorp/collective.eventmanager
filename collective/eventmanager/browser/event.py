@@ -242,6 +242,7 @@ class EMailSenderForm(grok.View):
             pdf = generateCertificate(registrations=regs,
                                       portal_url=portal_url,
                                       underlines_for_empty_values=False,
+                                      context=self.context,
                                       **certinfo)
 
             # add to attachments
@@ -810,7 +811,11 @@ class EventCertificationView(BrowserView):
         portal = urltool.getPortalObject()
         portal_url = portal.absolute_url()
 
-        pdf = generateCertificate(regs, portal_url, True, **certinfo)
+        pdf = generateCertificate(regs,
+                                  portal_url,
+                                  True,
+                                  context=self.context,
+                                  **certinfo)
 
         REQUEST.response.setHeader('Content-Disposition',
                                    'attachment; filename=%s' % pdf['filename'])
