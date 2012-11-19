@@ -77,11 +77,13 @@ class View(grok.View):
     @property
     @memoize
     def number_registered(self):
-        return len(self.catalog(path={
-            'query': '/'.join(self.context.getPhysicalPath()),
-            'depth': 5},
-            portal_type="collective.eventmanager.Registration",
-            review_state=('approved', 'confirmed')))
+        return len(
+            self.catalog.search({
+                    'path': {
+                        'query': '/'.join(self.context.getPhysicalPath()),
+                        'depth': 5},
+                    'portal_type': "collective.eventmanager.Registration",
+                    'review_state': ('approved', 'confirmed')}))
 
     @property
     @memoize
@@ -240,6 +242,7 @@ class EMailSenderForm(grok.View):
             pdf = generateCertificate(registrations=regs,
                                       portal_url=portal_url,
                                       underlines_for_empty_values=False,
+                                      context=self.context,
                                       **certinfo)
 
             # add to attachments
@@ -808,7 +811,11 @@ class EventCertificationView(BrowserView):
         portal = urltool.getPortalObject()
         portal_url = portal.absolute_url()
 
-        pdf = generateCertificate(regs, portal_url, True, **certinfo)
+        pdf = generateCertificate(regs,
+                                  portal_url,
+                                  True,
+                                  context=self.context,
+                                  **certinfo)
 
         REQUEST.response.setHeader('Content-Disposition',
                                    'attachment; filename=%s' % pdf['filename'])

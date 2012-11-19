@@ -1,3 +1,7 @@
 .em .span4 {
     width: 285px;
 }
+
+.em .emoffset {
+    margin-left: 0px;
+}

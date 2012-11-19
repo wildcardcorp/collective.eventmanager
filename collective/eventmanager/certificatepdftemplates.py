@@ -1,7 +1,10 @@
 from DateTime import DateTime
 from mako.template import Template
 from plone.registry.interfaces import IRegistry
+from plone.subrequest import subrequest
+from Products.CMFCore.utils import getToolByName
 import StringIO
+from urllib import unquote
 import xhtml2pdf.pisa as pisa
 from zope import schema
 from zope.component import getUtility
@@ -45,7 +48,7 @@ class ICertificatePDFTemplateSettings(Interface):
 def generateCertificate(registrations, portal_url, underlines_for_empty_values,
                         certtitle, certsubtitle, certprenamedesc,
                         certpostnamedesc, certawardtitle, certdate,
-                        certsigdesc, certborder):
+                        certsigdesc, certborder, context):
 
     registry = getUtility(IRegistry)
     certificatepdftemplatetext = registry.records[
@@ -69,8 +72,31 @@ def generateCertificate(registrations, portal_url, underlines_for_empty_values,
 
     pdf = StringIO.StringIO()
 
+    def fetchResource(uri, rel):
+        urltool = getToolByName(context, "portal_url")
+        portal = urltool.getPortalObject()
+        base = portal.absolute_url()
+        if uri.startswith(base):
+            response = subrequest(unquote(uri[len(base)+1:]))
+            if response.status != 200:
+                return
+
+            try:
+                ctype, encoding = response.getHeader('content-type').split('charset=')
+                ctype = ctype.split(';')[0]
+                data = response.getBody().decode(encoding).encode('ascii', errors='ignore')
+            except ValueError:
+                ctype = response.getHeader('content-type').split(';')[0]
+                data = response.getBody()
+
+            data = data.encode("base64").replace("\n", "")
+            data_uri = "data:{0};base64,{1}".format(ctype, data)
+            return data_uri
+        return uri
+
+
     html = StringIO.StringIO(renderedcertificatepdfs)
-    pisa.pisaDocument(html, pdf, raise_exception=True)
+    pisa.pisaDocument(html, pdf, raise_exception=True, link_callback=fetchResource)
     assert pdf.len != 0, 'PDF generation utility returned empty PDF!'
     html.close()
 

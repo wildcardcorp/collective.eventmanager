@@ -135,8 +135,8 @@
             </ul>
           </div>
       </div>
-      <div class='row'>
-        <div class='span8'>
+      <div class='row emoffset emnotes'>
+        <div class='span12'>
           <div id='map' tal:condition="python: view.showMap()">
             <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
             <script type='text/javascript' tal:content="python: view.cgmapSettings()">

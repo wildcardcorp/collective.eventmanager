@@ -82,3 +82,7 @@ form#certificatepdf .clear_thumbnails {
 form#certificatepdf #certificate_borders input {
     margin-right: 5px;
 }
+
+.emnotes {
+    margin-bottom: 20px;
+}
