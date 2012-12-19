@@ -3,6 +3,7 @@ from plone.directives import form, dexterity
 from Products.CMFCore.utils import getToolByName
 from zope import schema
 from zope.component.hooks import getSite
+from zope.component.interfaces import IObjectEvent
 
 from collective.eventmanager import EventManagerMessageFactory as _
 
@@ -42,3 +43,7 @@ def validateEmail(value):
 def generateRegistrationHash(salt, registration):
     msg = "%s%s%s" % (salt, registration.email, registration.getId())
     return hashlib.sha256(msg).hexdigest()
+
+
+class IRegistrationCreatedEvent(IObjectEvent):
+    registration = schema.Object(title=u"Registration", schema=IRegistration)

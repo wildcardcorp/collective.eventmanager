@@ -86,3 +86,7 @@ form#certificatepdf #certificate_borders input {
 .emnotes {
     margin-bottom: 20px;
 }
+
+td.datagridwidget-cell {
+    vertical-align: top;
+}

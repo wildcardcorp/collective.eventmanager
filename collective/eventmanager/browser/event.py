@@ -23,9 +23,12 @@ from z3c.form.interfaces import IErrorViewSnippet
 from zope import schema
 from zope.component import getMultiAdapter
 from zope.component import getUtility
+from zope.event import notify
 
 from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.browser.registration import addDynamicFields
+from collective.eventmanager.browser.registration \
+    import RegistrationCreatedEvent
 from collective.eventmanager.browser.rostersettings import RosterSettings
 from collective.eventmanager.certificatepdftemplates \
     import generateCertificate
@@ -736,8 +739,8 @@ class PublicRegistrationForm(form.SchemaForm):
             # mark only as finished if we get the new object
             self._finishedAdd = True
             msg = "Registration Complete"
-            IStatusMessage(self.request).addStatusMessage(
-                msg, "info")
+            IStatusMessage(self.request).addStatusMessage(msg, "info")
+            notify(RegistrationCreatedEvent(obj))
 
             self.request.response.redirect(self.context.absolute_url()
                                             + '/@@pay-for-registration')

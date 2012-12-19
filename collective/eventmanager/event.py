@@ -25,19 +25,23 @@ class IRegistrationFieldRow(Interface):
             vocabulary=RegistrationRowAvailableFieldTypes,
             required=True,
         )
+
     required = schema.Bool(
             title=u"Required?",
             required=True,
             default=True,
         )
-    configuration = schema.Text(
-            title=u"Field Configuration",
+
+    fieldset = schema.TextLine(
+            title=u"Fieldset",
             required=False,
+            default=u"",
         )
 
     configuration = schema.Text(
-        title=u"Configuration",
-        required=False)
+            title=u"Configuration",
+            required=False
+        )
 
 
 class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
@@ -74,7 +78,7 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                           u"created, the session folders will be deleted, "
                           u"along with all sessions added to it."),
             required=True,
-            default=True,
+            default=False,
         )
 
     registrationOpen = schema.Datetime(

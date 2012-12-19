@@ -1,6 +1,7 @@
 from five import grok
 from plone.z3cform.fieldsets import utils
 from plone.directives import dexterity
+from plone.supermodel.model import Fieldset
 from Products.statusmessages.interfaces import IStatusMessage
 from Products.CMFCore.utils import getToolByName
 from z3c.form import button
@@ -8,12 +9,15 @@ from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.interfaces import IErrorViewSnippet
 from zope import schema
 from zope.component import getMultiAdapter
+from zope.component.interfaces import ObjectEvent
+from zope.event import notify
 from zope.schema.vocabulary import SimpleVocabulary
 from zope.schema.vocabulary import SimpleTerm
 
 from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.registration import IRegistration
+from collective.eventmanager.registration import IRegistrationCreatedEvent
 from collective.eventmanager.utils import findRegistrationObject
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
 
@@ -114,6 +118,27 @@ class View(grok.View):
 
 
 def addDynamicFields(form, reg_fields):
+    # build fieldsets
+    found_sets = {}
+    for fielddata in reg_fields:
+        if fielddata['fieldset'] != "" and fielddata != "<NO_VALUE>":
+            if fielddata['fieldset'] in found_sets:
+                found_sets[fielddata['fieldset']].append(fielddata['name'])
+            else:
+                found_sets[fielddata['fieldset']] = [fielddata['name']]
+
+    counter = 0
+    for fieldset in found_sets:
+        #field = Fieldset("dynamicfieldset%d" % (counter,),
+        #                 label=_(fieldset),
+        #                 fields=found_sets[fieldset])
+        #utils.add(form, field)
+        #form.fieldset("dynamicfieldset" + counter,
+        #              label=_(fieldset),
+        #              fields=found_sets[fieldset])
+        counter += 1
+
+    # build fields
     for fielddata in reg_fields:
         kwargs = dict(title=unicode(fielddata['name']),
                       required=fielddata['required'])
@@ -210,8 +235,9 @@ class AddForm(dexterity.AddForm):
                 msg = u'Registration submitted'
             else:
                 msg = u'Registered user'
-            IStatusMessage(self.request).addStatusMessage(
-                msg, "info")
+            IStatusMessage(self.request).addStatusMessage(msg, "info")
+
+            notify(RegistrationCreatedEvent(obj))
 
     def updateWidgets(self):
         em = self.context.__parent__
@@ -230,3 +256,10 @@ class AddForm(dexterity.AddForm):
         super(dexterity.AddForm, self).updateFields()
         em = self.context.__parent__
         addDynamicFields(self, em.registrationFields)
+
+
+class RegistrationCreatedEvent(ObjectEvent):
+    grok.implements(IRegistrationCreatedEvent)
+
+    def __init__(self, registration):
+        self.object = registration
