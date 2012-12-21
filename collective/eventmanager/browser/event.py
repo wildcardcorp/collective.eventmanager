@@ -21,6 +21,7 @@ from z3c.form import button
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.interfaces import IErrorViewSnippet
 from zope import schema
+from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.event import notify
@@ -37,8 +38,12 @@ from collective.eventmanager.certificatepdftemplates \
 from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
-from collective.eventmanager.registration import IRegistration
+#from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.registration import generateRegistrationHash
+from collective.eventmanager.registration \
+    import IRegistrationDefaultSchemaProvider
+from collective.eventmanager.browser.registration \
+    import RegistrationDefaultSchema
 from collective.eventmanager.utils import findRegistrationObject
 
 
@@ -688,12 +693,19 @@ class PublicRegistrationForm(form.SchemaForm):
     grok.name('registration-form')
     grok.layer(ILayer)
 
-    schema = IRegistration
+    #schema = IRegistration
     ignoreContext = True
 
     MAP_CSS_CLASS = 'eventlocation'
 
     label = 'Register'
+
+    @property
+    def schema(self):
+        schema_provider = getAdapter((RegistrationDefaultSchema()),
+                                     IRegistrationDefaultSchemaProvider)
+        schema_value = schema_provider.getSchema()
+        return schema_value
 
     @property
     def description(self):
@@ -756,6 +768,7 @@ class PublicRegistrationForm(form.SchemaForm):
         super(form.SchemaForm, self).updateWidgets()
 
     def updateFields(self):
+        #import pdb; pdb.set_trace()
         super(form.SchemaForm, self).updateFields()
         em = self.context
         addDynamicFields(self, em.registrationFields)

@@ -4,6 +4,7 @@ from Products.CMFCore.utils import getToolByName
 from zope import schema
 from zope.component.hooks import getSite
 from zope.component.interfaces import IObjectEvent
+from zope.interface import Interface
 
 from collective.eventmanager import EventManagerMessageFactory as _
 
@@ -47,3 +48,14 @@ def generateRegistrationHash(salt, registration):
 
 class IRegistrationCreatedEvent(IObjectEvent):
     registration = schema.Object(title=u"Registration", schema=IRegistration)
+
+
+class IRegistrationDefaultSchemaProvider(Interface):
+    def getSchema(self):
+        """
+        Get a schema interface class that defines the default schema for
+        a registration.
+
+        @return: zope.interface.Interface that defines a default schema
+                 for registrations
+        """

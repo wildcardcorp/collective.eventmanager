@@ -1,7 +1,7 @@
 from five import grok
 from plone.z3cform.fieldsets import utils
 from plone.directives import dexterity
-from plone.supermodel.model import Fieldset
+#from plone.supermodel.model import Fieldset
 from Products.statusmessages.interfaces import IStatusMessage
 from Products.CMFCore.utils import getToolByName
 from z3c.form import button
@@ -11,6 +11,7 @@ from zope import schema
 from zope.component import getMultiAdapter
 from zope.component.interfaces import ObjectEvent
 from zope.event import notify
+import zope.interface
 from zope.schema.vocabulary import SimpleVocabulary
 from zope.schema.vocabulary import SimpleTerm
 
@@ -18,6 +19,8 @@ from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.registration import IRegistrationCreatedEvent
+from collective.eventmanager.registration \
+    import IRegistrationDefaultSchemaProvider
 from collective.eventmanager.utils import findRegistrationObject
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
 
@@ -121,13 +124,14 @@ def addDynamicFields(form, reg_fields):
     # build fieldsets
     found_sets = {}
     for fielddata in reg_fields:
-        if fielddata['fieldset'] != "" and fielddata != "<NO_VALUE>":
+        if fielddata != None and fielddata['fieldset'] != "" and fielddata != "<NO_VALUE>":
             if fielddata['fieldset'] in found_sets:
                 found_sets[fielddata['fieldset']].append(fielddata['name'])
             else:
                 found_sets[fielddata['fieldset']] = [fielddata['name']]
 
     counter = 0
+    #import pdb; pdb.set_trace()
     for fieldset in found_sets:
         #field = Fieldset("dynamicfieldset%d" % (counter,),
         #                 label=_(fieldset),
@@ -263,3 +267,7 @@ class RegistrationCreatedEvent(ObjectEvent):
 
     def __init__(self, registration):
         self.object = registration
+
+
+class RegistrationDefaultSchema(object):
+    zope.interface.implements(IRegistrationDefaultSchemaProvider)
