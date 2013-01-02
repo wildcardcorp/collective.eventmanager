@@ -8,6 +8,7 @@ from z3c.form import button
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.interfaces import IErrorViewSnippet
 from zope import schema
+from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component.interfaces import ObjectEvent
 from zope.event import notify
@@ -25,13 +26,31 @@ from collective.eventmanager.utils import findRegistrationObject
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
 
 
+class RegistrationCreatedEvent(ObjectEvent):
+    grok.implements(IRegistrationCreatedEvent)
+
+    def __init__(self, registration):
+        self.object = registration
+
+
+class RegistrationDefaultSchema(object):
+    zope.interface.implements(IRegistrationDefaultSchemaProvider)
+
+
+def getSchema():
+    schema_provider = getAdapter((RegistrationDefaultSchema()),
+                                 IRegistrationDefaultSchemaProvider)
+    schema_value = schema_provider.getSchema()
+    return schema_value
+
+
 class View(grok.View):
     """Default view (called "@@view"") for an event.
 
     The associated template is found in registration_templates/view.pt
     """
 
-    grok.context(IRegistration)
+    grok.context(getSchema())
     grok.require('zope2.View')
     grok.name('view')
     grok.layer(ILayer)
@@ -159,7 +178,11 @@ def addDynamicFields(form, reg_fields):
 
 
 class EditForm(dexterity.EditForm):
-    grok.context(IRegistration)
+    grok.context(getSchema())
+
+    #@property
+    #def schema(self):
+    #    return getSchema()
 
     def updateWidgets(self):
         em = self.context.__parent__
@@ -179,6 +202,10 @@ class EditForm(dexterity.EditForm):
 
 class AddForm(dexterity.AddForm):
     grok.name('collective.eventmanager.Registration')
+
+    @property
+    def schema(self):
+        return getSchema()
 
     @property
     def label(self):
@@ -260,14 +287,3 @@ class AddForm(dexterity.AddForm):
         super(dexterity.AddForm, self).updateFields()
         em = self.context.__parent__
         addDynamicFields(self, em.registrationFields)
-
-
-class RegistrationCreatedEvent(ObjectEvent):
-    grok.implements(IRegistrationCreatedEvent)
-
-    def __init__(self, registration):
-        self.object = registration
-
-
-class RegistrationDefaultSchema(object):
-    zope.interface.implements(IRegistrationDefaultSchemaProvider)
