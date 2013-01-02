@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from DateTime import DateTime
-import re
-from persistent.dict import PersistentDict
-from mako.template import Template
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from mako.template import Template
+import os
+from persistent.dict import PersistentDict
+import re
 
 from collective.geo.mapwidget.browser.widget import MapWidget
 from five import grok
@@ -24,6 +25,7 @@ from zope import schema
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component import getUtility
+from zope.dottedname.resolve import resolve
 from zope.event import notify
 
 from collective.eventmanager import EventManagerMessageFactory as _
@@ -38,7 +40,7 @@ from collective.eventmanager.certificatepdftemplates \
 from collective.eventmanager.emailtemplates import sendEMail
 from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
-#from collective.eventmanager.registration import IRegistration
+from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.registration import generateRegistrationHash
 from collective.eventmanager.registration \
     import IRegistrationDefaultSchemaProvider
@@ -702,10 +704,14 @@ class PublicRegistrationForm(form.SchemaForm):
 
     @property
     def schema(self):
-        schema_provider = getAdapter((RegistrationDefaultSchema()),
-                                     IRegistrationDefaultSchemaProvider)
-        schema_value = schema_provider.getSchema()
-        return schema_value
+        if 'DEFAULT_REGISTRATION_SCHEMA' in os.environ:
+            return resolve(os.environ['DEFAULT_REGISTRATION_SCHEMA'])
+
+        return IRegistration
+        #schema_provider = getAdapter((RegistrationDefaultSchema()),
+        #                             IRegistrationDefaultSchemaProvider)
+        #schema_value = schema_provider.getSchema()
+        #return schema_value
 
     @property
     def description(self):

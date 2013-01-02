@@ -11,6 +11,7 @@
   <five:registerPackage package="." initialize=".initialize" />
   <includeDependencies package="." />
   <include file="permissions.zcml" />
+      
   <grok:grok package="." />
 
   <genericsetup:registerProfile
@@ -24,10 +25,12 @@
   <include package=".browser" />
 
   <!-- override to provide a different default schema for registrations -->
+  <!--
   <adapter
       for=".browser.registration.RegistrationDefaultSchema"
       provides=".registration.IRegistrationDefaultSchemaProvider"
       factory=".adapters.RegistrationDefaultSchemaProvider"
       />
+  !-->
 
 </configure>

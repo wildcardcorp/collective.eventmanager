@@ -1,3 +1,5 @@
+import os
+
 from five import grok
 from plone.z3cform.fieldsets import utils
 from plone.directives import dexterity
@@ -11,6 +13,7 @@ from zope import schema
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component.interfaces import ObjectEvent
+from zope.dottedname.resolve import resolve
 from zope.event import notify
 import zope.interface
 from zope.schema.vocabulary import SimpleVocabulary
@@ -38,10 +41,14 @@ class RegistrationDefaultSchema(object):
 
 
 def getSchema():
-    schema_provider = getAdapter((RegistrationDefaultSchema()),
-                                 IRegistrationDefaultSchemaProvider)
-    schema_value = schema_provider.getSchema()
-    return schema_value
+    if 'DEFAULT_REGISTRATION_SCHEMA' in os.environ:
+        return resolve(os.environ['DEFAULT_REGISTRATION_SCHEMA'])
+
+    return IRegistration
+    #schema_provider = getAdapter((RegistrationDefaultSchema()),
+    #                             IRegistrationDefaultSchemaProvider)
+    #schema_value = schema_provider.getSchema()
+    #return schema_value
 
 
 class View(grok.View):
@@ -178,11 +185,12 @@ def addDynamicFields(form, reg_fields):
 
 
 class EditForm(dexterity.EditForm):
-    grok.context(getSchema())
+    grok.context(IRegistration)
 
-    #@property
-    #def schema(self):
-    #    return getSchema()
+    @property
+    def schema(self):
+        import pdb; pdb.set_trace()
+        return getSchema()
 
     def updateWidgets(self):
         em = self.context.__parent__
@@ -196,6 +204,7 @@ class EditForm(dexterity.EditForm):
 
     def updateFields(self):
         super(dexterity.EditForm, self).updateFields()
+        import pdb; pdb.set_trace()
         em = self.context.__parent__.__parent__
         addDynamicFields(self, em.registrationFields)
 
@@ -258,6 +267,7 @@ class AddForm(dexterity.AddForm):
         # be False, but hiding the widget makes it come out True. This just
         # make sure it's set correctly
         data['noshow'] = False
+        import pdb; pdb.set_trace()
         obj = self.createAndAdd(data)
         if obj is not None:
             # mark only as finished if we get the new object
