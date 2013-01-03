@@ -1,10 +1,7 @@
-import os
-
 from getpaid.wizard.interfaces import IWizard
 from plone.directives import dexterity
 from plone.directives import form
 from zope import schema
-from zope.dottedname.resolve import resolve
 from zope.interface import Interface
 
 from collective.eventmanager import EventManagerMessageFactory as _
@@ -18,7 +15,7 @@ class IEMWizard(IWizard):
     pass
 
 
-class IRegistrationDefault(form.Schema):
+class IBaseRegistration(form.Schema):
     """A registration for an event"""
 
     title = schema.TextLine(title=_(u"Name"))
@@ -41,12 +38,3 @@ class IRegistrationDefault(form.Schema):
     form.mode(new_user='hidden')
     new_user = schema.TextLine(
         title=u"new user", default=u'no')
-
-
-IBaseRegistration = IRegistrationDefault
-try:
-    if 'DEFAULT_REGISTRATION_SCHEMA' in os.environ:
-        import pdb; pdb.set_trace()
-        IBaseRegistration = resolve(os.environ['DEFAULT_REGISTRATION_SCHEMA'])
-except ImportError:
-    pass

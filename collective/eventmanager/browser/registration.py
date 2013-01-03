@@ -44,6 +44,7 @@ class RegistrationDefaultSchema(object):
 
 def getSchema():
     if 'DEFAULT_REGISTRATION_SCHEMA' in os.environ:
+        import pdb; pdb.set_trace()
         return resolve(os.environ['DEFAULT_REGISTRATION_SCHEMA'])
 
     return IRegistration

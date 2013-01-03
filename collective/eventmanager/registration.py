@@ -1,4 +1,5 @@
 import hashlib
+import os
 
 from plone.directives import form
 from Products.CMFCore.utils import getToolByName
@@ -6,11 +7,19 @@ from zope import schema
 from zope.component.hooks import getSite
 from zope.component.interfaces import IObjectEvent
 from zope.interface import Interface
+from zope.dottedname.resolve import resolve
+from collective.eventmanager.interfaces import IBaseRegistration
 
-from collective.eventmanager.interfaces import IRegistrationDefault
+try:
+    if 'DEFAULT_REGISTRATION_SCHEMA' in os.environ:
+        import pdb; pdb.set_trace()
+        IBaseRegistration = resolve(os.environ['DEFAULT_REGISTRATION_SCHEMA'])
+except ImportError:
+    pass
 
 
-class IRegistration(IRegistrationDefault):
+
+class IRegistration(IBaseRegistration):
     pass
 
 
