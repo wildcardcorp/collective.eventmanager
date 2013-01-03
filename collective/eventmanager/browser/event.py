@@ -22,16 +22,12 @@ from z3c.form import button
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.interfaces import IErrorViewSnippet
 from zope import schema
-from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.dottedname.resolve import resolve
-from zope.event import notify
 
 from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.browser.registration import addDynamicFields
-from collective.eventmanager.browser.registration \
-    import RegistrationCreatedEvent
 from collective.eventmanager.browser.rostersettings import RosterSettings
 from collective.eventmanager.certificatepdftemplates \
     import generateCertificate
@@ -42,10 +38,6 @@ from collective.eventmanager.event import IEMEvent
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.registration import generateRegistrationHash
-from collective.eventmanager.registration \
-    import IRegistrationDefaultSchemaProvider
-from collective.eventmanager.browser.registration \
-    import RegistrationDefaultSchema
 from collective.eventmanager.utils import findRegistrationObject
 
 
@@ -708,10 +700,6 @@ class PublicRegistrationForm(form.SchemaForm):
             return resolve(os.environ['DEFAULT_REGISTRATION_SCHEMA'])
 
         return IRegistration
-        #schema_provider = getAdapter((RegistrationDefaultSchema()),
-        #                             IRegistrationDefaultSchemaProvider)
-        #schema_value = schema_provider.getSchema()
-        #return schema_value
 
     @property
     def description(self):
@@ -758,7 +746,6 @@ class PublicRegistrationForm(form.SchemaForm):
             self._finishedAdd = True
             msg = "Registration Complete"
             IStatusMessage(self.request).addStatusMessage(msg, "info")
-            notify(RegistrationCreatedEvent(obj))
 
             self.request.response.redirect(self.context.absolute_url()
                                             + '/@@pay-for-registration')

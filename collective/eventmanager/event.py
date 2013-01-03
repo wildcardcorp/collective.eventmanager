@@ -422,4 +422,3 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
                       u"interested in attending, you can complete your "
                       u"registration by following the instructions below"),
         )
-

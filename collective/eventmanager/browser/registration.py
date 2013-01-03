@@ -1,9 +1,6 @@
-import os
-
 from five import grok
 from plone.z3cform.fieldsets import utils
 from plone.directives import dexterity
-from plone.directives import form
 #from plone.supermodel.model import Fieldset
 from Products.statusmessages.interfaces import IStatusMessage
 from Products.CMFCore.utils import getToolByName
@@ -11,47 +8,15 @@ from z3c.form import button
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.interfaces import IErrorViewSnippet
 from zope import schema
-from zope.component import getAdapter
 from zope.component import getMultiAdapter
-from zope.component.interfaces import ObjectEvent
-from zope.dottedname.resolve import resolve
-from zope.event import notify
-import zope.interface
 from zope.schema.vocabulary import SimpleVocabulary
 from zope.schema.vocabulary import SimpleTerm
 
 from collective.eventmanager import EventManagerMessageFactory as _
 from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.registration import IRegistration
-from collective.eventmanager.registration import IRegistrationCreatedEvent
-from collective.eventmanager.registration \
-    import IRegistrationDefaultSchemaProvider
 from collective.eventmanager.utils import findRegistrationObject
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
-
-
-
-class RegistrationCreatedEvent(ObjectEvent):
-    grok.implements(IRegistrationCreatedEvent)
-
-    def __init__(self, registration):
-        self.object = registration
-
-
-class RegistrationDefaultSchema(object):
-    zope.interface.implements(IRegistrationDefaultSchemaProvider)
-
-
-def getSchema():
-    if 'DEFAULT_REGISTRATION_SCHEMA' in os.environ:
-        import pdb; pdb.set_trace()
-        return resolve(os.environ['DEFAULT_REGISTRATION_SCHEMA'])
-
-    return IRegistration
-    #schema_provider = getAdapter((RegistrationDefaultSchema()),
-    #                             IRegistrationDefaultSchemaProvider)
-    #schema_value = schema_provider.getSchema()
-    #return schema_value
 
 
 class View(grok.View):
@@ -190,11 +155,6 @@ def addDynamicFields(form, reg_fields):
 class EditForm(dexterity.EditForm):
     grok.context(IRegistration)
 
-    #@property
-    #def schema(self):
-    #    import pdb; pdb.set_trace()
-    #    return getSchema()
-
     def updateWidgets(self):
         em = self.context.__parent__
         for fielddata in em.registrationFields:
@@ -214,10 +174,6 @@ class EditForm(dexterity.EditForm):
 
 class AddForm(dexterity.AddForm):
     grok.name('collective.eventmanager.Registration')
-
-    #@property
-    #def schema(self):
-    #    return getSchema()
 
     @property
     def label(self):
@@ -280,8 +236,6 @@ class AddForm(dexterity.AddForm):
             else:
                 msg = u'Registered user'
             IStatusMessage(self.request).addStatusMessage(msg, "info")
-
-            notify(RegistrationCreatedEvent(obj))
 
     def updateWidgets(self):
         em = self.context.__parent__
