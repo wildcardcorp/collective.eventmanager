@@ -3,6 +3,7 @@ import os
 from five import grok
 from plone.z3cform.fieldsets import utils
 from plone.directives import dexterity
+from plone.directives import form
 #from plone.supermodel.model import Fieldset
 from Products.statusmessages.interfaces import IStatusMessage
 from Products.CMFCore.utils import getToolByName
@@ -27,6 +28,7 @@ from collective.eventmanager.registration \
     import IRegistrationDefaultSchemaProvider
 from collective.eventmanager.utils import findRegistrationObject
 from collective.eventmanager.utils import getNumApprovedAndConfirmed
+
 
 
 class RegistrationCreatedEvent(ObjectEvent):
@@ -57,7 +59,7 @@ class View(grok.View):
     The associated template is found in registration_templates/view.pt
     """
 
-    grok.context(getSchema())
+    grok.context(IRegistration)
     grok.require('zope2.View')
     grok.name('view')
     grok.layer(ILayer)
@@ -187,10 +189,10 @@ def addDynamicFields(form, reg_fields):
 class EditForm(dexterity.EditForm):
     grok.context(IRegistration)
 
-    @property
-    def schema(self):
-        import pdb; pdb.set_trace()
-        return getSchema()
+    #@property
+    #def schema(self):
+    #    import pdb; pdb.set_trace()
+    #    return getSchema()
 
     def updateWidgets(self):
         em = self.context.__parent__
@@ -204,7 +206,7 @@ class EditForm(dexterity.EditForm):
 
     def updateFields(self):
         super(dexterity.EditForm, self).updateFields()
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         em = self.context.__parent__.__parent__
         addDynamicFields(self, em.registrationFields)
 
@@ -212,9 +214,9 @@ class EditForm(dexterity.EditForm):
 class AddForm(dexterity.AddForm):
     grok.name('collective.eventmanager.Registration')
 
-    @property
-    def schema(self):
-        return getSchema()
+    #@property
+    #def schema(self):
+    #    return getSchema()
 
     @property
     def label(self):
@@ -267,7 +269,7 @@ class AddForm(dexterity.AddForm):
         # be False, but hiding the widget makes it come out True. This just
         # make sure it's set correctly
         data['noshow'] = False
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         obj = self.createAndAdd(data)
         if obj is not None:
             # mark only as finished if we get the new object
