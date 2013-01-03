@@ -1,57 +1,16 @@
 import hashlib
-import os
 
-from plone.directives import form, dexterity
+from plone.directives import form
 from Products.CMFCore.utils import getToolByName
 from zope import schema
 from zope.component.hooks import getSite
 from zope.component.interfaces import IObjectEvent
-from zope.dottedname.resolve import resolve
 from zope.interface import Interface
 
-from collective.eventmanager import EventManagerMessageFactory as _
+from collective.eventmanager.interfaces import IRegistrationDefault
 
 
-class IRegistrationDefault(form.Schema):
-    """A registration for an event"""
-
-    title = schema.TextLine(title=_(u"Name"))
-    email = schema.TextLine(title=_(u"EMail Address"))
-
-    dexterity.write_permission(
-            noshow='collective.eventmanager.ManageRegistrations')
-    noshow = schema.Bool(
-                title=_(u"No Show"),
-                default=False,
-                description=_(u"Set if the registration did not show at the "
-                              u"event"))
-
-    dexterity.write_permission(
-        paid_fee='collective.eventmanager.ManageRegistrations')
-    paid_fee = schema.Bool(
-        title=_(u"Paid"),
-        description=_(u"Paid registration fee."))
-
-    form.mode(new_user='hidden')
-    new_user = schema.TextLine(
-        title=u"new user", default=u'no')
-
-
-def importDefaultSchema():
-    brs = IRegistrationDefault
-    try:
-        if 'DEFAULT_REGISTRATION_SCHEMA' in os.environ:
-            import pdb; pdb.set_trace()
-            brs = resolve(os.environ['DEFAULT_REGISTRATION_SCHEMA'])
-    except ImportError:
-        pass
-
-    return brs
-
-BaseRegistrationSchema = importDefaultSchema()
-
-
-class IRegistration(BaseRegistrationSchema):
+class IRegistration(IRegistrationDefault):
     pass
 
 
