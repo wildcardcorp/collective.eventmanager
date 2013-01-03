@@ -23,6 +23,8 @@
       <em>EMail Address:</em> <span tal:content="python: context.email" />
     </div>
 
+    <tal:custom-content tal:content="structure view/customContent" />
+
     <dl>
       <tal:item tal:repeat="item view/dynamicFields">
         <tal:if tal:condition="python: view.getDisplayValueFor(item) != ''">

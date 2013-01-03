@@ -1,7 +1,10 @@
+import os
+
 from five import grok
 from plone.z3cform.fieldsets import utils
 from plone.directives import dexterity
 #from plone.supermodel.model import Fieldset
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.statusmessages.interfaces import IStatusMessage
 from Products.CMFCore.utils import getToolByName
 from z3c.form import button
@@ -53,6 +56,19 @@ class View(grok.View):
         if not event.maxRegistrations:
             return True
         return num < event.maxRegistrations
+
+    @property
+    def customContent(self):
+        #import pdb; pdb.set_trace()
+        if 'CUSTOM_REGISTRATION_CONTENT_TEMPLATE' in os.environ:
+            try:
+                renderedtemp = ViewPageTemplateFile(
+                    os.environ['CUSTOM_REGISTRATION_CONTENT_TEMPLATE'])
+                return renderedtemp(self)
+            except:
+                return ""
+
+        return ""
 
     def dynamicFields(self):
         registrationFields = \
