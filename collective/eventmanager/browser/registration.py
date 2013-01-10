@@ -33,6 +33,8 @@ class View(grok.View):
     grok.name('view')
     grok.layer(ILayer)
 
+    enable_form_tabbing = False
+
     @property
     def event(self):
         return self.context.__parent__.__parent__
@@ -171,6 +173,8 @@ def addDynamicFields(form, reg_fields):
 class EditForm(dexterity.EditForm):
     grok.context(IRegistration)
 
+    enable_form_tabbing = False
+
     def updateWidgets(self):
         em = self.context.__parent__
         for fielddata in em.registrationFields:
@@ -190,6 +194,8 @@ class EditForm(dexterity.EditForm):
 
 class AddForm(dexterity.AddForm):
     grok.name('collective.eventmanager.Registration')
+
+    enable_form_tabbing = False
 
     @property
     def label(self):

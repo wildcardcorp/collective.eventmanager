@@ -694,6 +694,8 @@ class PublicRegistrationForm(form.SchemaForm):
 
     label = 'Register'
 
+    enable_form_tabbing = False
+
     @property
     def schema(self):
         if 'DEFAULT_REGISTRATION_SCHEMA' in os.environ:
