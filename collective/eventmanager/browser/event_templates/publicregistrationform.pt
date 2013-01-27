@@ -5,24 +5,37 @@
       i18n:domain="collective.eventmanager"
       metal:use-macro="context/main_template/macros/master">
 
+<metal:css fill-slot="style_slot">
+  <link href="++resource++brstatic/bootstrap.css" rel="stylesheet"
+      tal:attributes="href string:${context/portal_url}/++theme++em/bootstrap.css">
+  <link href="++resource++brstatic/bootstrap.css" rel="stylesheet"
+      tal:attributes="href string:${context/portal_url}/++theme++em/bootstrap-custom.css">
+</metal:css>
+
   <metal:block fill-slot="main">
 
-    <h1 class="documentFirstHeading" tal:content="view/label | nothing" />
-    <tal:map tal:condition="context/location|nothing">
-      <div>
-        <a id='regshowhidemap' href='javascript:void(0)'>Show a Map of the Event</a>
+    <h1 class="" tal:content="view/label | nothing" />
+    <div class="em">
+      <div class="alert">
+        <strong>Read before you begin...</strong>
+        <div class="regHelpText" tal:content="structure context/registrationHelpText/output|string:" />
       </div>
-      <div id='regmap' tal:condition="python: view.showMap()">
-        <tal:if condition="python: view.location() is not None and view.location() != ''">
-          <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
-          <script type='text/javascript' tal:content="python: view.cgmapSettings()">
-          </script>
-          <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
-        </tal:if>
+      <tal:map tal:condition="context/location|nothing">
+        <div>
+          <a class="btn" id='regshowhidemap' href='javascript:void(0)'>Show a Map of the Event</a>
+        </div>
+        <div id='regmap' tal:condition="python: view.showMap()">
+          <tal:if condition="python: view.location() is not None and view.location() != ''">
+            <metal:use use-macro="context/@@collectivegeo-macros/openlayers" />
+            <script type='text/javascript' tal:content="python: view.cgmapSettings()">
+            </script>
+            <metal:use use-macro="context/@@collectivegeo-macros/map-widget" />
+          </tal:if>
+        </div>
+      </tal:map>
+      <div tal:condition="context/mapFile|nothing">
+        <a class="btn" tal:attributes="href string:${context/absolute_url}/@@download/mapFile">Download information map</a>
       </div>
-    </tal:map>
-    <div tal:condition="context/mapFile|nothing">
-      <a tal:attributes="href string:${context/absolute_url}/@@download/mapFile">Download information map</a>
     </div>
 
     <div id="content-core">

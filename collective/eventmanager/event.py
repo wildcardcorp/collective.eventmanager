@@ -190,8 +190,17 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             "registrationfields",
             label=_(u"Registration Fields"),
             fields=[
-                'registrationFields'
+                'registrationFields',
+                'registrationHelpText'
             ]
+        )
+
+    registrationHelpText = RichText(
+            title=_(u"Registration Help Text"),
+            description=_(u"The text provided here will render above the "
+                          u"registration field."),
+            required=False,
+            default=u''
         )
 
     form.widget(registrationFields=DataGridFieldFactory)
