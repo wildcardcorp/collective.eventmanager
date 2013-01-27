@@ -108,6 +108,13 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             required=False,
         )
 
+    mapFile = NamedBlobFile(
+            title=_(u"Map Information File"),
+            description=_(u"A file with further explanation of "
+                          u"the location of the event."),
+            required=False,
+        )
+
     maxRegistrations = schema.Int(
             title=_(u"Maximum Registrations Available"),
             description=_(u"The maximum amount of registrations to accept "
