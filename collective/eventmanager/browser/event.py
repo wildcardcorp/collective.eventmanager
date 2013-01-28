@@ -733,9 +733,14 @@ class PublicRegistrationForm(form.SchemaForm):
         pt = getToolByName(self, 'portal_types')
         type_info = pt.getTypeInfo('collective.eventmanager.Registration')
         normalizer = getUtility(IIDNormalizer)
-        newid = normalizer.normalize(data['title'])
+        orignewid = newid = normalizer.normalize(data['title'])
+        registrations = self.context['registrations']
+        count = 1
+        while newid in registrations:
+            newid = orignewid + '-' + str(count)
+            count += 1
         obj = type_info._constructInstance(
-                self.context['registrations'],
+                registrations,
                 type_name='collective.eventmanager.Registration',
                 id=newid,
                 **data)
