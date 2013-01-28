@@ -248,7 +248,6 @@ class AddForm(dexterity.AddForm):
         # be False, but hiding the widget makes it come out True. This just
         # make sure it's set correctly
         data['noshow'] = False
-        #import pdb; pdb.set_trace()
         obj = self.createAndAdd(data)
         if obj is not None:
             # mark only as finished if we get the new object

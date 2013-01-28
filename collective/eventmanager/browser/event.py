@@ -693,6 +693,7 @@ class PublicRegistrationForm(form.SchemaForm):
     MAP_CSS_CLASS = 'eventlocation'
 
     label = 'Register'
+    default_fieldset_label = u'Contact Information'
 
     enable_form_tabbing = False
 
@@ -761,9 +762,10 @@ class PublicRegistrationForm(form.SchemaForm):
                 self.fields[fielddata['name']].field.context = self.context
 
         super(form.SchemaForm, self).updateWidgets()
+        self.widgets['noshow'].mode = 'hidden'
+        self.widgets['paid_fee'].mode = 'hidden'
 
     def updateFields(self):
-        #import pdb; pdb.set_trace()
         super(form.SchemaForm, self).updateFields()
         em = self.context
         addDynamicFields(self, em.registrationFields)
