@@ -108,6 +108,13 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             required=False,
         )
 
+    mapFile = NamedBlobFile(
+            title=_(u"Map Information File"),
+            description=_(u"A file with further explanation of "
+                          u"the location of the event."),
+            required=False,
+        )
+
     maxRegistrations = schema.Int(
             title=_(u"Maximum Registrations Available"),
             description=_(u"The maximum amount of registrations to accept "
@@ -183,8 +190,17 @@ class IEMEvent(form.Schema, ISolgemaFullcalendarMarker):
             "registrationfields",
             label=_(u"Registration Fields"),
             fields=[
-                'registrationFields'
+                'registrationFields',
+                'registrationHelpText'
             ]
+        )
+
+    registrationHelpText = RichText(
+            title=_(u"Registration Help Text"),
+            description=_(u"The text provided here will render above the "
+                          u"registration field."),
+            required=False,
+            default=u''
         )
 
     form.widget(registrationFields=DataGridFieldFactory)

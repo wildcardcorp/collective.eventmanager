@@ -99,7 +99,9 @@
           <h2>Flyer</h2>
           <div class="well">
             <div class='event_flyer'>
-              <a href="./@@display-file/flyer" class="btn">View Event Flyer</a>
+              <a href="./@@display-file/flyer"
+                 tal:attributes="href string:${context/absolute_url}/@@display-file/flyer"
+                 class="btn">View Event Flyer</a>
             </div>
           </div>
         </div><!--/span-->
@@ -121,6 +123,16 @@
                 <a tal:attributes="href announcement/getURL" tal:content="announcement/Title" />
               </li>
             </ul>
+          </div>
+        </div>
+        <div class="span4" tal:condition="context/mapFile">
+          <h2>Informational Map</h2>
+          <div class="well">
+            <div class='map_download'>
+              <a href="./@@display-file/mapFile"
+                 tal:attributes="href string:${context/absolute_url}/@@download/mapFile"
+                 class="btn">Download</a>
+            </div>
           </div>
         </div>
       </div>
