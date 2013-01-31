@@ -36,17 +36,12 @@
           Registration is closed
         </h4>
         <div class="btn-group">
-          <button class="btn" tal:condition="python: view.can_register">
-            <a href="#"
-              tal:attributes="href string:${context/absolute_url}/registration-form">Register for this event</a>
-          </button>
-          <button tal:condition="view/can_pay" class="btn">
-            <a tal:condition="view/can_pay"
-              tal:attributes="href string:${context/absolute_url}/@@pay-for-registration">Pay for event</a>
-          </button>
-          <button class="btn" tal:condition="python: view.can_req_reg_reminder">
-            <a tal:attributes="href string:${context/absolute_url}/@@reg-reminder">Request Registration Reminder</a>
-          </button>
+          <a href="#" class="btn" tal:condition="python: view.can_register"
+          tal:attributes="href string:${context/absolute_url}/registration-form">Register for this event</a>
+          <a tal:condition="view/can_pay" class="btn"
+            tal:attributes="href string:${context/absolute_url}/@@pay-for-registration">Pay for event</a>
+          <a class="btn" tal:condition="python: view.can_req_reg_reminder"
+             tal:attributes="href string:${context/absolute_url}/@@reg-reminder">Request Registration Reminder</a>
         </div>
       </div>
 
