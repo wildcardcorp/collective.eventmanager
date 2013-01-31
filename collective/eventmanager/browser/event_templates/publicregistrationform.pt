@@ -46,19 +46,22 @@
       (function($){
         $(document).ready(function(){
           $('a#regshowhidemap').click(function(){
-            $('div#regmap').toggle();
-            if($('div#regmap').css('display') == 'none') {
-              $(this).html('Show a Map of the Event');
+            if($('div#regmap').css('position') == 'absolute') {
+                $(this).html('Hide Map');
+                $('#regmap').css('position', '');
+                $('#regmap').css('left', '');
+                cgmap.config['default-cgmap'].map.layers[0].onMapResize()
             }
             else {
-              $(this).html('Hide Map');
+                $(this).html('Show a Map of the Event');
+                $('#regmap').css('position', 'absolute');
+                $('#regmap').css('left', '-99999px');
             }
           });
         });
 
-        setTimeout(function(){
-          $('#regmap').hide();
-        }, 1000);
+        $('#regmap').css('position', 'absolute');
+        $('#regmap').css('left', '-99999px');
       })(jQuery);
     </script>
 
