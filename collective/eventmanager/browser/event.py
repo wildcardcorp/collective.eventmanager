@@ -767,8 +767,10 @@ class PublicRegistrationForm(form.SchemaForm):
                 self.fields[fielddata['name']].field.context = self.context
 
         super(form.SchemaForm, self).updateWidgets()
-        self.widgets['noshow'].mode = 'hidden'
-        self.widgets['paid_fee'].mode = 'hidden'
+        if 'noshow' in self.widgets:
+            self.widgets['noshow'].mode = 'hidden'
+        if 'paid_fee' in self.widgets:
+            self.widgets['paid_fee'].mode = 'hidden'
 
     def updateFields(self):
         super(form.SchemaForm, self).updateFields()
