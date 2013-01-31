@@ -22,12 +22,18 @@ def _canAdd(folder, type_name):
 
 
 def _addSessionsFolder(emevent):
+    if 'sessions' in emevent:
+        return
+
     # add a folder to hold sessions
     id = emevent.invokeFactory('Folder', 'sessions', title="Sessions")
     _canAdd(emevent[id], 'Session')
 
 
 def _addSessionCalender(emevent):
+    if 'session-calendar' in emevent:
+        return
+
     # Add a collections object for a calendar if available.
     idval = emevent.invokeFactory('Topic', 'session-calendar',
                                   title="Session Calendar")
@@ -86,16 +92,21 @@ def addFoldersForEventFormsFolder(emevent, event):
 def checkEventForSessionsState(emevent, event):
     """If sessions are disabled then remove the sessions folder,
        they are enabled, then session folders should be added."""
-    ids = emevent.objectIds()
     if not emevent.enableSessions:
-        if 'sessions' in ids:
-            emevent.manage_delObjects(['sessions'])
-        if 'session-calendar' in ids:
-            emevent.manage_delObjects(['session-calendar'])
+        if 'sessions' in emevent:
+            try:
+                emevent.manage_delObjects(['sessions'])
+            except AttributeError:
+                pass
+        if 'session-calendar' in emevent:
+            try:
+                emevent.manage_delObjects(['session-calendar'])
+            except AttributeError:
+                pass
     else:
-        if 'sessions' not in ids:
+        if 'sessions' not in emevent:
             _addSessionsFolder(emevent)
-        if 'session-calendar' not in ids:
+        if 'session-calendar' not in emevent:
             _addSessionCalender(emevent)
 
 
