@@ -797,8 +797,9 @@ class PublicRegistrationForm(form.SchemaForm):
         settings['lat'] = float(coords[1])
         settings['zoom'] = 16
 
-        return "cgmap.state['" + self.MAP_CSS_CLASS + "'] = " \
-               + str(settings) + ";"
+        return "cgmap.state['default-cgmap'] = " + str(settings) + ";"
+        #return "cgmap.state['" + self.MAP_CSS_CLASS + "'] = " \
+        #       + str(settings) + ";"
 
 
 class EventCertificationView(BrowserView):
