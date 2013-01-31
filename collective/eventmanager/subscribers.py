@@ -14,6 +14,7 @@ from collective.eventmanager.utils import getNumApprovedAndConfirmed
 from collective.eventmanager.utils import executeUnderSpecialRole
 from collective.eventmanager.config import BASE_TYPE_NAME
 from collective.eventmanager.emailtemplates import sendEMail
+from Products.DCWorkflow.interfaces import IAfterTransitionEvent
 
 
 def _canAdd(folder, type_name):
@@ -161,6 +162,17 @@ def handleNewSession(sess, event):
     sess[id].setLocallyAllowedTypes(('News Item',))
 
 
-# XXX Need to subscribe to event publish
-# and auto publish contents of event
-# OR make sub items use parent workflow
+@grok.subscribe(IEMEvent, IAfterTransitionEvent)
+def handleEventTransition(em, event):
+    workflowTool = getToolByName(em, "portal_workflow")
+    workflow = event.workflow
+
+    for obj in em.values():
+        chain = workflowTool.getChainFor(em)
+        if len(chain) == 0:
+            continue
+        workflow_id = chain[0]
+        if event.workflow.id == workflow_id:
+            # we know we can auto-transition
+            if workflow.isActionSupported(obj, event.transition.id):
+                workflowTool.doActionFor(obj, event.transition.id)
