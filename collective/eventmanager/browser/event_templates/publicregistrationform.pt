@@ -15,10 +15,10 @@
   <metal:block fill-slot="main">
 
     <h1 class="" tal:content="view/label | nothing" />
-    <div class="em">
-      <div class="alert">
+    <div class="em" tal:define="help_text context/registrationHelpText/output|string:">
+      <div class="alert" tal:condition="help_text">
         <strong>Read before you begin...</strong>
-        <div class="regHelpText" tal:content="structure context/registrationHelpText/output|string:" />
+        <div class="regHelpText" tal:content="structure help_text" />
       </div>
       <tal:map tal:condition="context/location|nothing">
         <div>
