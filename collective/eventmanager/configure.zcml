@@ -13,6 +13,8 @@
   <include file="permissions.zcml" />
   <grok:grok package="." />
 
+  <adapter factory=".calendar.EMEventSupport" />
+
   <genericsetup:registerProfile
       name="default"
       title="Event Manager"
