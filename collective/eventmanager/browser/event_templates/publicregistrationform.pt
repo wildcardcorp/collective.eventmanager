@@ -10,6 +10,10 @@
       tal:attributes="href string:${context/portal_url}/++theme++em/bootstrap.css">
   <link href="++resource++brstatic/bootstrap.css" rel="stylesheet"
       tal:attributes="href string:${context/portal_url}/++theme++em/bootstrap-custom.css">
+  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 </metal:css>
 
   <metal:block fill-slot="main">
