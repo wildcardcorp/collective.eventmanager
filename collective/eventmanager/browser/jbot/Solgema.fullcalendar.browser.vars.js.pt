@@ -37,5 +37,6 @@
     editable: false,
     disableDragging: true,
     disableResizing: false,
+    ignoreTimezone: false
   }
 </metal:javascript>
