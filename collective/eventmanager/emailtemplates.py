@@ -1,8 +1,9 @@
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from email.Header import Header
 from email.mime.multipart import MIMEMultipart
-from mako.template import Template
+from mako.template import Template as MakoTemplate
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.utils import getToolByName
 from zope import schema
@@ -11,6 +12,13 @@ from zope.component import getUtility
 from zope.interface import Interface
 
 from collective.eventmanager.registration import generateRegistrationHash
+
+
+def Template(txt):
+    return MakoTemplate(txt,
+        input_encoding='utf-8',
+        output_encoding='utf-8',
+        encoding_errors='replace')
 
 
 class IEMailTemplateSettings(Interface):
@@ -151,13 +159,13 @@ If you'd like to cancel your registration, please visit the following URL:
     messagetemplate = Template(mbody)
 
     # apply results of event template render to site wide templates
-    messageresult = messagetemplate.render(emevent=emevent)
+    messageresult = messagetemplate.render(emevent=emevent).decode('utf-8')
     messagehtml = htmltemplate.render(
-                    emevent=emevent,
-                    event_content=messageresult)
+        emevent=emevent,
+        event_content=messageresult)
     messageplain = plaintemplate.render(
-                    emevent=emevent,
-                    event_content=messageresult)
+        emevent=emevent,
+        event_content=messageresult)
 
     if additional_html_body is not None:
         messagehtml += additional_html_body
@@ -168,10 +176,10 @@ If you'd like to cancel your registration, please visit the following URL:
 
     # create a multipart message to hold both a text and html version
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = subject
-    msg['From'] = mfrom
-    msgpart1 = MIMEText(messageplain, 'plain')
-    msgpart2 = MIMEText(messagehtml, 'html')
+    msg['Subject'] = Header(subject.decode('utf-8'), 'utf-8')
+    msg['From'] = mfrom.encode('ascii')
+    msgpart1 = MIMEText(messageplain, 'plain', 'utf-8')
+    msgpart2 = MIMEText(messagehtml, 'html', 'utf-8')
     msg.attach(msgpart1)
     msg.attach(msgpart2)
 
@@ -187,7 +195,7 @@ If you'd like to cancel your registration, please visit the following URL:
 
     # send a separate message to each address
     for address in mto:
-        msg['To'] = address
+        msg['To'] = address.encode('ascii')
         mh.send(msg.as_string(), address, mfrom, subject)
         #mh.send(msg)
 
