@@ -1,5 +1,5 @@
 from DateTime import DateTime
-from mako.template import Template
+from collective.eventmanager.utils import Template
 from plone.registry.interfaces import IRegistry
 from plone.subrequest import subrequest
 from Products.CMFCore.utils import getToolByName
@@ -95,7 +95,7 @@ def generateCertificate(registrations, portal_url, underlines_for_empty_values,
         return uri
 
 
-    html = StringIO.StringIO(renderedcertificatepdfs)
+    html = StringIO.StringIO(renderedcertificatepdfs.decode('utf-8'))
     pisa.pisaDocument(html, pdf, raise_exception=True, link_callback=fetchResource)
     assert pdf.len != 0, 'PDF generation utility returned empty PDF!'
     html.close()

@@ -3,8 +3,16 @@ from AccessControl import getSecurityManager
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import setSecurityManager
 from AccessControl.User import UnrestrictedUser as BaseUnrestrictedUser
+from mako.template import Template as MakoTemplate
 
 from collective.eventmanager.registration import IRegistration
+
+
+def Template(txt):
+    return MakoTemplate(txt,
+        input_encoding='utf-8',
+        output_encoding='utf-8',
+        encoding_errors='replace')
 
 
 def findRegistrationObject(context, email):

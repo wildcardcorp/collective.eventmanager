@@ -1,9 +1,7 @@
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
-from email.Header import Header
 from email.mime.multipart import MIMEMultipart
-from mako.template import Template as MakoTemplate
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.utils import getToolByName
 from zope import schema
@@ -12,13 +10,7 @@ from zope.component import getUtility
 from zope.interface import Interface
 
 from collective.eventmanager.registration import generateRegistrationHash
-
-
-def Template(txt):
-    return MakoTemplate(txt,
-        input_encoding='utf-8',
-        output_encoding='utf-8',
-        encoding_errors='replace')
+from collective.eventmanager.utils import Template
 
 
 class IEMailTemplateSettings(Interface):
@@ -176,7 +168,7 @@ If you'd like to cancel your registration, please visit the following URL:
 
     # create a multipart message to hold both a text and html version
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = Header(subject.decode('utf-8'), 'utf-8')
+    msg['Subject'] = subject.decode('utf-8')
     msg['From'] = mfrom.encode('ascii')
     msgpart1 = MIMEText(messageplain, 'plain', 'utf-8')
     msgpart2 = MIMEText(messagehtml, 'html', 'utf-8')

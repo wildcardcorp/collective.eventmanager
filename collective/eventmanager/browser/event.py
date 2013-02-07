@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from DateTime import DateTime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from mako.template import Template
 import os
 from persistent.dict import PersistentDict
 import re
@@ -39,6 +38,7 @@ from collective.eventmanager.interfaces import ILayer
 from collective.eventmanager.registration import IRegistration
 from collective.eventmanager.registration import generateRegistrationHash
 from collective.eventmanager.utils import findRegistrationObject
+from collective.eventmanager.utils import Template
 
 
 class View(grok.View):
@@ -619,11 +619,11 @@ class EventRosterView(BrowserView):
 
         mh = getToolByName(self.context, 'MailHost')
         msg = MIMEMultipart('alternative')
-        msgpart1 = MIMEText(renderedplain, 'plain')
-        msgpart2 = MIMEText(renderedhtml, 'html')
+        msgpart1 = MIMEText(renderedplain, 'plain', 'utf-8')
+        msgpart2 = MIMEText(renderedhtml, 'html', 'utf-8')
         msg.attach(msgpart1)
         msg.attach(msgpart2)
-        msg['Subject'] = renderedsubject
+        msg['Subject'] = renderedsubject.decode('utf-8')
         msg['From'] = postitems[fromkey]
         msg['To'] = postitems[tokey]
         try:
