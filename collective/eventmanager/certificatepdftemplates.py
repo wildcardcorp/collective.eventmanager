@@ -58,16 +58,16 @@ def generateCertificate(registrations, portal_url, underlines_for_empty_values,
     certificatepdftemplate = Template(certificatepdftemplatetext)
     renderedcertificatepdfs = certificatepdftemplate.render(
             registrations=registrations,
-            portal_url=portal_url,
+            portal_url=portal_url.decode('utf-8'),
             underlines_for_empty_values=underlines_for_empty_values,
-            certtitle=certtitle,
-            certsubtitle=certsubtitle,
-            certprenamedesc=certprenamedesc,
-            certpostnamedesc=certpostnamedesc,
-            certawardtitle=certawardtitle,
-            certdate=certdate,
-            certsigdesc=certsigdesc,
-            certborder=certborder
+            certtitle=certtitle.decode('utf-8'),
+            certsubtitle=certsubtitle.decode('utf-8'),
+            certprenamedesc=certprenamedesc.decode('utf-8'),
+            certpostnamedesc=certpostnamedesc.decode('utf-8'),
+            certawardtitle=certawardtitle.decode('utf-8'),
+            certdate=certdate.decode('utf-8'),
+            certsigdesc=certsigdesc.decode('utf-8'),
+            certborder=certborder.decode('utf-8')
         )
 
     pdf = StringIO.StringIO()
@@ -95,7 +95,7 @@ def generateCertificate(registrations, portal_url, underlines_for_empty_values,
         return uri
 
 
-    html = StringIO.StringIO(renderedcertificatepdfs.decode('utf-8'))
+    html = StringIO.StringIO(renderedcertificatepdfs)
     pisa.pisaDocument(html, pdf, raise_exception=True, link_callback=fetchResource)
     assert pdf.len != 0, 'PDF generation utility returned empty PDF!'
     html.close()
